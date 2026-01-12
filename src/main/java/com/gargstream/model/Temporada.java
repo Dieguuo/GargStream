@@ -23,5 +23,5 @@ public class Temporada {
 
     //una temporada puede tener muchos capítulos
     @OneToMany
-    private List<Copitulo> capitulos;
+    private List<Capitulo> capitulos;
 }

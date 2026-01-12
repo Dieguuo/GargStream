@@ -60,3 +60,6 @@ Thumbs.db
 # Ignorar logs (registros de errores)
 logs/
 *.log
+
+#ignorar contenido-fisico
+contenido-fisico/
