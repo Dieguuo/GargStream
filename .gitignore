@@ -1,0 +1,62 @@
+HELP.md
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+
+
+### Configuración GargStream ###
+
+# Ignorar la base de datos local H2 (IMPORTANTE)
+# Si no ignoras esto, subirás un archivo binario que cambia cada segundo
+# y tendrás conflictos siempre.
+data/
+*.mv.db
+*.trace.db
+
+# Ignorar las carpetas de subida de archivos
+# GitHub no permite archivos de más de 100MB. Si intentas subir una película,
+# el push fallará. Además, no queremos llenar la nube de pruebas.
+uploads/
+media/
+videos/
+imagenes/
+
+# Ignorar archivos del sistema y del IDE (por si acaso)
+.idea/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Ignorar logs (registros de errores)
+logs/
+*.log
