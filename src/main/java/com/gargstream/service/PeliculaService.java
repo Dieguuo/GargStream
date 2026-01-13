@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
 
 import java.util.stream.Collectors;
 
@@ -28,7 +28,7 @@ public class PeliculaService {
     public Pelicula guardarPelicula(String titulo, MultipartFile archivo){
         //guardar el archivo físico
         String nombreArchivo = almacenamientoService.store(archivo);
-        String urlVideo = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/archivos/").path(nombreArchivo).toUriString();
+        String urlVideo = "/api/archivos/" + nombreArchivo;
 
         //crear el objeto película
         Pelicula pelicula = new Pelicula();

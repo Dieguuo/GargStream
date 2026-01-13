@@ -27,15 +27,9 @@ public class AlmacenamientoController {
     @PostMapping("/subir")
     public Map<String, String> subirArchivo(@RequestParam("fichero") MultipartFile fichero){
 
-        // ¡OJO! Esto es solo para probar. Luego bórralo para no mostrar tu clave en los logs.
-        System.out.println("--- PRUEBA DE SEGURIDAD ---");
-        System.out.println("Mi clave de TMDB es: " + apiKeyPrueba);
-        System.out.println("---------------------------");
-
-
         String nombreArchivo = almacenamientoService.store(fichero);
         //crear la url pública
-        String url = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/archivos/").path(nombreArchivo).toUriString();
+        String url = "/api/archivos/" + nombreArchivo;
         return Map.of("url", url);
     }
 
@@ -52,13 +46,22 @@ public class AlmacenamientoController {
 
         }
 
+        // si Java no detecta el tipo y acaba en .mp4 fuerzo que es video
+        if (contentType == null) {
+            if (nombreArchivo.toLowerCase().endsWith(".mp4")) {
+                contentType = "video/mp4";
+            } else {
+                contentType = "application/octet-stream";
+            }
+        }
+
         //si no se detecta se pone binario (genérico)
         if (contentType == null){
             contentType = "application/octet-stream";
         }
 
         //devolver el archivo tal cual
-        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,"inline; filename=\"" + recurso.getFilename() + "\"").body(recurso);
+        return ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, contentType).header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + recurso.getFilename() + "\"").body(recurso);
     }
 
 }

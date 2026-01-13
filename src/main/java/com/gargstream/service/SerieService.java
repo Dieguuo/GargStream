@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
 
 import java.util.ArrayList;
 import java.util.stream.Collectors;
@@ -110,8 +110,13 @@ public class SerieService {
         //buscar la serie en la base de datos
         Serie serie = (Serie) contenidoRepository.findById(idSerie).orElseThrow(() -> new RuntimeException("No se ha encontrado la serie"));
 
+        //por si la lsita es nula la inicializo para evitar errores
+        if (serie.getTemporadas() == null) {
+            serie.setTemporadas(new ArrayList<>());
+        }
+
         //busca si ya existe la temporada y si no la crea
-        Temporada temporada = serie.getTemporadas().stream().filter(t -> t.getNumeroTemporada().equals(numCapitulo)).findFirst().orElseGet(() -> {
+        Temporada temporada = serie.getTemporadas().stream().filter(t -> t.getNumeroTemporada().equals(numTemporada)).findFirst().orElseGet(() -> {
             Temporada nueva = new Temporada();
             nueva.setNumeroTemporada(numTemporada);
             nueva.setSerie(serie);
@@ -121,7 +126,7 @@ public class SerieService {
 
         //guardar el archivo
         String nombreArchivo = almacenamientoService.store(archivo);
-        String urlvideo = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/archivos/").path(nombreArchivo).toUriString();
+        String urlvideo = "/api/archivos/" + nombreArchivo;
 
         //crear el objeto cap
         Capitulo capitulo = new Capitulo();

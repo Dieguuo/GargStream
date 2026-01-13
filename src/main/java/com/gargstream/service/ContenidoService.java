@@ -5,7 +5,7 @@ import com.gargstream.repository.ContenidoRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
 
 @Service
 @AllArgsConstructor
@@ -19,7 +19,7 @@ public class ContenidoService {
         //guardar el archivo físico en el disco
         String nombreArchivo = almacenamientoService.store(archivo);
         //url para verlo
-        String urlVideo = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/archivos/").path(nombreArchivo).toUriString();
+        String urlVideo = "/api/archivos/" + nombreArchivo;
         //crear el objeto para la db
         VideoPersonal video = new VideoPersonal();
         video.setTitulo(titulo);

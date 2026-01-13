@@ -5,19 +5,61 @@
   <title>GargStream - Inicio</title>
   <style>
     body {
-        background-color: #141414; /* Negro Netflix */
+        background-color: #141414;
         color: white;
         font-family: Arial, sans-serif;
         margin: 0;
         padding: 20px;
     }
-    h1 { color: #e50914; /* Rojo Netflix */ }
 
+    /* CABECERA FLEXIBLE */
+    .header-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .brand-section h1 { margin: 0; color: #e50914; }
+    .brand-section p { margin: 5px 0 0 0; color: #aaa; }
+
+    /* BUSCADOR */
+    .search-box {
+        flex: 1;
+        max-width: 400px;
+        position: relative;
+        margin: 0 20px;
+    }
+    .search-input {
+        width: 100%;
+        padding: 12px 15px;
+        background-color: #000;
+        border: 1px solid #333;
+        color: white;
+        border-radius: 4px;
+        font-size: 1em;
+        padding-left: 35px;
+    }
+    .search-input:focus {
+        border-color: #e50914;
+        outline: none;
+    }
+    .search-icon {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #aaa;
+    }
+
+    /* GRID */
     .grid-container {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Rejilla automática */
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
         gap: 20px;
-        padding: 20px;
+        padding: 20px 0;
     }
 
     .card {
@@ -26,16 +68,18 @@
         overflow: hidden;
         transition: transform 0.3s;
         cursor: pointer;
+        position: relative;
     }
 
     .card:hover {
-        transform: scale(1.05); /* Efecto zoom al pasar el ratón */
+        transform: scale(1.05);
+        z-index: 2;
     }
 
     .card img {
         width: 100%;
         height: 300px;
-        object-fit: cover; /* Ajusta la imagen sin deformarla */
+        object-fit: cover;
     }
 
     .info {
@@ -89,116 +133,170 @@
         align-items: center;
         justify-content: center;
         font-size: 1.2em;
-        opacity: 0; /* Invisible por defecto */
+        opacity: 0;
         transition: opacity 0.3s;
         z-index: 10;
     }
 
     .card:hover .btn-delete {
-        opacity: 1; /* Visible al pasar el ratón */
+        opacity: 1;
     }
 
     .btn-delete:hover {
         background-color: red;
     }
 
-    /* Necesario para posicionar el botón absoluto */
-    .card {
-        position: relative;
-        /* ... el resto de estilos que ya tenías en .card ... */
+    .btn-admin {
+        background: #333;
+        padding: 10px 15px;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        border: 1px solid #555;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        transition: background 0.3s;
+    }
+    .btn-admin:hover {
+        background: #444;
+        border-color: #777;
+    }
+
+    #no-results {
+        display: none;
+        text-align: center;
+        width: 100%;
+        margin-top: 50px;
+        color: #777;
+        font-size: 1.5em;
     }
   </style>
 </head>
 <body>
 
-<h1>GargStream</h1>
-<p>Tu catálogo privado</p>
+<div class="header-container">
+  <div class="brand-section">
+    <h1>GargStream</h1>
+    <p style="margin: 5px 0 0 0; color: #aaa;">Tu catálogo privado</p>
+  </div>
 
-<div class="grid-container" id="catalogo">
+  <div class="search-box">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="buscador" class="search-input" placeholder="Buscar películas, series...">
+  </div>
+
+  <a href="admin.html" class="btn-admin">
+    ⚙️ Gestionar Contenido
+  </a>
 </div>
 
+<div class="grid-container" id="catalogo"></div>
+<div id="no-results">No se encontraron coincidencias 😞</div>
+
 <script>
-  // Al cargar la página, pedimos los datos a la API
+  let todosLosContenidos = [];
+
+  // --- 1. CARGA INICIAL ---
   fetch('/api/public/catalogo')
       .then(response => response.json())
       .then(contenidos => {
-          const contenedor = document.getElementById('catalogo');
+          todosLosContenidos = contenidos;
+          renderizarCatalogo(contenidos);
+      })
+      .catch(error => console.error('Error cargando catálogo:', error));
 
-          contenidos.forEach(contenido => {
-              const card = document.createElement('div');
-              card.className = 'card';
+  // --- 2. RENDERIZAR TARJETAS ---
+  function renderizarCatalogo(lista) {
+      const contenedor = document.getElementById('catalogo');
+      const mensajeVacio = document.getElementById('no-results');
+      contenedor.innerHTML = '';
 
-              // 1. IMAGEN: Si no tiene, ponemos una gris
-              const imagen = contenido.rutaCaratula ? contenido.rutaCaratula : 'https://via.placeholder.com/200x300?text=Sin+Imagen';
+      if(lista.length === 0) {
+          mensajeVacio.style.display = 'block';
+          return;
+      } else {
+          mensajeVacio.style.display = 'none';
+      }
 
-              // 2. LÓGICA INTELIGENTE: ¿Es Peli, Serie o Vídeo?
-              let tipo = "Video Personal";
-              let link = contenido.rutaVideo; // Por defecto asumimos que es un archivo
-              let textoBoton = "Ver Ahora";
-              let target = '_blank'; // Los vídeos se abren en pestaña nueva
+      lista.forEach(contenido => {
+          const card = document.createElement('div');
+          card.className = 'card';
 
-              // SI NO TIENE RUTA DE VIDEO -> ES UNA SERIE (Contenedor)
-              if (!contenido.rutaVideo) {
-                  tipo = "Serie TV";
-                  // Cambiamos el link para ir a la página de detalles
-                  link = `/ver_serie.html?id=${contenido.id}`;
-                  textoBoton = "Ver Capítulos";
-                  target = '_self'; // Las series se abren en la misma pestaña (navegación)
-              }
-              // SI TIENE DIRECTOR -> ES UNA PELÍCULA
-              else if (contenido.director) {
-                  tipo = "Película";
-              }
+          const imagen = contenido.rutaCaratula ? contenido.rutaCaratula : 'https://via.placeholder.com/200x300?text=Sin+Imagen';
 
-             // 3. PINTAR LA TARJETA
-              card.innerHTML = `
-                  <button class="btn-delete" onclick="borrarContenido(${contenido.id}, this)" title="Borrar">
-                      &times;
-                  </button>
+          let tipo = "Video Personal";
 
+          // --- AQUÍ ESTÁ EL CAMBIO CLAVE ---
+          // Antes: Pelis -> Vídeo directo / Series -> ver_serie.html
+          // Ahora: TODO -> ver_detalle.html
+          let link = `/ver_detalle.html?id=${contenido.id}`;
+
+          let textoBoton = "Ver Ficha"; // Texto genérico para todos
+          let target = '_self'; // Se abre en la misma pestaña
+
+          if (!contenido.rutaVideo) {
+              tipo = "Serie TV";
+              textoBoton = "Ver Capítulos";
+          } else if (contenido.director) {
+              tipo = "Película";
+              textoBoton = "Ver Película";
+          }
+
+          card.innerHTML = `
+              <button class="btn-delete" onclick="borrarContenido(${contenido.id}, this)" title="Borrar">
+                  &times;
+              </button>
+
+              <a href="${link}" style="text-decoration:none; color:inherit;">
                   <img src="${imagen}" alt="${contenido.titulo}">
                   <div class="info">
                       <div class="titulo" title="${contenido.titulo}">${contenido.titulo}</div>
                       <div class="tipo">${tipo}</div>
                       <div style="font-size:0.9em; color: #ffd700;">⭐ ${contenido.puntuacionMedia || '-'}</div>
 
-                      <a href="${link}" target="${target}" class="btn-accion">
+                      <div class="btn-accion">
                           ${textoBoton}
-                      </a>
+                      </div>
                   </div>
-              `;
+              </a>
+          `;
 
-              contenedor.appendChild(card);
-          });
-      })
-      .catch(error => console.error('Error cargando catálogo:', error));
+          contenedor.appendChild(card);
+      });
+  }
 
+  // --- 3. BUSCADOR ---
+  const inputBuscador = document.getElementById('buscador');
+  inputBuscador.addEventListener('keyup', (e) => {
+      const texto = e.target.value.toLowerCase();
+      const filtrados = todosLosContenidos.filter(item => item.titulo.toLowerCase().includes(texto));
+      renderizarCatalogo(filtrados);
+  });
+
+  // --- 4. BORRAR ---
   function borrarContenido(id, boton) {
-            // Preguntar para no borrar por error
-            if(!confirm("¿Seguro que quieres borrar esto? Si es una serie, se borrarán todos sus capítulos.")) {
-                return;
+        // Importante: detener la propagación para no entrar en la ficha al borrar
+        event.preventDefault();
+        event.stopPropagation();
+
+        if(!confirm("¿Seguro que quieres borrar esto?")) return;
+
+        fetch('/api/admin/eliminar/' + id, { method: 'DELETE' })
+        .then(response => {
+            if(response.ok) {
+                todosLosContenidos = todosLosContenidos.filter(c => c.id !== id);
+                const tarjeta = boton.parentElement;
+                tarjeta.style.transition = "transform 0.5s, opacity 0.5s";
+                tarjeta.style.transform = "scale(0)";
+                tarjeta.style.opacity = "0";
+                setTimeout(() => tarjeta.remove(), 500);
+            } else {
+                alert("Error al borrar.");
             }
-
-            // Llamada al backend
-            fetch('/api/admin/eliminar/' + id, {
-                method: 'DELETE'
-            })
-            .then(response => {
-                if(response.ok) {
-                    // Si se borró bien, quitamos la tarjeta de la pantalla visualmente
-                    // El truco: 'boton' es la X, su padre es la 'card'
-                    const tarjeta = boton.parentElement;
-                    tarjeta.style.transition = "transform 0.5s, opacity 0.5s";
-                    tarjeta.style.transform = "scale(0)";
-                    tarjeta.style.opacity = "0";
-
-                    setTimeout(() => tarjeta.remove(), 500); // Esperar a la animación y borrar
-                } else {
-                    alert("Error al borrar.");
-                }
-            })
-            .catch(error => console.error(error));
-        }
+        })
+        .catch(error => console.error(error));
+    }
 </script>
 
 </body>
