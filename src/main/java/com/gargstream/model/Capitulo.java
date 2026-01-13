@@ -1,5 +1,6 @@
 package com.gargstream.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -29,5 +30,6 @@ public class Capitulo {
     //muchos capitulos solo a una temporada
     @ManyToOne
     @JoinColumn(name = "temporada_id")
+    @JsonIgnore//evita el bucle infinito
     private Temporada temporada;
 }

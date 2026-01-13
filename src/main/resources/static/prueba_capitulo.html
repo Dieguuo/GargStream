@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Subir Capítulo - GargStream</title>
+</head>
+<body>
+<h1>Añadir Capítulo a una Serie</h1>
+
+<form method="POST" action="/api/admin/nuevo-capitulo" enctype="multipart/form-data">
+
+    <label>1. ID de la Serie (Mira en H2 o el JSON anterior):</label><br>
+    <input type="number" name="idSerie" required placeholder="Ej: 1"/><br><br>
+
+    <label>2. Número de Temporada:</label><br>
+    <input type="number" name="numTemporada" required value="1"/><br><br>
+
+    <label>3. Número de Capítulo:</label><br>
+    <input type="number" name="numCapitulo" required value="1"/><br><br>
+
+    <label>4. Título del Capítulo:</label><br>
+    <input type="text" name="titulo" placeholder="Ej: Piloto" /><br><br>
+
+    <label>5. Archivo de Vídeo (.mp4):</label><br>
+    <input type="file" name="archivo" required /><br><br>
+
+    <button type="submit">Subir Capítulo</button>
+</form>
+</body>
+</html>

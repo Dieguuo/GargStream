@@ -21,4 +21,9 @@ public class Serie extends Contenido{
     //hacer la relación, ya que una serie puede tener muchas temporadas
     @OneToMany(mappedBy = "serie", cascade = CascadeType.ALL)//casacade all para que si se borra la serie se borren las temporadas.
     private List<Temporada> temporadas;
+
+    //puntuacion media
+    private Double puntuacionMedia;
+
+
 }

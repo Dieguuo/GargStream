@@ -31,6 +31,17 @@ public class DetallesTMDB {
     //director
     private Creditos credits;
 
+
+    //DATOS SERIES
+    @JsonProperty("first_air_date")
+    private String fechaInicio; //primer cap
+
+    @JsonProperty("last_air_date")
+    private String fechaFin; //último cap
+
+    @JsonProperty("created_by")
+    private List<Creador> creadores; //lista de los nombres de los creadores
+
     @Data
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Genero{
@@ -48,6 +59,12 @@ public class DetallesTMDB {
     public static class Personal{
         private String job; //el director, escritor...
         private String name; //el nombre real
+    }
+
+    @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class Creador{
+        private String name;
     }
 
 }

@@ -31,5 +31,11 @@ public class RespuestaTMDB {
         //el id en la db de tmdb
         @JsonProperty("id")
         private Long idTmdb;
+
+        //para la serie
+        @JsonProperty("name")
+        private String name;
+
     }
+
 }

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Ver Serie</title>
+  <style>
+    body { background-color: #141414; color: white; font-family: Arial, sans-serif; padding: 20px; }
+    .header { display: flex; gap: 20px; margin-bottom: 30px; flex-wrap: wrap; }
+    .poster { width: 200px; border-radius: 8px; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+    .info h1 { margin: 0; color: #e50914; font-size: 2.5em;}
+    .info p { color: #ccc; max-width: 600px; line-height: 1.5; }
+
+    /* ESTILO PARA LOS DESPLEGABLES (ACORDEÓN) */
+    details {
+        background-color: #333;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        overflow: hidden;
+    }
+
+    summary {
+        background-color: #222;
+        padding: 15px;
+        font-weight: bold;
+        font-size: 1.2em;
+        cursor: pointer;
+        list-style: none; /* Quita el triángulo por defecto */
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    /* Pequeño truco para poner un icono + o - */
+    summary::after {
+        content: '+';
+        font-size: 1.5em;
+        color: #aaa;
+    }
+    details[open] summary::after {
+        content: '-';
+    }
+
+    summary:hover { background-color: #2a2a2a; }
+
+    /* LISTA DE CAPÍTULOS */
+    .capitulos-list {
+        padding: 0;
+        margin: 0;
+    }
+
+    .capitulo-card {
+        padding: 15px 20px;
+        border-top: 1px solid #444;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: 0.2s;
+    }
+    .capitulo-card:hover { background-color: #444; }
+
+    .btn-play {
+        background-color: #e50914;
+        color: white;
+        text-decoration: none;
+        padding: 8px 15px;
+        border-radius: 4px;
+        font-weight: bold;
+        font-size: 0.9em;
+    }
+    .btn-play:hover { background-color: #f40612; }
+
+    .volver { display: inline-block; margin-bottom: 20px; color: #aaa; text-decoration: none; }
+    .volver:hover { color: white; }
+  </style>
+</head>
+<body>
+
+<a href="index.html" class="volver">← Volver al Catálogo</a>
+
+<div id="detalle-serie">
+  <p style="text-align:center; margin-top:50px;">Cargando datos...</p>
+</div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+
+  if(id) {
+      fetch('/api/public/contenido/' + id)
+          .then(response => response.json())
+          .then(serie => {
+              const contenedor = document.getElementById('detalle-serie');
+
+              // 1. CABECERA
+              let html = `
+                  <div class="header">
+                      <img class="poster" src="${serie.rutaCaratula || 'https://via.placeholder.com/200'}" >
+                      <div class="info">
+                          <h1>${serie.titulo}</h1>
+                          <p><strong>Creador:</strong> ${serie.creador || 'Desconocido'}</p>
+                          <p><strong>Género:</strong> ${serie.genero || 'Varios'}</p>
+                          <p>${serie.sinopsis || 'Sin descripción'}</p>
+                          <p>⭐ ${serie.puntuacionMedia}</p>
+                      </div>
+                  </div>
+                  <h2>Episodios</h2>
+              `;
+
+              // 2. LÓGICA DE FUSIÓN Y ORDENACIÓN (La Magia)
+              if (serie.temporadas && serie.temporadas.length > 0) {
+
+                  // A) Agrupar capitulos por número de temporada
+                  // Esto soluciona el problema de tener "Temporada 1" repetida 3 veces
+                  const temporadasMap = {};
+
+                  serie.temporadas.forEach(temp => {
+                      const num = temp.numeroTemporada;
+                      if (!temporadasMap[num]) {
+                          temporadasMap[num] = [];
+                      }
+                      // Añadimos los capítulos de esta temporada al grupo
+                      temporadasMap[num].push(...temp.capitulos);
+                  });
+
+                  // B) Iterar las temporadas ordenadas (1, 2, 3...)
+                  const numerosTemporadas = Object.keys(temporadasMap).sort((a, b) => a - b);
+
+                  numerosTemporadas.forEach(numTemp => {
+                      const capitulos = temporadasMap[numTemp];
+
+                      // C) Ordenar los capítulos (1, 2, 3...)
+                      capitulos.sort((a, b) => a.numeroCapitulo - b.numeroCapitulo);
+
+                      // D) Crear el desplegable (<details>)
+                      // El atributo 'open' en el primero hace que la Temp 1 salga abierta
+                      const isOpen = (numTemp == numerosTemporadas[0]) ? 'open' : '';
+
+                      html += `
+                          <details ${isOpen}>
+                              <summary>Temporada ${numTemp}</summary>
+                              <div class="capitulos-list">
+                      `;
+
+                      capitulos.forEach(cap => {
+                          html += `
+                              <div class="capitulo-card">
+                                  <div>
+                                      <strong>${cap.numeroCapitulo}. ${cap.titulo || 'Episodio ' + cap.numeroCapitulo}</strong>
+                                  </div>
+                                  <a href="${cap.rutaVideo}" class="btn-play" target="_blank">▶ Reproducir</a>
+                              </div>
+                          `;
+                      });
+
+                      html += `
+                              </div>
+                          </details>
+                      `;
+                  });
+
+              } else {
+                  html += "<p>No hay capítulos disponibles todavía.</p>";
+              }
+
+              contenedor.innerHTML = html;
+          })
+          .catch(e => {
+              console.error(e);
+              document.getElementById('detalle-serie').innerHTML = "<p>Error al cargar la serie. Revisa la consola.</p>";
+          });
+  }
+</script>
+
+</body>
+</html>
