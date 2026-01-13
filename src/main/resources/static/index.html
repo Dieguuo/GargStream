@@ -73,6 +73,40 @@
     .btn-accion:hover {
         background: #f40612;
     }
+
+    .btn-delete {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: rgba(0, 0, 0, 0.7);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2em;
+        opacity: 0; /* Invisible por defecto */
+        transition: opacity 0.3s;
+        z-index: 10;
+    }
+
+    .card:hover .btn-delete {
+        opacity: 1; /* Visible al pasar el ratón */
+    }
+
+    .btn-delete:hover {
+        background-color: red;
+    }
+
+    /* Necesario para posicionar el botón absoluto */
+    .card {
+        position: relative;
+        /* ... el resto de estilos que ya tenías en .card ... */
+    }
   </style>
 </head>
 <body>
@@ -116,8 +150,12 @@
                   tipo = "Película";
               }
 
-              // 3. PINTAR LA TARJETA
+             // 3. PINTAR LA TARJETA
               card.innerHTML = `
+                  <button class="btn-delete" onclick="borrarContenido(${contenido.id}, this)" title="Borrar">
+                      &times;
+                  </button>
+
                   <img src="${imagen}" alt="${contenido.titulo}">
                   <div class="info">
                       <div class="titulo" title="${contenido.titulo}">${contenido.titulo}</div>
@@ -134,6 +172,33 @@
           });
       })
       .catch(error => console.error('Error cargando catálogo:', error));
+
+  function borrarContenido(id, boton) {
+            // Preguntar para no borrar por error
+            if(!confirm("¿Seguro que quieres borrar esto? Si es una serie, se borrarán todos sus capítulos.")) {
+                return;
+            }
+
+            // Llamada al backend
+            fetch('/api/admin/eliminar/' + id, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if(response.ok) {
+                    // Si se borró bien, quitamos la tarjeta de la pantalla visualmente
+                    // El truco: 'boton' es la X, su padre es la 'card'
+                    const tarjeta = boton.parentElement;
+                    tarjeta.style.transition = "transform 0.5s, opacity 0.5s";
+                    tarjeta.style.transform = "scale(0)";
+                    tarjeta.style.opacity = "0";
+
+                    setTimeout(() => tarjeta.remove(), 500); // Esperar a la animación y borrar
+                } else {
+                    alert("Error al borrar.");
+                }
+            })
+            .catch(error => console.error(error));
+        }
 </script>
 
 </body>

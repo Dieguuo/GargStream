@@ -73,6 +73,14 @@ public class AdminController {
         return ResponseEntity.ok(capitulo);
     }
 
+    //borrar archivos
+    @DeleteMapping("/eliminar/{id}")
+    public ResponseEntity<Void> eliminarContenido(@PathVariable Long id){
+
+        contenidoService.eliminarContenido(id);
+        return ResponseEntity.noContent().build();
+    }
+
 
 
 

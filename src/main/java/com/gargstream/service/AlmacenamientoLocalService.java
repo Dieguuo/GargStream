@@ -1,5 +1,6 @@
 package com.gargstream.service;
 
+import com.gargstream.exception.FormatoInvalidoException;
 import com.gargstream.exception.StorageException;
 import com.gargstream.exception.StorageFileNotFoundException;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,6 +47,17 @@ public class AlmacenamientoLocalService implements AlmacenamientoService{
             if(archivo.isEmpty()){
                 throw new StorageException("Error. El archivo está vacío");
             }
+
+            //validar el tipo de archivo
+            String tipoContenido = archivo.getContentType();
+            //si no es un vídeo lanzo la excepción
+            if(tipoContenido == null || !tipoContenido.startsWith("video/")){
+                throw new FormatoInvalidoException("Formato no válido: "+tipoContenido+". Solo vídeo");
+
+            }
+
+
+
             //obtener el nombre original
             String nombreArchivo = archivo.getOriginalFilename();
             //construir la ruta de destino
@@ -85,7 +97,18 @@ public class AlmacenamientoLocalService implements AlmacenamientoService{
 
 
     @Override
-    public void deleteAll(){
+    public void delete(String nombreArchivo){
+        try {
+            Path archivo = rootLocation.resolve(nombreArchivo);
+            //borrar el archivo si existe
+            Files.deleteIfExists(archivo);
+        } catch (IOException e){
+            System.err.println("No se pudo borrar el archivo físico: " + nombreArchivo);
+            e.printStackTrace();
+        }
 
     }
+
+    @Override
+    public void deleteAll(){}
 }

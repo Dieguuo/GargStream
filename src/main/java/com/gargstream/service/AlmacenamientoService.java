@@ -16,6 +16,7 @@ public interface AlmacenamientoService {
     //cargar el archivo como un recurso para que se pueda reproducir en el navegador
     Resource loadAsResource(String nombreArchivo);
 
-    //borrarlo todo para reiniciar el proyecto
+    //borrar
+    void delete(String nombreArchivo);
     void deleteAll();
 }
