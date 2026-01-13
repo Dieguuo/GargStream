@@ -1,7 +1,7 @@
 package com.gargstream.controller;
 
 import com.gargstream.service.AlmacenamientoService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -14,14 +14,25 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/archivos")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AlmacenamientoController {
+
+    //BORRAR 2 LINEAS
+    @org.springframework.beans.factory.annotation.Value("${tmdb.api.key}")
+    private String apiKeyPrueba;
 
     private final AlmacenamientoService almacenamientoService;
 
     //subir un archivo POST http://localhost:8080/api/archivos/subir
     @PostMapping("/subir")
     public Map<String, String> subirArchivo(@RequestParam("fichero") MultipartFile fichero){
+
+        // ¡OJO! Esto es solo para probar. Luego bórralo para no mostrar tu clave en los logs.
+        System.out.println("--- PRUEBA DE SEGURIDAD ---");
+        System.out.println("Mi clave de TMDB es: " + apiKeyPrueba);
+        System.out.println("---------------------------");
+
+
         String nombreArchivo = almacenamientoService.store(fichero);
         //crear la url pública
         String url = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/archivos/").path(nombreArchivo).toUriString();

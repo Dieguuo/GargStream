@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Subir Cine - GargStream</title>
+</head>
+<body>
+<h1>Subir Película (Datos Automáticos)</h1>
+<form method="POST" action="/api/admin/nueva-pelicula" enctype="multipart/form-data">
+
+    <label>Título de la Película (Ponlo bien escrito):</label><br>
+    <input type="text" name="titulo" required placeholder="Ej: Avatar"/><br><br>
+
+    <label>Archivo de la Película (.mp4):</label><br>
+    <input type="file" name="archivo" required /><br><br>
+
+    <button type="submit">¡Buscar datos y Guardar!</button>
+</form>
+</body>
+</html>
