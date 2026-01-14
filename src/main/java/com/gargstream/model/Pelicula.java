@@ -2,6 +2,7 @@ package com.gargstream.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import jakarta.persistence.*;
 
 @Entity
 @Data
@@ -19,5 +20,10 @@ public class Pelicula extends Contenido{
     private Double puntuacionMedia;
     //la ruta de la pelicula
     private String rutaVideo;
+
+    //subtitulos
+    @Column(name = "ruta_subtitulo")
+    private String rutaSubtitulo;
+
 
 }

@@ -13,4 +13,8 @@ public class VideoPersonal extends Contenido{
     private String autor;
     //ruta del video
     private String rutaVideo;
+
+    //subtitulos
+    @Column(name = "ruta_subtitulo")
+    private String rutaSubtitulo;
 }

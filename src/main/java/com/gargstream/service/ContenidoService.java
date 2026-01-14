@@ -15,7 +15,7 @@ public class ContenidoService {
     private final AlmacenamientoService almacenamientoService;
 
     //guardar un vídeo personal en la db
-    public VideoPersonal guardarVideoPersonal(String titulo, String sipnosis, String autor, MultipartFile archivo){
+    public VideoPersonal guardarVideoPersonal(String titulo, String sipnosis, String autor, MultipartFile archivo, MultipartFile archivoSubtitulo){
         //guardar el archivo físico en el disco
         String nombreArchivo = almacenamientoService.store(archivo);
         //url para verlo
@@ -26,6 +26,13 @@ public class ContenidoService {
         video.setSipnosis(sipnosis);
         video.setAutor(autor);
         video.setRutaVideo(urlVideo);
+
+        //si hay subts añadirlos
+        if(archivoSubtitulo != null && !archivoSubtitulo.isEmpty()){
+            String nombreSubtitulo = almacenamientoService.store(archivoSubtitulo);
+            String urlSubtitulo = "/api/archivos/" + archivoSubtitulo;
+            video.setRutaSubtitulo(urlSubtitulo);
+        }
 
         //guardar en la db h2
         return contenidoRepository.save(video);

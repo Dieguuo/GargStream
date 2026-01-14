@@ -6,56 +6,34 @@
     <style>
         body { background-color: #141414; color: white; font-family: Arial, sans-serif; padding: 20px; margin: 0; }
 
-        /* BOTÓN VOLVER (Flotante para que no moleste en modo cine) */
         .volver {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            z-index: 100;
-            color: rgba(255,255,255,0.7);
-            text-decoration: none;
-            font-size: 1.1em;
-            background: rgba(0,0,0,0.5);
-            padding: 5px 10px;
-            border-radius: 5px;
+            position: absolute; top: 20px; left: 20px; z-index: 100;
+            color: rgba(255,255,255,0.7); text-decoration: none;
+            font-size: 1.1em; background: rgba(0,0,0,0.5);
+            padding: 5px 10px; border-radius: 5px; cursor: pointer;
         }
         .volver:hover { color: white; background: rgba(0,0,0,0.8); }
 
-        /* CABECERA CON FONDO DIFUMINADO */
+        /* CABECERA */
         .backdrop {
             position: relative;
-            background-size: cover;
-            background-position: center top; /* Alineado arriba para que se vean las caras */
-            padding: 60px 40px; /* Más padding para que respire */
-            border-radius: 10px;
-            box-shadow: 0 0 50px rgba(0,0,0,0.5);
-            margin-bottom: 30px;
-            display: flex;
-            gap: 40px;
-            align-items: flex-end; /* Alineamos contenido abajo */
-            flex-wrap: wrap;
-            min-height: 400px; /* Altura mínima para series */
-            transition: min-height 0.3s;
-            overflow: hidden; /* Para que la capa oscura no se salga */
+            background-size: cover; background-position: center top;
+            padding: 60px 40px; border-radius: 10px;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5); margin-bottom: 30px;
+            display: flex; gap: 40px; align-items: flex-end; flex-wrap: wrap;
+            min-height: 400px; transition: min-height 0.3s; overflow: hidden;
         }
 
-        /* --- NUEVO: MODO CINE (Solo para películas) --- */
         .backdrop.movie-mode {
-            min-height: 85vh; /* Ocupa el 85% de la pantalla */
-            border-radius: 0 0 20px 20px; /* Solo redondeamos abajo */
-            margin-top: -20px; /* Pegamos arriba quitando el margen del body */
-            margin-left: -20px;
-            margin-right: -20px;
-            align-items: center; /* Centramos el contenido verticalmente */
-            justify-content: center; /* Centramos horizontalmente si queremos, o dejamos flex-start */
+            min-height: 85vh; padding-bottom: 80px;
+            border-radius: 0 0 20px 20px; margin: -20px -20px 30px -20px;
+            align-items: center; justify-content: center;
         }
 
-        /* En modo cine, ajustamos el degradado para que sea más intenso */
         .backdrop.movie-mode::before {
             background: linear-gradient(to top, #141414 10%, rgba(20,20,20,0.8) 50%, rgba(20,20,20,0.4) 100%);
         }
 
-        /* Capa oscura estándar */
         .backdrop::before {
             content: ''; position: absolute; top:0; left:0; right:0; bottom:0;
             background: linear-gradient(to top, #141414 5%, rgba(20,20,20,0.8) 60%, rgba(20,20,20,0.3) 100%);
@@ -63,67 +41,85 @@
         }
 
         .poster {
-            position: relative; z-index: 1;
-            width: 300px; /* Un poco más grande */
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            position: relative; z-index: 1; width: 300px;
+            border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
             border: 1px solid rgba(255,255,255,0.2);
+            flex-shrink: 0;
         }
 
         .info {
-            position: relative; z-index: 1;
-            flex: 1;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
-            max-width: 900px;
+            position: relative; z-index: 1; flex: 1;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.9); max-width: 900px;
         }
 
         .info h1 { margin: 0 0 15px 0; color: #fff; font-size: 3.5em; line-height: 1.1; font-weight: 800; }
-
-        .meta-data {
-            color: #ddd; font-size: 1.1em; margin-bottom: 25px;
-            display: flex; gap: 15px; align-items: center; flex-wrap: wrap;
-        }
+        .meta-data { color: #ddd; font-size: 1.1em; margin-bottom: 25px; display: flex; gap: 15px; align-items: center; flex-wrap: wrap;}
         .meta-tag { border: 1px solid rgba(255,255,255,0.4); padding: 4px 10px; border-radius: 4px; font-size: 0.85em; background: rgba(0,0,0,0.3); backdrop-filter: blur(5px);}
         .score { color: #46d369; font-weight: bold; font-size: 1.2em; }
-
         .sinopsis { font-size: 1.2em; line-height: 1.6; color: #eee; margin-bottom: 30px; max-width: 700px; }
-
         .director-cast { font-size: 1em; color: #ccc; margin-bottom: 20px; }
 
-        /* BOTÓN PLAY GIGANTE MEJORADO */
+        /* BOTÓN PLAY GIGANTE (PELIS) */
         .btn-play-big {
             background-color: #e50914; color: white; border: none;
             padding: 15px 40px; font-size: 1.3em; font-weight: bold;
             border-radius: 5px; cursor: pointer; text-decoration: none;
             display: inline-flex; align-items: center; gap: 15px;
-            transition: all 0.2s;
-            box-shadow: 0 4px 15px rgba(229, 9, 20, 0.4);
+            transition: all 0.2s; box-shadow: 0 4px 15px rgba(229, 9, 20, 0.4);
         }
         .btn-play-big:hover { background-color: #f40612; transform: scale(1.05); box-shadow: 0 6px 20px rgba(229, 9, 20, 0.6);}
+
+        /* OVERLAY REPRODUCTOR */
+        #overlay-reproductor {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: black; z-index: 9999;
+            display: none; flex-direction: column; justify-content: center; align-items: center;
+        }
+
+        .btn-cerrar-video {
+            position: absolute; top: 20px; left: 20px; z-index: 10000;
+            background: rgba(0,0,0,0.6); color: white; border: 1px solid rgba(255,255,255,0.3);
+            padding: 10px 20px; font-size: 1.2em; cursor: pointer; border-radius: 5px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .btn-cerrar-video:hover { background: rgba(255,255,255,0.2); }
 
         /* LISTA EPISODIOS */
         #lista-episodios { padding: 0 20px; }
         details { background-color: #222; margin-bottom: 10px; border-radius: 5px; overflow: hidden; border: 1px solid #333;}
         summary { padding: 15px; font-weight: bold; font-size: 1.1em; cursor: pointer; list-style: none; display: flex; justify-content: space-between; background: #1f1f1f;}
         summary:hover { background-color: #333; }
-
         .capitulo-card { padding: 15px 20px; border-top: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
-        .btn-cap { background: #333; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px; border: 1px solid #555; transition: 0.2s;}
+
+        /* BOTÓN PLAY PEQUEÑO (SERIES) */
+        .btn-cap {
+            background: #333; color: white; padding: 8px 15px; cursor: pointer;
+            border-radius: 4px; border: 1px solid #555; transition: 0.2s; font-size: 0.9em;
+        }
         .btn-cap:hover { background: #e50914; border-color: #e50914; }
 
     </style>
 </head>
 <body>
 
-<a href="index.html" class="volver">← Volver</a>
+<a href="index.html" class="volver">← Volver al Catálogo</a>
 
 <div id="contenedor-principal">
     <p style="text-align:center; margin-top:50px; font-size:1.5em; color:#666;">Cargando...</p>
 </div>
 
+<div id="overlay-reproductor">
+    <button class="btn-cerrar-video" onclick="cerrarVideo()">⬅ Volver a la Ficha</button>
+    <div id="video-container" style="width:100%; height:100%"></div>
+</div>
+
 <script>
     const params = new URLSearchParams(window.location.search);
     const id = params.get('id');
+
+    // Variables globales para la película principal
+    let rutaVideoPeli = "";
+    let rutaSubPeli = "";
 
     if(id) {
         fetch('/api/public/contenido/' + id)
@@ -141,10 +137,13 @@
                 const puntuacion = c.puntuacionMedia ? c.puntuacionMedia + '/10' : '-';
 
                 const esSerie = !c.rutaVideo;
-
-                // --- LÓGICA DE CLASE CSS ---
-                // Si es película, añadimos 'movie-mode' para que sea pantalla completa
                 const claseModo = esSerie ? '' : 'movie-mode';
+
+                // Si es película, guardamos sus rutas
+                if(!esSerie) {
+                    rutaVideoPeli = c.rutaVideo;
+                    rutaSubPeli = c.rutaSubtitulo || "";
+                }
 
                 let html = `
                     <div class="backdrop ${claseModo}" style="background-image: url('${imagen}');">
@@ -152,35 +151,32 @@
 
                         <div class="info">
                             <h1>${titulo}</h1>
-
                             <div class="meta-data">
                                 <span class="score">⭐ ${puntuacion}</span>
                                 <span>${anio}</span>
                                 ${duracion ? `<span class="meta-tag">${duracion}</span>` : ''}
                                 ${genero ? `<span class="meta-tag">${genero}</span>` : ''}
                             </div>
-
                             <div class="director-cast">
                                 ${esSerie ? 'Creador' : 'Director'}: <strong>${director}</strong>
                             </div>
-
                             <p class="sinopsis">${sinopsis}</p>
                 `;
 
                 if (!esSerie) {
-                    // --- PELÍCULA (Botón Play y cierre) ---
+                    // --- PELÍCULA: Botón usa las variables globales ---
                     html += `
-                            <a href="${c.rutaVideo}" target="_blank" class="btn-play-big">
+                            <button onclick="reproducir(rutaVideoPeli, rutaSubPeli)" class="btn-play-big">
                                 ▶ Reproducir Película
-                            </a>
+                            </button>
                         </div> </div> `;
                 } else {
-                    // --- SERIE (Cierre backdrop normal + Lista) ---
+                    // --- SERIE: Lista de episodios ---
                     html += `
-                        </div> </div> <h2 style="padding-left:20px; margin-bottom:20px;">Temporadas y Episodios</h2>
-                    <div id="lista-episodios">
+                        </div> </div>
+                        <h2 style="padding-left:20px; margin-bottom:20px;">Temporadas y Episodios</h2>
+                        <div id="lista-episodios">
                     `;
-
                     if (c.temporadas && c.temporadas.length > 0) {
                         const mapTemps = {};
                         c.temporadas.forEach(t => {
@@ -191,27 +187,28 @@
                         Object.keys(mapTemps).sort((a,b)=>a-b).forEach((num, index) => {
                             const caps = mapTemps[num].sort((a,b)=>a.numeroCapitulo - b.numeroCapitulo);
                             const isOpen = index === 0 ? 'open' : '';
+                            html += `<details ${isOpen}><summary>Temporada ${num} <span style="font-weight:normal; font-size:0.9em; color:#aaa">${caps.length} episodios</span></summary><div>`;
 
-                            html += `
-                                <details ${isOpen}>
-                                    <summary>Temporada ${num} <span style="font-weight:normal; font-size:0.9em; color:#aaa">${caps.length} episodios</span></summary>
-                                    <div>
-                            `;
                             caps.forEach(cap => {
+                                // Definimos las rutas de cada capítulo
+                                const urlVideoCap = cap.rutaVideo;
+                                const urlSubCap = cap.rutaSubtitulo || "";
+
                                 html += `
                                     <div class="capitulo-card">
                                         <div style="display:flex; flex-direction:column;">
                                             <span style="font-weight:bold; font-size:1em;">${cap.numeroCapitulo}. ${cap.titulo || 'Episodio ' + cap.numeroCapitulo}</span>
                                         </div>
-                                        <a href="${cap.rutaVideo}" target="_blank" class="btn-cap">▶ Reproducir</a>
+
+                                        <button class="btn-cap" onclick="reproducir('${urlVideoCap}', '${urlSubCap}')">
+                                            ▶ Reproducir
+                                        </button>
                                     </div>
                                 `;
                             });
                             html += `</div></details>`;
                         });
-                    } else {
-                        html += '<p style="padding-left:20px;">No hay capítulos disponibles.</p>';
-                    }
+                    } else { html += '<p style="padding-left:20px;">No hay capítulos disponibles.</p>'; }
                     html += `</div>`;
                 }
 
@@ -222,6 +219,38 @@
                 document.getElementById('contenedor-principal').innerHTML = "<h1>Error</h1><p>No se pudieron cargar los datos.</p>";
             });
     }
+
+    // --- FUNCIÓN ÚNICA DE REPRODUCCIÓN (Sirve para Pelis y Series) ---
+    function reproducir(urlVideo, urlSubtitulo) {
+        const overlay = document.getElementById('overlay-reproductor');
+        const container = document.getElementById('video-container');
+
+        let trackHtml = '';
+        // Solo añadimos el track si existe una URL de subtítulo válida
+        if(urlSubtitulo && urlSubtitulo !== "undefined" && urlSubtitulo !== "null") {
+            trackHtml = `<track label="Español" kind="subtitles" srclang="es" src="${urlSubtitulo}" default>`;
+        }
+
+        container.innerHTML = `
+            <video id="miVideoPlayer" controls autoplay style="width:100%; height:100%; outline:none;">
+                <source src="${urlVideo}" type="video/mp4">
+                ${trackHtml}
+                Tu navegador no soporta vídeos HTML5.
+            </video>
+        `;
+
+        overlay.style.display = 'flex';
+        document.body.style.overflow = 'hidden'; // Bloquea el scroll
+    }
+
+    function cerrarVideo() {
+        const overlay = document.getElementById('overlay-reproductor');
+        const container = document.getElementById('video-container');
+        container.innerHTML = ""; // Destruir vídeo
+        overlay.style.display = 'none';
+        document.body.style.overflow = 'auto'; // Restaurar scroll
+    }
+
 </script>
 </body>
 </html>

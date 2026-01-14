@@ -106,7 +106,7 @@ public class SerieService {
     }
 
     //METODO PARA AÑADIR LOS CAPS
-    public Capitulo agregarCapitulo(Long idSerie, Integer numTemporada, Integer numCapitulo, String tituloCapitulo, MultipartFile archivo){
+    public Capitulo agregarCapitulo(Long idSerie, Integer numTemporada, Integer numCapitulo, String tituloCapitulo, MultipartFile archivo, MultipartFile archivoSubtitulo){
         //buscar la serie en la base de datos
         Serie serie = (Serie) contenidoRepository.findById(idSerie).orElseThrow(() -> new RuntimeException("No se ha encontrado la serie"));
 
@@ -137,6 +137,13 @@ public class SerieService {
 
         //añadirlo a la lista de la temp
         temporada.getCapitulos().add(capitulo);
+
+        //añadir subtitulos si los hay
+        if(archivoSubtitulo != null && !archivoSubtitulo.isEmpty()){
+            String nombreSubtitulo = almacenamientoService.store(archivoSubtitulo);
+            String urlSubtitulo = "/api/archivos/" + nombreSubtitulo;
+            capitulo.setRutaSubtitulo(urlSubtitulo);
+        }
 
         //guardar la serie
         contenidoRepository.save(serie);

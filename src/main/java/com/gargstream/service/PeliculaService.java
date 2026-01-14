@@ -25,7 +25,7 @@ public class PeliculaService {
     private String apiKey;
 
     //metodo que sube el archivo y descarga los datos
-    public Pelicula guardarPelicula(String titulo, MultipartFile archivo){
+    public Pelicula guardarPelicula(String titulo, MultipartFile archivo, MultipartFile archivoSubtitulo){
         //guardar el archivo físico
         String nombreArchivo = almacenamientoService.store(archivo);
         String urlVideo = "/api/archivos/" + nombreArchivo;
@@ -34,6 +34,13 @@ public class PeliculaService {
         Pelicula pelicula = new Pelicula();
         pelicula.setTitulo(titulo);
         pelicula.setRutaVideo(urlVideo);
+
+        //si se ponen subtitulos guardalos también
+        if(archivoSubtitulo != null && !archivoSubtitulo.isEmpty()){
+            String nombreSubtitulo = almacenamientoService.store(archivoSubtitulo);
+            String urlSubtitulo = "/api/archivos/" + nombreSubtitulo;
+            pelicula.setRutaSubtitulo(urlSubtitulo);
+        }
 
         //conectarse a internet para poder llamar a la api y que busque los datos restantes
         RestTemplate restTemplate = new RestTemplate();

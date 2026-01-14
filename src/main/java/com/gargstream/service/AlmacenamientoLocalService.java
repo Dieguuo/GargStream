@@ -51,9 +51,13 @@ public class AlmacenamientoLocalService implements AlmacenamientoService{
             //validar el tipo de archivo
             String tipoContenido = archivo.getContentType();
             //si no es un vídeo lanzo la excepción
-            if(tipoContenido == null || !tipoContenido.startsWith("video/")){
-                throw new FormatoInvalidoException("Formato no válido: "+tipoContenido+". Solo vídeo");
-
+            if(tipoContenido == null || (
+                    !tipoContenido.startsWith("video/") &&
+                    !tipoContenido.equals("text/vtt") &&
+                    !tipoContenido.equals("application/x-subrip") &&
+                    !tipoContenido.equals("text/plain")
+            )){
+                throw new FormatoInvalidoException("Formato no válido: " + tipoContenido + ". Solo vídeo o subtítulos");
             }
 
 

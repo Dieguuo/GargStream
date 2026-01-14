@@ -32,4 +32,8 @@ public class Capitulo {
     @JoinColumn(name = "temporada_id")
     @JsonIgnore//evita el bucle infinito
     private Temporada temporada;
+
+    //subtitulos
+    @Column(name = "ruta_subtitulo")
+    private String rutaSubtitulo;
 }

@@ -30,10 +30,12 @@ public class AdminController {
             @RequestParam("titulo") String titulo,
             @RequestParam("descripcion") String descripcion,
             @RequestParam("autor") String autor,
-            @RequestParam("archivo") MultipartFile archivo){
+            @RequestParam("archivo") MultipartFile archivo,
+            //los subtitulso son opcionales
+            @RequestParam(value = "subtitulo", required = false) MultipartFile subtitulo){
 
 
-        VideoPersonal videoGuardado = contenidoService.guardarVideoPersonal(titulo, descripcion, autor, archivo);
+        VideoPersonal videoGuardado = contenidoService.guardarVideoPersonal(titulo, descripcion, autor, archivo, subtitulo);
 
         return ResponseEntity.ok(videoGuardado);
 
@@ -43,10 +45,12 @@ public class AdminController {
     @PostMapping("/nueva-pelicula")
     public ResponseEntity<Pelicula> subirPelicula(
             @RequestParam("titulo") String titulo,
-            @RequestParam("archivo") MultipartFile archivo){
+            @RequestParam("archivo") MultipartFile archivo,
+            //los subtitulso son opcionales
+            @RequestParam(value = "subtitulo", required = false) MultipartFile subtitulo){
 
         //solo hay que pasar el titulo y archivo, y la api busca los demás datos
-        Pelicula pelicula = peliculaService.guardarPelicula(titulo, archivo);
+        Pelicula pelicula = peliculaService.guardarPelicula(titulo, archivo, subtitulo);
         return ResponseEntity.ok(pelicula);
 
     }
@@ -67,9 +71,11 @@ public class AdminController {
             @RequestParam("numTemporada") Integer numTemporada,
             @RequestParam("numCapitulo") Integer numCapitulo,
             @RequestParam("titulo") String titulo,
-            @RequestParam("archivo") MultipartFile archivo){
+            @RequestParam("archivo") MultipartFile archivo,
+            //los subtitulso son opcionales
+            @RequestParam(value = "subtitulo", required = false) MultipartFile subtitulo){
 
-        Capitulo capitulo = serieService.agregarCapitulo(idSerie, numTemporada, numCapitulo, titulo, archivo);
+        Capitulo capitulo = serieService.agregarCapitulo(idSerie, numTemporada, numCapitulo, titulo, archivo, subtitulo);
         return ResponseEntity.ok(capitulo);
     }
 
