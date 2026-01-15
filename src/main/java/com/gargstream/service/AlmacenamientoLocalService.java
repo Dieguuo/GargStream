@@ -53,9 +53,9 @@ public class AlmacenamientoLocalService implements AlmacenamientoService{
             //si no es un vídeo lanzo la excepción
             if(tipoContenido == null || (
                     !tipoContenido.startsWith("video/") &&
-                    !tipoContenido.equals("text/vtt") &&
-                    !tipoContenido.equals("application/x-subrip") &&
-                    !tipoContenido.equals("text/plain")
+                            !tipoContenido.equals("text/vtt") &&
+                            !tipoContenido.equals("application/x-subrip") &&
+                            !tipoContenido.equals("text/plain")
             )){
                 throw new FormatoInvalidoException("Formato no válido: " + tipoContenido + ". Solo vídeo o subtítulos");
             }

@@ -23,6 +23,7 @@ public class SerieService {
 
     private final ContenidoRepository contenidoRepository;
     private final AlmacenamientoService almacenamientoService;
+    private final TmdbService tmdbService;
 
     @Value("${tmdb.api.key}")
     private String apiKey;
@@ -46,6 +47,13 @@ public class SerieService {
                 //cargar el primer resultado
                 RespuestaTMDB.DatosPelicula datosBasicos = respuesta.getResults().getFirst();
                 Long idTmdb = datosBasicos.getIdTmdb();
+
+
+                //buscar el trailer con el id de la serie
+                String idTrailer = tmdbService.obtenerTrailer(idTmdb, "tv");
+                if(idTrailer != null){
+                    serie.setYoutubeTrailerId(idTrailer);
+                }
 
                 //sacar los detalles
                 String urlDetalles = "https://api.themoviedb.org/3/tv/" + idTmdb + "?api_key=" + apiKey + "&language=es-ES";

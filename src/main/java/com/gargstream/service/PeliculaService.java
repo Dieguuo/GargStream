@@ -19,6 +19,7 @@ public class PeliculaService {
 
     private final ContenidoRepository contenidoRepository;
     private final AlmacenamientoService almacenamientoService;
+    private final TmdbService tmdbService;
 
     //la clave de la api tmdb
     @Value("${tmdb.api.key}")
@@ -46,7 +47,6 @@ public class PeliculaService {
         RestTemplate restTemplate = new RestTemplate();
 
         //la url de búsqueda en tmdb
-        // CORREGIDO: Aquí usamos el endpoint "search" y ponemos el título en "query"
         String urlBusqueda = "https://api.themoviedb.org/3/search/movie?api_key=" + apiKey + "&query=" + titulo + "&language=es-ES";
 
         try{
@@ -56,6 +56,13 @@ public class PeliculaService {
             //si hay varios resultados se coge el primero
             if(respuesta != null && respuesta.getResults() != null && !respuesta.getResults().isEmpty()){
                 Long idTmdb= respuesta.getResults().getFirst().getIdTmdb();
+
+
+                //buscar el video del trailer con el id
+                String idTrailer = tmdbService.obtenerTrailer(idTmdb, "movie");
+                if(idTrailer != null){
+                    pelicula.setYoutubeTrailerId(idTrailer);
+                }
 
                 String urlDetalles = "https://api.themoviedb.org/3/movie/" + idTmdb + "?api_key=" + apiKey + "&language=es-ES&append_to_response=credits";
 

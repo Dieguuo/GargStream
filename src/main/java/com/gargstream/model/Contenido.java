@@ -28,6 +28,10 @@ public abstract class Contenido {
     //para la fecha de subida
     private LocalDateTime fechaSubida;
 
+    //trailer
+    @Column(name = "youtube_trailer_id")
+    private String youtubeTrailerId;
+
 
     @PrePersist
     public void alCrear(){
