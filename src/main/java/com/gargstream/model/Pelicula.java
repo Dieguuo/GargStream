@@ -21,9 +21,7 @@ public class Pelicula extends Contenido{
     //la ruta de la pelicula
     private String rutaVideo;
 
-    //subtitulos
-    @Column(name = "ruta_subtitulo")
-    private String rutaSubtitulo;
+
 
 
 }

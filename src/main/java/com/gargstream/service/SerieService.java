@@ -113,7 +113,7 @@ public class SerieService {
 
     }
 
-    //METODO PARA AÑADIR LOS CAPS
+    //método para añadir los capitulos
     public Capitulo agregarCapitulo(Long idSerie, Integer numTemporada, Integer numCapitulo, String tituloCapitulo, MultipartFile archivo, MultipartFile archivoSubtitulo){
         //buscar la serie en la base de datos
         Serie serie = (Serie) contenidoRepository.findById(idSerie).orElseThrow(() -> new RuntimeException("No se ha encontrado la serie"));
@@ -150,7 +150,16 @@ public class SerieService {
         if(archivoSubtitulo != null && !archivoSubtitulo.isEmpty()){
             String nombreSubtitulo = almacenamientoService.store(archivoSubtitulo);
             String urlSubtitulo = "/api/archivos/" + nombreSubtitulo;
-            capitulo.setRutaSubtitulo(urlSubtitulo);
+
+            // crearel objeto subtitulo
+            com.gargstream.model.Subtitulo sub = new com.gargstream.model.Subtitulo();
+            sub.setRutaArchivo(urlSubtitulo);
+            sub.setIdioma("es");
+            sub.setEtiqueta("Español");
+            sub.setCapitulo(capitulo); //y se vincula a capitulo
+
+            // guardarlo
+            capitulo.getSubtitulos().add(sub);
         }
 
         //guardar la serie

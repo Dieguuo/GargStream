@@ -3,6 +3,7 @@ package com.gargstream.service;
 import com.gargstream.dto.DetallesTMDB;
 import com.gargstream.dto.RespuestaTMDB;
 import com.gargstream.model.Pelicula;
+import com.gargstream.model.Subtitulo;
 import com.gargstream.repository.ContenidoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,7 +41,16 @@ public class PeliculaService {
         if(archivoSubtitulo != null && !archivoSubtitulo.isEmpty()){
             String nombreSubtitulo = almacenamientoService.store(archivoSubtitulo);
             String urlSubtitulo = "/api/archivos/" + nombreSubtitulo;
-            pelicula.setRutaSubtitulo(urlSubtitulo);
+
+            //crear el objeto subtitulo
+            Subtitulo sub = new Subtitulo();
+            sub.setRutaArchivo(urlSubtitulo);
+            sub.setIdioma("es");
+            sub.setEtiqueta("Español");
+            sub.setContenido(pelicula);
+
+            //guardarlo
+            pelicula.getSubtitulos().add(sub);
         }
 
         //conectarse a internet para poder llamar a la api y que busque los datos restantes

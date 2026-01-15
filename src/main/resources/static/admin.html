@@ -38,12 +38,15 @@
         select { cursor: pointer; color: white; }
         select option { background-color: #333; }
 
-        button[type="submit"] {
+        button[type="submit"], .btn-cancelar {
             background-color: #e50914; color: white; border: none;
             padding: 12px 20px; margin-top: 20px; cursor: pointer;
             font-size: 1em; font-weight: bold; border-radius: 4px; width: 100%;
         }
         button[type="submit"]:hover { background-color: #f40612; }
+
+        .btn-cancelar { background-color: #666; margin-top: 10px; }
+        .btn-cancelar:hover { background-color: #888; }
 
         .row { display: flex; gap: 10px; }
 
@@ -54,6 +57,25 @@
             overflow: auto; white-space: pre-wrap; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); display: none;
         }
         .console-title { color: #555; font-size: 0.8em; margin-bottom: 5px; text-transform: uppercase;}
+
+        /* --- NUEVOS ESTILOS PARA EDICIÓN --- */
+        .grid-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            width: 100%;
+        }
+        .card-edit {
+            background: #222; border-radius: 5px; overflow: hidden;
+            cursor: pointer; transition: transform 0.2s; border: 1px solid transparent;
+        }
+        .card-edit:hover { transform: scale(1.05); border-color: #e50914; }
+        .card-edit img { width: 100%; height: 220px; object-fit: cover; }
+        .card-edit p { padding: 10px; margin: 0; font-size: 0.9em; text-align: center; color: #ddd; }
+
+        .edit-form-container { display: none; border: 1px solid #444; padding: 20px; border-radius: 10px; background: #1a1a1a; }
+        .section-separator { border-top: 1px solid #333; margin: 20px 0; padding-top: 10px; }
+        .section-title { color: #aaa; margin-bottom: 10px; font-size: 1.1em; border-left: 3px solid #e50914; padding-left: 10px; }
     </style>
 </head>
 <body>
@@ -62,10 +84,10 @@
     <h2>⚙️ Admin Panel</h2>
     <button class="menu-btn active" onclick="mostrar('sec-cine')">🎬 Nueva Película</button>
     <button class="menu-btn" onclick="mostrar('sec-serie')">📺 Nueva Serie</button>
-
     <button class="menu-btn" onclick="mostrar('sec-capitulo'); cargarSeriesEnSelector()">▶️ Nuevo Capítulo</button>
-
     <button class="menu-btn" onclick="mostrar('sec-video')">📹 Video Personal</button>
+
+    <button class="menu-btn" onclick="mostrar('sec-editar'); cargarContenidoParaEditar()">✏️ Editar / Gestionar</button>
 
     <a href="index.html" class="back-link">← Volver al Catálogo</a>
 </div>
@@ -157,6 +179,70 @@
         </form>
     </div>
 
+    <div id="sec-editar" class="form-section" style="max-width: 900px;">
+        <h1>Gestionar Contenido</h1>
+        <p style="color:#aaa;">Haz clic en una carátula para editar sus datos.</p>
+
+        <div id="grid-edicion" class="grid-content">
+        </div>
+
+        <div id="formulario-edicion" class="edit-form-container">
+            <h2 style="margin-top:0;">Editando: <span id="edit-titulo-display" style="color:#e50914"></span></h2>
+
+            <form action="/api/admin/editar-contenido" onsubmit="enviarFormulario(event)">
+                <input type="hidden" name="id" id="edit-id">
+
+                <div class="row">
+                    <div style="flex:1">
+                        <label>Título:</label>
+                        <input type="text" name="titulo" id="edit-titulo">
+                    </div>
+                    <div style="flex:1">
+                        <label>ID Youtube Trailer:</label>
+                        <input type="text" name="youtubeTrailerId" id="edit-trailer" placeholder="Ej: dQw4w9WgXcQ">
+                    </div>
+                </div>
+
+                <label>Sinopsis:</label>
+                <textarea name="sipnosis" id="edit-sinopsis" rows="4"></textarea>
+
+                <div class="section-separator"></div>
+                <div class="section-title">📂 Archivos (Opcional)</div>
+                <p style="font-size:0.8em; color:#777;">Solo sube archivos si quieres cambiar/añadir algo.</p>
+
+                <label>Cambiar Carátula:</label>
+                <input type="file" name="archivoCaratula" accept="image/*">
+
+                <div class="section-separator"></div>
+                <div class="section-title">🌍 Añadir Nuevo Subtítulo</div>
+
+                <div class="row">
+                    <div style="flex:1">
+                        <label>Idioma (código):</label>
+                        <select name="idiomaSub">
+                            <option value="es">Español (es)</option>
+                            <option value="en">Inglés (en)</option>
+                            <option value="fr">Francés (fr)</option>
+                            <option value="de">Alemán (de)</option>
+                            <option value="it">Italiano (it)</option>
+                            <option value="pt">Portugués (pt)</option>
+                        </select>
+                    </div>
+                    <div style="flex:1">
+                        <label>Etiqueta (Lo que se ve):</label>
+                        <input type="text" name="nombreSub" placeholder="Ej: Español, English (CC)">
+                    </div>
+                </div>
+
+                <label>Archivo Subtítulo (.vtt / .srt):</label>
+                <input type="file" name="archivoSubtitulo" accept=".srt,.vtt">
+
+                <button type="submit">💾 Guardar Cambios</button>
+                <button type="button" class="btn-cancelar" onclick="cerrarEditor()">Cancelar</button>
+            </form>
+        </div>
+    </div>
+
 </div>
 
 <script>
@@ -172,21 +258,18 @@
         if(idSeccion === 'sec-serie') botones[1].classList.add('active');
         if(idSeccion === 'sec-capitulo') botones[2].classList.add('active');
         if(idSeccion === 'sec-video') botones[3].classList.add('active');
+        if(idSeccion === 'sec-editar') botones[4].classList.add('active'); // Nuevo botón
     }
 
-    // --- 2. CARGAR SERIES EN EL SELECTOR (NUEVO) ---
+    // --- 2. CARGAR SERIES EN EL SELECTOR ---
     async function cargarSeriesEnSelector() {
         const selector = document.getElementById('selector-series');
         selector.innerHTML = '<option value="" disabled selected>⏳ Buscando series...</option>';
 
         try {
-            // Reutilizamos la API del catálogo público para obtener la lista
             const response = await fetch('/api/public/catalogo');
             const data = await response.json();
-
-            // Filtramos SOLO las que son series
-            // (Sabemos que es serie si NO tiene rutaVideo directo, o si tiene 'temporadas')
-            const series = data.filter(item => !item.rutaVideo);
+            const series = data.filter(item => !item.rutaVideo); // Filtrar solo series
 
             selector.innerHTML = '<option value="" disabled selected>-- Elige una Serie --</option>';
 
@@ -197,8 +280,8 @@
             } else {
                 series.forEach(serie => {
                     const option = document.createElement('option');
-                    option.value = serie.id; // Esto es lo que se enviará al servidor
-                    option.text = serie.titulo; // Esto es lo que ves tú
+                    option.value = serie.id;
+                    option.text = serie.titulo;
                     selector.add(option);
                 });
             }
@@ -209,7 +292,71 @@
         }
     }
 
-    // --- 3. ENVÍO DE FORMULARIOS (AJAX) ---
+    // --- 3. NUEVO: CARGAR CONTENIDO PARA EDITAR ---
+    async function cargarContenidoParaEditar() {
+        // Ocultar formulario si estaba abierto
+        cerrarEditor();
+        const grid = document.getElementById('grid-edicion');
+        grid.innerHTML = '<p>Cargando contenido...</p>';
+
+        try {
+            const response = await fetch('/api/public/catalogo');
+            const data = await response.json();
+            grid.innerHTML = '';
+
+            data.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'card-edit';
+                div.onclick = () => abrirEditor(item.id); // Al hacer clic, abrimos editor
+
+                const img = item.rutaCaratula ? item.rutaCaratula : 'https://via.placeholder.com/150x220?text=No+Cover';
+
+                div.innerHTML = `
+                    <img src="${img}" alt="${item.titulo}">
+                    <p>${item.titulo}</p>
+                `;
+                grid.appendChild(div);
+            });
+
+        } catch (error) {
+            grid.innerHTML = '<p style="color:red">Error cargando catálogo.</p>';
+        }
+    }
+
+    // --- 4. NUEVO: ABRIR EL EDITOR Y RELLENAR DATOS ---
+    async function abrirEditor(id) {
+        // 1. Ocultar grid, mostrar formulario
+        document.getElementById('grid-edicion').style.display = 'none';
+        const formContainer = document.getElementById('formulario-edicion');
+        formContainer.style.display = 'block';
+        formContainer.scrollIntoView({ behavior: 'smooth' });
+
+        // 2. Pedir datos frescos del contenido
+        try {
+            const response = await fetch('/api/public/contenido/' + id);
+            const data = await response.json();
+
+            // 3. Rellenar campos
+            document.getElementById('edit-id').value = data.id;
+            document.getElementById('edit-titulo-display').textContent = data.titulo;
+            document.getElementById('edit-titulo').value = data.titulo || '';
+            document.getElementById('edit-sinopsis').value = data.sipnosis || data.sinopsis || ''; // A veces es sipnosis/sinopsis
+            document.getElementById('edit-trailer').value = data.youtubeTrailerId || '';
+
+        } catch (e) {
+            alert("Error al cargar datos del contenido");
+            cerrarEditor();
+        }
+    }
+
+    function cerrarEditor() {
+        document.getElementById('formulario-edicion').style.display = 'none';
+        document.getElementById('grid-edicion').style.display = 'grid';
+        // Limpiar formulario (opcional)
+        document.querySelector('#formulario-edicion form').reset();
+    }
+
+    // --- 5. ENVÍO DE FORMULARIOS (AJAX) ---
     async function enviarFormulario(event) {
         event.preventDefault();
 
@@ -219,7 +366,7 @@
         const boton = form.querySelector('button[type="submit"]');
 
         consola.style.display = 'block';
-        contenidoConsola.textContent = "⏳ Subiendo archivo (esto puede tardar dependiendo del tamaño)...";
+        contenidoConsola.textContent = "⏳ Procesando solicitud...";
         contenidoConsola.style.color = "#ffff00";
         boton.disabled = true;
         boton.style.opacity = "0.5";
@@ -228,24 +375,31 @@
             const formData = new FormData(form);
             const response = await fetch(form.action, { method: 'POST', body: formData });
 
-            // Si devuelve texto plano (nuestro manejador de errores), lo leemos como texto
-            // Si devuelve JSON (éxito), lo leemos como JSON.
-            const contentType = response.headers.get("content-type");
-
             if (response.ok) {
                 // ÉXITO (200)
                 const json = await response.json();
                 contenidoConsola.textContent = "✅ ¡ÉXITO!\n" + JSON.stringify(json, null, 4);
                 contenidoConsola.style.color = "#0f0";
-                form.reset();
 
-                // Si acabamos de subir un capítulo, recargamos la lista por si acaso
+                // Si estamos en el editor, no reseteamos todo el form para no perder el ID
+                // Pero si estamos creando, sí reseteamos
+                if(!form.action.includes("editar-contenido")) {
+                    form.reset();
+                } else {
+                    // Si editamos, cerramos el editor tras 1 segundo y refrescamos la lista
+                    setTimeout(() => {
+                        cerrarEditor();
+                        cargarContenidoParaEditar();
+                        consola.style.display = 'none';
+                    }, 1500);
+                }
+
                 if(form.action.includes("nuevo-capitulo")) {
                     cargarSeriesEnSelector();
                 }
 
             } else {
-                // ERROR (400, 404, 500)
+                // ERROR
                 const textoError = await response.text();
                 contenidoConsola.textContent = textoError;
                 contenidoConsola.style.color = "#ff4444";

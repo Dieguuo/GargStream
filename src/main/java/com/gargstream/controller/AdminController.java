@@ -2,9 +2,8 @@ package com.gargstream.controller;
 import com.gargstream.model.Pelicula;
 import com.gargstream.model.Serie;
 import com.gargstream.model.VideoPersonal;
-import com.gargstream.service.ContenidoService;
-import com.gargstream.service.PeliculaService;
-import com.gargstream.service.SerieService;
+import com.gargstream.repository.ContenidoRepository;
+import com.gargstream.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +11,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import com.gargstream.service.PeliculaService;
 import com.gargstream.model.Capitulo;
+import com.gargstream.model.Contenido;
+import com.gargstream.model.Subtitulo;
+
 
 
 @RestController
@@ -21,6 +23,8 @@ public class AdminController {
 
     private final ContenidoService contenidoService;
     private final PeliculaService peliculaService;
+    private final ContenidoRepository contenidoRepository;
+    private final AlmacenamientoService almacenamientoService;
     private final SerieService serieService;
 
     /*VIDEOS PERSONALES*/
@@ -85,6 +89,69 @@ public class AdminController {
 
         contenidoService.eliminarContenido(id);
         return ResponseEntity.noContent().build();
+    }
+
+
+    @PostMapping("/editar-contenido")
+    public ResponseEntity<String> editarContenido(
+            @RequestParam Long id,
+            @RequestParam(required = false) String titulo,
+            @RequestParam(required = false) String sipnosis,
+            @RequestParam(required = false) String youtubeTrailerId,
+            @RequestParam(required = false) MultipartFile archivoCaratula,
+            @RequestParam(required = false) MultipartFile archivoSubtitulo,
+            @RequestParam(required = false) String idiomaSub,
+            @RequestParam(required = false) String nombreSub
+    ) {
+        try {
+            // buscar el contenido
+            Contenido contenido = contenidoRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Contenido no encontrado"));
+
+            // actualizar los textos
+            if (titulo != null && !titulo.isBlank()) contenido.setTitulo(titulo);
+            if (sipnosis != null && !sipnosis.isBlank()) contenido.setSipnosis(sipnosis);
+
+            //cambiar el trailer
+            if (youtubeTrailerId != null) {
+                contenido.setYoutubeTrailerId(youtubeTrailerId); // al enviar una cadena vacía se borra
+            }
+
+            // cambiar la carátula
+            if (archivoCaratula != null && !archivoCaratula.isEmpty()) {
+                String nombreFichero = almacenamientoService.store(archivoCaratula);
+                contenido.setRutaCaratula("/api/archivos/" + nombreFichero);
+            }
+
+            // añadir un nuevo subtítulo
+            if (archivoSubtitulo != null && !archivoSubtitulo.isEmpty()) {
+                // guardar el archivo físico
+                String nombreArchivoFisico = almacenamientoService.store(archivoSubtitulo);
+
+                String rutaFinal = "/api/archivos/" + nombreArchivoFisico;
+
+                // crear un objeto Subtitulo
+                Subtitulo nuevoSub = new Subtitulo();
+                nuevoSub.setRutaArchivo(rutaFinal);
+
+                // usar lo que ponga el usuario
+                nuevoSub.setIdioma((idiomaSub != null && !idiomaSub.isBlank()) ? idiomaSub : "es");
+                nuevoSub.setEtiqueta((nombreSub != null && !nombreSub.isBlank()) ? nombreSub : "Español (Extra)");
+                nuevoSub.setContenido(contenido);
+
+                // añadirlo a la lista que ya hay
+                contenido.getSubtitulos().add(nuevoSub);
+            }
+
+            // 5. Guardar todo
+            contenidoRepository.save(contenido);
+
+            return ResponseEntity.ok().body("{\"mensaje\": \"Contenido actualizado correctamente\"}");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Error al editar: " + e.getMessage());
+        }
     }
 
 }

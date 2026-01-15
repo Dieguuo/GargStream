@@ -72,7 +72,7 @@
         }
         .btn-play-big:hover { background-color: #f40612; transform: scale(1.05); box-shadow: 0 6px 20px rgba(229, 9, 20, 0.6);}
 
-        /* NUEVO: BOTÓN TRÁILER (Gris translúcido) */
+        /* BOTÓN TRÁILER */
         .btn-trailer {
             background-color: rgba(109, 109, 110, 0.7); color: white; border: none;
             padding: 15px 40px; font-size: 1.3em; font-weight: bold;
@@ -81,7 +81,6 @@
             transition: all 0.2s;
         }
         .btn-trailer:hover { background-color: rgba(109, 109, 110, 0.4); transform: scale(1.05); }
-
 
         /* OVERLAY REPRODUCTOR */
         #overlay-reproductor {
@@ -105,7 +104,6 @@
         summary:hover { background-color: #333; }
         .capitulo-card { padding: 15px 20px; border-top: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
 
-        /* BOTÓN PLAY PEQUEÑO (SERIES) */
         .btn-cap {
             background: #333; color: white; padding: 8px 15px; cursor: pointer;
             border-radius: 4px; border: 1px solid #555; transition: 0.2s; font-size: 0.9em;
@@ -131,9 +129,12 @@
     const params = new URLSearchParams(window.location.search);
     const id = params.get('id');
 
-    // Variables globales para la película principal
+    // Variables globales
     let rutaVideoPeli = "";
-    let rutaSubPeli = "";
+    // Ahora guardamos la LISTA completa de subtítulos
+    let subsPeli = [];
+    // Mapa para guardar los subs de cada capítulo por su ID
+    let episodiosData = {};
 
     if(id) {
         fetch('/api/public/contenido/' + id)
@@ -149,17 +150,16 @@
                 const director = c.director || c.creador || c.autor || 'Desconocido';
                 const genero = c.genero || '';
                 const puntuacion = c.puntuacionMedia ? c.puntuacionMedia + '/10' : '-';
-
-                // NUEVO: Capturar el ID de Youtube
                 const youtubeId = c.youtubeTrailerId || "";
 
                 const esSerie = !c.rutaVideo;
                 const claseModo = esSerie ? '' : 'movie-mode';
 
-                // Si es película, guardamos sus rutas
+                // Si es película, guardamos datos
                 if(!esSerie) {
                     rutaVideoPeli = c.rutaVideo;
-                    rutaSubPeli = c.rutaSubtitulo || "";
+                    // Aseguramos que sea un array
+                    subsPeli = c.subtitulos || [];
                 }
 
                 let html = `
@@ -182,16 +182,15 @@
                             <div class="actions">
                 `;
 
-                // Botón PLAY (Solo si es Película)
                 if (!esSerie) {
+                    // PELÍCULA: Pasamos la lista 'subsPeli' a la función
                     html += `
-                        <button onclick="reproducir(rutaVideoPeli, rutaSubPeli)" class="btn-play-big">
+                        <button onclick="reproducirPeli()" class="btn-play-big">
                             ▶ Reproducir
                         </button>
                     `;
                 }
 
-                // Botón TRÁILER (Común a Series y Pelis)
                 if(youtubeId) {
                     html += `
                         <button onclick="verTrailer('${youtubeId}')" class="btn-trailer">
@@ -200,12 +199,9 @@
                     `;
                 }
 
-                // Cerramos las etiquetas backdrop e info
                 html += `   </div> </div> </div> `;
 
-
                 if (esSerie) {
-                    // --- SERIE: Lista de episodios ---
                     html += `
                         <h2 style="padding-left:20px; margin-bottom:20px;">Temporadas y Episodios</h2>
                         <div id="lista-episodios">
@@ -223,9 +219,9 @@
                             html += `<details ${isOpen}><summary>Temporada ${num} <span style="font-weight:normal; font-size:0.9em; color:#aaa">${caps.length} episodios</span></summary><div>`;
 
                             caps.forEach(cap => {
-                                // Definimos las rutas de cada capítulo
                                 const urlVideoCap = cap.rutaVideo;
-                                const urlSubCap = cap.rutaSubtitulo || "";
+                                // Guardamos los subs de este cap en el mapa global usando su ID
+                                episodiosData[cap.id] = cap.subtitulos || [];
 
                                 html += `
                                     <div class="capitulo-card">
@@ -233,7 +229,7 @@
                                             <span style="font-weight:bold; font-size:1em;">${cap.numeroCapitulo}. ${cap.titulo || 'Episodio ' + cap.numeroCapitulo}</span>
                                         </div>
 
-                                        <button class="btn-cap" onclick="reproducir('${urlVideoCap}', '${urlSubCap}')">
+                                        <button class="btn-cap" onclick="reproducirCapitulo('${urlVideoCap}', ${cap.id})">
                                             ▶ Reproducir
                                         </button>
                                     </div>
@@ -253,35 +249,60 @@
             });
     }
 
-    // --- 1. REPRODUCIR ARCHIVO LOCAL (MP4) ---
-    function reproducir(urlVideo, urlSubtitulo) {
+    // --- FUNCIONES AUXILIARES ---
+
+    function reproducirPeli() {
+        reproducir(rutaVideoPeli, subsPeli);
+    }
+
+    function reproducirCapitulo(url, idCapitulo) {
+        // Recuperamos los subs del mapa global
+        const listaSubs = episodiosData[idCapitulo] || [];
+        reproducir(url, listaSubs);
+    }
+
+    // --- REPRODUCTOR MAESTRO (Admite lista de subs) ---
+    function reproducir(urlVideo, listaSubtitulos) {
         const overlay = document.getElementById('overlay-reproductor');
         const container = document.getElementById('video-container');
 
-        let trackHtml = '';
-        // Solo añadimos el track si existe una URL de subtítulo válida
-        if(urlSubtitulo && urlSubtitulo !== "undefined" && urlSubtitulo !== "null") {
-            trackHtml = `<track label="Español" kind="subtitles" srclang="es" src="${urlSubtitulo}" default>`;
+        // Construimos las etiquetas <track>
+        let tracksHtml = '';
+
+        if (listaSubtitulos && Array.isArray(listaSubtitulos)) {
+            listaSubtitulos.forEach((sub, index) => {
+                // El primero será el default
+                const esDefault = index === 0 ? 'default' : '';
+
+                // TRUCO ANTI-CACHÉ: Añadimos ?t=FECHA para que el navegador cargue fresco
+                tracksHtml += `
+                    <track
+                        kind="subtitles"
+                        label="${sub.etiqueta}"
+                        srclang="${sub.idioma}"
+                        src="${sub.rutaArchivo}?t=${new Date().getTime()}"
+                        ${esDefault}>
+                `;
+            });
         }
 
         container.innerHTML = `
-            <video id="miVideoPlayer" controls autoplay style="width:100%; height:100%; outline:none;">
+            <video id="miVideoPlayer" controls autoplay style="width:100%; height:100%; outline:none;" crossorigin="anonymous">
                 <source src="${urlVideo}" type="video/mp4">
-                ${trackHtml}
+                ${tracksHtml}
                 Tu navegador no soporta vídeos HTML5.
             </video>
         `;
 
         overlay.style.display = 'flex';
-        document.body.style.overflow = 'hidden'; // Bloquea el scroll
+        document.body.style.overflow = 'hidden';
     }
 
-    // --- 2. NUEVO: REPRODUCIR TRÁILER YOUTUBE ---
+    // --- REPRODUCTOR TRAILER ---
     function verTrailer(youtubeId) {
         const overlay = document.getElementById('overlay-reproductor');
         const container = document.getElementById('video-container');
 
-        // Insertamos un Iframe de Youtube
         container.innerHTML = `
             <iframe width="100%" height="100%"
                 src="https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0"
@@ -297,9 +318,9 @@
     function cerrarVideo() {
         const overlay = document.getElementById('overlay-reproductor');
         const container = document.getElementById('video-container');
-        container.innerHTML = ""; // Destruir vídeo (mp4 o iframe)
+        container.innerHTML = "";
         overlay.style.display = 'none';
-        document.body.style.overflow = 'auto'; // Restaurar scroll
+        document.body.style.overflow = 'auto';
     }
 
 </script>

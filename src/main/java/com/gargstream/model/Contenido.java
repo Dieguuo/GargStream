@@ -3,6 +3,8 @@ package com.gargstream.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data//los data hace que no haya que escribir los getter y setters manualmente
@@ -31,6 +33,9 @@ public abstract class Contenido {
     //trailer
     @Column(name = "youtube_trailer_id")
     private String youtubeTrailerId;
+    //lsita de subtitulos
+    @OneToMany(mappedBy = "contenido", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Subtitulo> subtitulos = new ArrayList<>();
 
 
     @PrePersist

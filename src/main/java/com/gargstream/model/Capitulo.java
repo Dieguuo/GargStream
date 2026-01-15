@@ -33,7 +33,9 @@ public class Capitulo {
     @JsonIgnore//evita el bucle infinito
     private Temporada temporada;
 
-    //subtitulos
-    @Column(name = "ruta_subtitulo")
-    private String rutaSubtitulo;
+    //lista de subtitulos
+    @OneToMany(mappedBy = "capitulo", cascade = CascadeType.ALL, orphanRemoval = true)
+    private java.util.List<Subtitulo> subtitulos = new java.util.ArrayList<>();
+
+
 }
