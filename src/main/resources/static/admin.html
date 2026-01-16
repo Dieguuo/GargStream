@@ -8,132 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
 
-    <style>
-        body {
-            background-color: #141414;
-            color: white;
-            font-family: 'Roboto', sans-serif; /* Texto general */
-            margin: 0;
-            display: flex;
-            height: 100vh;
-        }
-
-        /* BARRA LATERAL */
-        .sidebar { width: 250px; background-color: #000; padding: 20px; border-right: 1px solid #333; display: flex; flex-direction: column; }
-        .sidebar h2 {
-            color: #e50914;
-            margin-bottom: 30px;
-            font-family: 'Bebas Neue', sans-serif; /* Título menú */
-            font-size: 2.2em;
-            letter-spacing: 2px;
-        }
-        .menu-btn {
-            background: none; border: none; color: #aaa;
-            text-align: left; padding: 15px; cursor: pointer;
-            font-size: 1.1em; transition: 0.3s; width: 100%;
-            border-radius: 5px; margin-bottom: 5px;
-            font-family: 'Roboto', sans-serif;
-            font-weight: 500;
-        }
-        .menu-btn:hover, .menu-btn.active { background-color: #333; color: white; }
-        .back-link { margin-top: auto; color: #aaa; text-decoration: none; padding: 10px; font-weight: bold; }
-        .back-link:hover { color: white; }
-
-        /* AREA DE CONTENIDO */
-        .content { flex: 1; padding: 40px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px;}
-
-        /* Títulos de sección estilo Cine */
-        h1 { font-family: 'Bebas Neue', sans-serif; letter-spacing: 1px; font-size: 2.5em; margin-bottom: 10px;}
-
-        /* FORMULARIOS */
-        .form-section { display: none; max-width: 600px; }
-        .form-section.active { display: block; animation: fadeIn 0.5s; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        label { display: block; margin-top: 15px; color: #e50914; font-weight: bold; font-size: 0.9em; }
-        input[type="text"], input[type="number"], textarea, input[type="file"], select {
-            width: 100%; padding: 10px; margin-top: 5px;
-            background-color: #333; border: 1px solid #444; color: white; border-radius: 4px;
-            font-family: 'Roboto', sans-serif;
-        }
-
-        /* Estilo especial para el desplegable */
-        select { cursor: pointer; color: white; }
-        select option { background-color: #333; }
-
-        button[type="submit"], .btn-cancelar {
-            background-color: #e50914; color: white; border: none;
-            padding: 12px 20px; margin-top: 20px; cursor: pointer;
-            font-size: 1em; font-weight: bold; border-radius: 4px; width: 100%;
-            font-family: 'Roboto', sans-serif; text-transform: uppercase;
-        }
-        button[type="submit"]:hover { background-color: #f40612; }
-
-        .btn-cancelar { background-color: #666; margin-top: 10px; }
-        .btn-cancelar:hover { background-color: #888; }
-
-        /* Botón de eliminar (Rojo oscuro) */
-        .btn-eliminar {
-            background-color: #8b0000; color: white; border: 1px solid #ff0000;
-            margin-top: 30px; /* Separado del resto */
-            padding: 12px 20px; cursor: pointer; font-size: 1em;
-            font-weight: bold; border-radius: 4px; width: 100%;
-            font-family: 'Roboto', sans-serif; text-transform: uppercase;
-        }
-        .btn-eliminar:hover { background-color: #ff0000; }
-
-        .row { display: flex; gap: 10px; }
-
-        /* CONSOLA DE RESULTADOS */
-        #console-box {
-            background-color: #0d0d0d; border: 1px solid #333; border-radius: 8px; padding: 15px;
-            font-family: 'Courier New', monospace; color: #0f0; min-height: 150px; max-height: 300px;
-            overflow: auto; white-space: pre-wrap; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); display: none;
-        }
-        .console-title { color: #555; font-size: 0.8em; margin-bottom: 5px; text-transform: uppercase;}
-
-        /* --- NUEVOS ESTILOS PARA EDICIÓN --- */
-        .grid-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
-            width: 100%;
-        }
-        .card-edit {
-            background: #222; border-radius: 5px; overflow: hidden;
-            cursor: pointer; transition: transform 0.2s; border: 1px solid transparent;
-        }
-        .card-edit:hover { transform: scale(1.05); border-color: #e50914; }
-        .card-edit img { width: 100%; height: 220px; object-fit: cover; }
-        .card-edit p {
-            padding: 10px; margin: 0; font-size: 0.9em; text-align: center; color: #ddd;
-            font-family: 'Bebas Neue', sans-serif; letter-spacing: 1px;
-        }
-
-        .edit-form-container { display: none; border: 1px solid #444; padding: 20px; border-radius: 10px; background: #1a1a1a; }
-        .section-separator { border-top: 1px solid #333; margin: 20px 0; padding-top: 10px; }
-        .section-title { color: #aaa; margin-bottom: 10px; font-size: 1.1em; border-left: 3px solid #e50914; padding-left: 10px; }
-
-        /* --- ESTILOS DASHBOARD --- */
-        .dash-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;
-        }
-        .dash-card {
-            background: #222; padding: 20px; border-radius: 10px; text-align: center; border: 1px solid #333;
-        }
-        .dash-number {
-            font-size: 4em; /* Más grande con Bebas */
-            color: #e50914; margin: 10px 0;
-            font-family: 'Bebas Neue', sans-serif; /* Números estilo marcador */
-        }
-        .dash-label { color: #aaa; font-size: 1.1em; text-transform: uppercase; font-weight: bold;}
-
-        /* Barra de progreso disco */
-        .progress-container { width: 100%; background-color: #444; border-radius: 5px; height: 10px; margin-top: 10px; overflow: hidden;}
-        .progress-bar { height: 100%; width: 0%; background-color: #e50914; transition: width 1s; }
-        .disk-info { display: flex; justify-content: space-between; font-size: 0.8em; color: #888; margin-top: 5px;}
-    </style>
+    <link rel="stylesheet" href="css/admin.css">
 </head>
 <body>
 
@@ -141,12 +16,10 @@
     <h2>⚙️ Admin Panel</h2>
 
     <button class="menu-btn active" onclick="mostrar('sec-dashboard'); cargarMetricas()">📊 Resumen</button>
-
     <button class="menu-btn" onclick="mostrar('sec-cine')">🎬 Nueva Película</button>
     <button class="menu-btn" onclick="mostrar('sec-serie')">📺 Nueva Serie</button>
     <button class="menu-btn" onclick="mostrar('sec-capitulo'); cargarSeriesEnSelector()">▶️ Nuevo Capítulo</button>
     <button class="menu-btn" onclick="mostrar('sec-video')">📹 Video Personal</button>
-
     <button class="menu-btn" onclick="mostrar('sec-editar'); cargarContenidoParaEditar()">✏️ Editar / Gestionar</button>
 
     <a href="index.html" class="back-link">← Volver al Catálogo</a>
@@ -161,7 +34,6 @@
 
     <div id="sec-dashboard" class="form-section active" style="max-width: 100%;">
         <h1>Estado del Servidor</h1>
-
         <div class="dash-grid">
             <div class="dash-card">
                 <div class="dash-label">Películas</div>
@@ -178,7 +50,6 @@
             <div class="dash-card">
                 <div class="dash-label">Disco Usado</div>
                 <div class="dash-number" id="metric-espacio" style="font-size: 3em; color: #fff;">-</div>
-
                 <div class="progress-container">
                     <div class="progress-bar" id="disk-bar"></div>
                 </div>
@@ -188,7 +59,6 @@
                 </div>
             </div>
         </div>
-
         <p style="color:#666; text-align: center;">Bienvenido al panel de control de GargStream.</p>
     </div>
 
@@ -198,13 +68,10 @@
         <form action="/api/admin/nueva-pelicula" onsubmit="enviarFormulario(event)">
             <label>Título:</label>
             <input type="text" name="titulo" required placeholder="Ej: El Padrino">
-
             <label>Archivo de Vídeo (Obligatorio):</label>
             <input type="file" name="archivo" required accept="video/*">
-
             <label>Subtítulos (.srt o .vtt) - Opcional:</label>
             <input type="file" name="subtitulo" accept=".srt,.vtt">
-
             <button type="submit">Subir Película</button>
         </form>
     </div>
@@ -214,7 +81,6 @@
         <form action="/api/admin/nueva-serie" onsubmit="enviarFormulario(event)">
             <label>Título de la Serie:</label>
             <input type="text" name="titulo" required placeholder="Ej: Breaking Bad">
-
             <button type="submit">Crear Ficha</button>
         </form>
     </div>
@@ -222,12 +88,10 @@
     <div id="sec-capitulo" class="form-section">
         <h1>Subir Capítulo</h1>
         <form action="/api/admin/nuevo-capitulo" onsubmit="enviarFormulario(event)">
-
             <label>Selecciona la Serie:</label>
             <select name="idSerie" id="selector-series" required>
                 <option value="" disabled selected>Cargando series...</option>
             </select>
-
             <div class="row">
                 <div style="flex:1">
                     <label>Temporada:</label>
@@ -238,16 +102,12 @@
                     <input type="number" name="numCapitulo" required value="1">
                 </div>
             </div>
-
             <label>Título del Capítulo:</label>
             <input type="text" name="titulo" placeholder="Ej: Piloto">
-
             <label>Archivo de Vídeo (Obligatorio):</label>
             <input type="file" name="archivo" required accept="video/*">
-
             <label>Subtítulos (.srt o .vtt) - Opcional:</label>
             <input type="file" name="subtitulo" accept=".srt,.vtt">
-
             <button type="submit">Subir Capítulo</button>
         </form>
     </div>
@@ -261,13 +121,10 @@
             <input type="text" name="autor" placeholder="Yo">
             <label>Descripción:</label>
             <textarea name="descripcion" rows="3"></textarea>
-
             <label>Archivo de Vídeo (Obligatorio):</label>
             <input type="file" name="archivo" required accept="video/*">
-
             <label>Subtítulos (.srt o .vtt) - Opcional:</label>
             <input type="file" name="subtitulo" accept=".srt,.vtt">
-
             <button type="submit">Subir Video</button>
         </form>
     </div>
@@ -275,16 +132,12 @@
     <div id="sec-editar" class="form-section" style="max-width: 900px;">
         <h1>Gestionar Contenido</h1>
         <p style="color:#aaa;">Haz clic en una carátula para editar sus datos.</p>
-
-        <div id="grid-edicion" class="grid-content">
-        </div>
+        <div id="grid-edicion" class="grid-content"></div>
 
         <div id="formulario-edicion" class="edit-form-container">
             <h2 style="margin-top:0; font-family: 'Bebas Neue', sans-serif; letter-spacing: 1px;">Editando: <span id="edit-titulo-display" style="color:#e50914"></span></h2>
-
             <form action="/api/admin/editar-contenido" onsubmit="enviarFormulario(event)">
                 <input type="hidden" name="id" id="edit-id">
-
                 <div class="row">
                     <div style="flex:1">
                         <label>Título:</label>
@@ -295,20 +148,15 @@
                         <input type="text" name="youtubeTrailerId" id="edit-trailer" placeholder="Ej: dQw4w9WgXcQ">
                     </div>
                 </div>
-
                 <label>Sinopsis:</label>
                 <textarea name="sipnosis" id="edit-sinopsis" rows="4"></textarea>
-
                 <div class="section-separator"></div>
                 <div class="section-title">📂 Archivos (Opcional)</div>
                 <p style="font-size:0.8em; color:#777;">Solo sube archivos si quieres cambiar/añadir algo.</p>
-
                 <label>Cambiar Carátula:</label>
                 <input type="file" name="archivoCaratula" accept="image/*">
-
                 <div class="section-separator"></div>
                 <div class="section-title">🌍 Añadir Nuevo Subtítulo</div>
-
                 <div class="row">
                     <div style="flex:1">
                         <label>Idioma (código):</label>
@@ -326,13 +174,10 @@
                         <input type="text" name="nombreSub" placeholder="Ej: Español, English (CC)">
                     </div>
                 </div>
-
                 <label>Archivo Subtítulo (.vtt / .srt):</label>
                 <input type="file" name="archivoSubtitulo" accept=".srt,.vtt">
-
                 <button type="submit">💾 Guardar Cambios</button>
                 <button type="button" class="btn-cancelar" onclick="cerrarEditor()">Cancelar</button>
-
                 <button type="button" class="btn-eliminar" onclick="eliminarContenido()">🗑️ ELIMINAR CONTENIDO</button>
             </form>
         </div>
@@ -340,248 +185,6 @@
 
 </div>
 
-<script>
-    // --- 0. INICIO AUTOMÁTICO ---
-    // Cargar métricas nada más abrir la página
-    document.addEventListener("DOMContentLoaded", () => {
-        cargarMetricas();
-    });
-
-    // --- 1. GESTIÓN DE PESTAÑAS ---
-    function mostrar(idSeccion) {
-        document.querySelectorAll('.form-section').forEach(div => div.classList.remove('active'));
-        document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
-        document.getElementById(idSeccion).classList.add('active');
-        document.getElementById('console-box').style.display = 'none';
-
-        const botones = document.querySelectorAll('.menu-btn');
-        // Actualizamos los índices porque hemos añadido un botón nuevo al principio
-        if(idSeccion === 'sec-dashboard') botones[0].classList.add('active');
-        if(idSeccion === 'sec-cine') botones[1].classList.add('active');
-        if(idSeccion === 'sec-serie') botones[2].classList.add('active');
-        if(idSeccion === 'sec-capitulo') botones[3].classList.add('active');
-        if(idSeccion === 'sec-video') botones[4].classList.add('active');
-        if(idSeccion === 'sec-editar') botones[5].classList.add('active');
-    }
-
-    // --- 2. CARGAR MÉTRICAS DASHBOARD ---
-    async function cargarMetricas() {
-        try {
-            const res = await fetch('/api/admin/metricas');
-            if(res.ok) {
-                const data = await res.json();
-
-                // Animación simple de números
-                document.getElementById('metric-pelis').innerText = data.peliculas;
-                document.getElementById('metric-series').innerText = data.series;
-                document.getElementById('metric-videos').innerText = data.videos;
-
-                // Disco duro
-                document.getElementById('metric-espacio').innerText = data.porcentaje + "%";
-                document.getElementById('disk-used').innerText = data.usado;
-                document.getElementById('disk-total').innerText = "Total: " + data.total;
-
-                // Barra visual
-                const barra = document.getElementById('disk-bar');
-                barra.style.width = data.porcentaje + "%";
-
-                // Color según lo lleno que esté
-                if(data.porcentaje > 90) barra.style.backgroundColor = "#ff0000"; // Peligro
-                else if(data.porcentaje > 70) barra.style.backgroundColor = "#ffa500"; // Aviso
-                else barra.style.backgroundColor = "#46d369"; // Bien
-            }
-        } catch (e) {
-            console.error("Error cargando métricas", e);
-        }
-    }
-
-    // --- 3. CARGAR SERIES EN EL SELECTOR ---
-    async function cargarSeriesEnSelector() {
-        const selector = document.getElementById('selector-series');
-        selector.innerHTML = '<option value="" disabled selected>⏳ Buscando series...</option>';
-
-        try {
-            const response = await fetch('/api/public/catalogo');
-            const data = await response.json();
-            const series = data.filter(item => !item.rutaVideo); // Filtrar solo series
-
-            selector.innerHTML = '<option value="" disabled selected>-- Elige una Serie --</option>';
-
-            if(series.length === 0) {
-                const option = document.createElement('option');
-                option.text = "No hay series creadas todavía";
-                selector.add(option);
-            } else {
-                series.forEach(serie => {
-                    const option = document.createElement('option');
-                    option.value = serie.id;
-                    option.text = serie.titulo;
-                    selector.add(option);
-                });
-            }
-
-        } catch (error) {
-            console.error(error);
-            selector.innerHTML = '<option value="" disabled selected>❌ Error al cargar</option>';
-        }
-    }
-
-    // --- 4. NUEVO: CARGAR CONTENIDO PARA EDITAR ---
-    async function cargarContenidoParaEditar() {
-        // Ocultar formulario si estaba abierto
-        cerrarEditor();
-        const grid = document.getElementById('grid-edicion');
-        grid.innerHTML = '<p>Cargando contenido...</p>';
-
-        try {
-            const response = await fetch('/api/public/catalogo');
-            const data = await response.json();
-            grid.innerHTML = '';
-
-            data.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'card-edit';
-                div.onclick = () => abrirEditor(item.id); // Al hacer clic, abrimos editor
-
-                const img = item.rutaCaratula ? item.rutaCaratula : 'https://via.placeholder.com/150x220?text=No+Cover';
-
-                div.innerHTML = `
-                    <img src="${img}" alt="${item.titulo}">
-                    <p>${item.titulo}</p>
-                `;
-                grid.appendChild(div);
-            });
-
-        } catch (error) {
-            grid.innerHTML = '<p style="color:red">Error cargando catálogo.</p>';
-        }
-    }
-
-    // --- 5. NUEVO: ABRIR EL EDITOR Y RELLENAR DATOS ---
-    async function abrirEditor(id) {
-        // 1. Ocultar grid, mostrar formulario
-        document.getElementById('grid-edicion').style.display = 'none';
-        const formContainer = document.getElementById('formulario-edicion');
-        formContainer.style.display = 'block';
-        formContainer.scrollIntoView({ behavior: 'smooth' });
-
-        // 2. Pedir datos frescos del contenido
-        try {
-            const response = await fetch('/api/public/contenido/' + id);
-            const data = await response.json();
-
-            // 3. Rellenar campos
-            document.getElementById('edit-id').value = data.id;
-            document.getElementById('edit-titulo-display').textContent = data.titulo;
-            document.getElementById('edit-titulo').value = data.titulo || '';
-            document.getElementById('edit-sinopsis').value = data.sipnosis || data.sinopsis || ''; // A veces es sipnosis/sinopsis
-            document.getElementById('edit-trailer').value = data.youtubeTrailerId || '';
-
-        } catch (e) {
-            alert("Error al cargar datos del contenido");
-            cerrarEditor();
-        }
-    }
-
-    function cerrarEditor() {
-        document.getElementById('formulario-edicion').style.display = 'none';
-        document.getElementById('grid-edicion').style.display = 'grid';
-        // Limpiar formulario (opcional)
-        document.querySelector('#formulario-edicion form').reset();
-    }
-
-    // --- 6. ENVÍO DE FORMULARIOS (AJAX) ---
-    async function enviarFormulario(event) {
-        event.preventDefault();
-
-        const form = event.target;
-        const consola = document.getElementById('console-box');
-        const contenidoConsola = document.getElementById('console-content');
-        const boton = form.querySelector('button[type="submit"]');
-
-        consola.style.display = 'block';
-        contenidoConsola.textContent = "⏳ Procesando solicitud...";
-        contenidoConsola.style.color = "#ffff00";
-        boton.disabled = true;
-        boton.style.opacity = "0.5";
-
-        try {
-            const formData = new FormData(form);
-            const response = await fetch(form.action, { method: 'POST', body: formData });
-
-            if (response.ok) {
-                // ÉXITO (200)
-                const json = await response.json();
-                contenidoConsola.textContent = "✅ ¡ÉXITO!\n" + JSON.stringify(json, null, 4);
-                contenidoConsola.style.color = "#0f0";
-
-                // Si estamos en el editor, no reseteamos todo el form para no perder el ID
-                // Pero si estamos creando, sí reseteamos
-                if(!form.action.includes("editar-contenido")) {
-                    form.reset();
-                } else {
-                    // Si editamos, cerramos el editor tras 1 segundo y refrescamos la lista
-                    setTimeout(() => {
-                        cerrarEditor();
-                        cargarContenidoParaEditar();
-                        consola.style.display = 'none';
-                        // Actualizar métricas también por si se ha borrado algo
-                        cargarMetricas();
-                    }, 1500);
-                }
-
-                if(form.action.includes("nuevo-capitulo")) {
-                    cargarSeriesEnSelector();
-                }
-
-                // Actualizar métricas si hemos añadido algo
-                cargarMetricas();
-
-            } else {
-                // ERROR
-                const textoError = await response.text();
-                contenidoConsola.textContent = textoError;
-                contenidoConsola.style.color = "#ff4444";
-            }
-        } catch (error) {
-            console.error(error);
-            contenidoConsola.textContent = "❌ Error de conexión: " + error.message;
-            contenidoConsola.style.color = "#ff4444";
-        } finally {
-            boton.disabled = false;
-            boton.style.opacity = "1";
-        }
-    }
-
-    // --- 7. FUNCIÓN PARA BORRAR (NUEVA) ---
-    async function eliminarContenido() {
-        // 1. Obtener el ID oculto del formulario
-        const id = document.getElementById('edit-id').value;
-        const titulo = document.getElementById('edit-titulo-display').innerText;
-
-        // 2. Preguntar al usuario (Seguridad)
-        if(!confirm(`⚠️ ¿ESTÁS SEGURO?\n\nVas a eliminar "${titulo}" y todos sus archivos.\nEsta acción no se puede deshacer.`)) {
-            return; // Si dice "Cancelar", no hacemos nada
-        }
-
-        // 3. Llamar al servidor
-        try {
-            const response = await fetch('/api/admin/eliminar-contenido/' + id, {
-                method: 'DELETE'
-            });
-
-            if(response.ok) {
-                alert("✅ Eliminado correctamente");
-                cerrarEditor();           // Ocultar formulario
-                cargarContenidoParaEditar(); // Refrescar la lista (la peli desaparecerá)
-                cargarMetricas(); // Actualizar dashboard
-            } else {
-                alert("❌ Error al eliminar: " + await response.text());
-            }
-        } catch (e) {
-            alert("❌ Error de conexión");
-        }
-    }
-</script>
+<script src="js/admin.js"></script>
 </body>
 </html>
