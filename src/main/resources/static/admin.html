@@ -85,13 +85,31 @@
         .edit-form-container { display: none; border: 1px solid #444; padding: 20px; border-radius: 10px; background: #1a1a1a; }
         .section-separator { border-top: 1px solid #333; margin: 20px 0; padding-top: 10px; }
         .section-title { color: #aaa; margin-bottom: 10px; font-size: 1.1em; border-left: 3px solid #e50914; padding-left: 10px; }
+
+        /* --- ESTILOS DASHBOARD --- */
+        .dash-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;
+        }
+        .dash-card {
+            background: #222; padding: 20px; border-radius: 10px; text-align: center; border: 1px solid #333;
+        }
+        .dash-number { font-size: 3em; font-weight: bold; color: #e50914; margin: 10px 0; }
+        .dash-label { color: #aaa; font-size: 1.1em; text-transform: uppercase; }
+
+        /* Barra de progreso disco */
+        .progress-container { width: 100%; background-color: #444; border-radius: 5px; height: 10px; margin-top: 10px; overflow: hidden;}
+        .progress-bar { height: 100%; width: 0%; background-color: #e50914; transition: width 1s; }
+        .disk-info { display: flex; justify-content: space-between; font-size: 0.8em; color: #888; margin-top: 5px;}
     </style>
 </head>
 <body>
 
 <div class="sidebar">
     <h2>⚙️ Admin Panel</h2>
-    <button class="menu-btn active" onclick="mostrar('sec-cine')">🎬 Nueva Película</button>
+
+    <button class="menu-btn active" onclick="mostrar('sec-dashboard'); cargarMetricas()">📊 Resumen</button>
+
+    <button class="menu-btn" onclick="mostrar('sec-cine')">🎬 Nueva Película</button>
     <button class="menu-btn" onclick="mostrar('sec-serie')">📺 Nueva Serie</button>
     <button class="menu-btn" onclick="mostrar('sec-capitulo'); cargarSeriesEnSelector()">▶️ Nuevo Capítulo</button>
     <button class="menu-btn" onclick="mostrar('sec-video')">📹 Video Personal</button>
@@ -108,7 +126,40 @@
         <div id="console-content">Esperando acción...</div>
     </div>
 
-    <div id="sec-cine" class="form-section active">
+    <div id="sec-dashboard" class="form-section active" style="max-width: 100%;">
+        <h1>Estado del Servidor</h1>
+
+        <div class="dash-grid">
+            <div class="dash-card">
+                <div class="dash-label">Películas</div>
+                <div class="dash-number" id="metric-pelis">-</div>
+            </div>
+            <div class="dash-card">
+                <div class="dash-label">Series</div>
+                <div class="dash-number" id="metric-series">-</div>
+            </div>
+            <div class="dash-card">
+                <div class="dash-label">Vídeos</div>
+                <div class="dash-number" id="metric-videos">-</div>
+            </div>
+            <div class="dash-card">
+                <div class="dash-label">Disco Usado</div>
+                <div class="dash-number" id="metric-espacio" style="font-size: 2em; color: #fff;">-</div>
+
+                <div class="progress-container">
+                    <div class="progress-bar" id="disk-bar"></div>
+                </div>
+                <div class="disk-info">
+                    <span id="disk-used">0 GB</span>
+                    <span id="disk-total">Total: 0 GB</span>
+                </div>
+            </div>
+        </div>
+
+        <p style="color:#666; text-align: center;">Bienvenido al panel de control de GargStream.</p>
+    </div>
+
+    <div id="sec-cine" class="form-section">
         <h1>Subir Película</h1>
         <p style="color:#aaa; font-size:0.9em;">Escribe el título y sube el archivo. El servidor buscará la carátula y sinopsis automáticamente.</p>
         <form action="/api/admin/nueva-pelicula" onsubmit="enviarFormulario(event)">
@@ -257,6 +308,12 @@
 </div>
 
 <script>
+    // --- 0. INICIO AUTOMÁTICO ---
+    // Cargar métricas nada más abrir la página
+    document.addEventListener("DOMContentLoaded", () => {
+        cargarMetricas();
+    });
+
     // --- 1. GESTIÓN DE PESTAÑAS ---
     function mostrar(idSeccion) {
         document.querySelectorAll('.form-section').forEach(div => div.classList.remove('active'));
@@ -265,14 +322,47 @@
         document.getElementById('console-box').style.display = 'none';
 
         const botones = document.querySelectorAll('.menu-btn');
-        if(idSeccion === 'sec-cine') botones[0].classList.add('active');
-        if(idSeccion === 'sec-serie') botones[1].classList.add('active');
-        if(idSeccion === 'sec-capitulo') botones[2].classList.add('active');
-        if(idSeccion === 'sec-video') botones[3].classList.add('active');
-        if(idSeccion === 'sec-editar') botones[4].classList.add('active'); // Nuevo botón
+        // Actualizamos los índices porque hemos añadido un botón nuevo al principio
+        if(idSeccion === 'sec-dashboard') botones[0].classList.add('active');
+        if(idSeccion === 'sec-cine') botones[1].classList.add('active');
+        if(idSeccion === 'sec-serie') botones[2].classList.add('active');
+        if(idSeccion === 'sec-capitulo') botones[3].classList.add('active');
+        if(idSeccion === 'sec-video') botones[4].classList.add('active');
+        if(idSeccion === 'sec-editar') botones[5].classList.add('active');
     }
 
-    // --- 2. CARGAR SERIES EN EL SELECTOR ---
+    // --- 2. CARGAR MÉTRICAS DASHBOARD ---
+    async function cargarMetricas() {
+        try {
+            const res = await fetch('/api/admin/metricas');
+            if(res.ok) {
+                const data = await res.json();
+
+                // Animación simple de números
+                document.getElementById('metric-pelis').innerText = data.peliculas;
+                document.getElementById('metric-series').innerText = data.series;
+                document.getElementById('metric-videos').innerText = data.videos;
+
+                // Disco duro
+                document.getElementById('metric-espacio').innerText = data.porcentaje + "%";
+                document.getElementById('disk-used').innerText = data.usado;
+                document.getElementById('disk-total').innerText = "Total: " + data.total;
+
+                // Barra visual
+                const barra = document.getElementById('disk-bar');
+                barra.style.width = data.porcentaje + "%";
+
+                // Color según lo lleno que esté
+                if(data.porcentaje > 90) barra.style.backgroundColor = "#ff0000"; // Peligro
+                else if(data.porcentaje > 70) barra.style.backgroundColor = "#ffa500"; // Aviso
+                else barra.style.backgroundColor = "#46d369"; // Bien
+            }
+        } catch (e) {
+            console.error("Error cargando métricas", e);
+        }
+    }
+
+    // --- 3. CARGAR SERIES EN EL SELECTOR ---
     async function cargarSeriesEnSelector() {
         const selector = document.getElementById('selector-series');
         selector.innerHTML = '<option value="" disabled selected>⏳ Buscando series...</option>';
@@ -303,7 +393,7 @@
         }
     }
 
-    // --- 3. NUEVO: CARGAR CONTENIDO PARA EDITAR ---
+    // --- 4. NUEVO: CARGAR CONTENIDO PARA EDITAR ---
     async function cargarContenidoParaEditar() {
         // Ocultar formulario si estaba abierto
         cerrarEditor();
@@ -334,7 +424,7 @@
         }
     }
 
-    // --- 4. NUEVO: ABRIR EL EDITOR Y RELLENAR DATOS ---
+    // --- 5. NUEVO: ABRIR EL EDITOR Y RELLENAR DATOS ---
     async function abrirEditor(id) {
         // 1. Ocultar grid, mostrar formulario
         document.getElementById('grid-edicion').style.display = 'none';
@@ -367,7 +457,7 @@
         document.querySelector('#formulario-edicion form').reset();
     }
 
-    // --- 5. ENVÍO DE FORMULARIOS (AJAX) ---
+    // --- 6. ENVÍO DE FORMULARIOS (AJAX) ---
     async function enviarFormulario(event) {
         event.preventDefault();
 
@@ -402,12 +492,17 @@
                         cerrarEditor();
                         cargarContenidoParaEditar();
                         consola.style.display = 'none';
+                        // Actualizar métricas también por si se ha borrado algo
+                        cargarMetricas();
                     }, 1500);
                 }
 
                 if(form.action.includes("nuevo-capitulo")) {
                     cargarSeriesEnSelector();
                 }
+
+                // Actualizar métricas si hemos añadido algo
+                cargarMetricas();
 
             } else {
                 // ERROR
@@ -425,7 +520,7 @@
         }
     }
 
-    // --- 6. FUNCIÓN PARA BORRAR (NUEVA) ---
+    // --- 7. FUNCIÓN PARA BORRAR (NUEVA) ---
     async function eliminarContenido() {
         // 1. Obtener el ID oculto del formulario
         const id = document.getElementById('edit-id').value;
@@ -446,6 +541,7 @@
                 alert("✅ Eliminado correctamente");
                 cerrarEditor();           // Ocultar formulario
                 cargarContenidoParaEditar(); // Refrescar la lista (la peli desaparecerá)
+                cargarMetricas(); // Actualizar dashboard
             } else {
                 alert("❌ Error al eliminar: " + await response.text());
             }

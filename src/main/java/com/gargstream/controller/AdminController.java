@@ -16,6 +16,8 @@ import com.gargstream.model.Subtitulo;
 import org.springframework.web.bind.annotation.DeleteMapping; // Importar esto
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.util.HashMap;
+import java.util.Map;
 
 
 @RestController
@@ -158,7 +160,7 @@ public class AdminController {
     }
 
 
-    //borrar contenido (DESCOMENTADO Y CORREGIDO PARA EL BOTÓN ROJO)
+    //borrar contenido
     @DeleteMapping("/eliminar-contenido/{id}")
     public ResponseEntity<String> eliminarContenidoAdmin(@PathVariable Long id){
         try{
@@ -170,6 +172,53 @@ public class AdminController {
             e.printStackTrace();
             return ResponseEntity.status(500).body("Error al eliminar: " + e.getMessage());
         }
+    }
+
+
+    //obetener numero y peso total de contenido
+    @GetMapping("/metricas")
+    public ResponseEntity<Map<String, Object>> obtnerMetricas(){
+        Map<String, Object> respuesta = new HashMap<>();
+
+        try{
+            //contar los registros en la base de datos
+            long totalPelis = contenidoRepository.findAll().stream().filter(c -> c instanceof Pelicula).count();
+            long totalSeries = contenidoRepository.findAll().stream().filter(c -> c instanceof Serie).count();
+            long totalVideos = contenidoRepository.findAll().stream().filter(c-> c instanceof  VideoPersonal).count();
+
+            //calcular el espacio en el disco
+            long bytesUsados = almacenamientoService.obtenerEspacioUsado();
+            long bytesTotales = almacenamientoService.obtenerEspacioTotal();
+
+            //calcular el porcentaje del disco
+            int porcentaje = (bytesTotales > 0) ? (int) ((bytesUsados * 100) / bytesTotales) : 0;
+
+            //convertirlos a gb
+            String usadoLegible = bytesAString(bytesUsados);
+            String totalLegible = bytesAString(bytesTotales);
+
+            //empaquetarlo
+            respuesta.put("peliculas", totalPelis);
+            respuesta.put("series", totalSeries);
+            respuesta.put("videos", totalVideos);
+            respuesta.put("usado", usadoLegible);
+            respuesta.put("total", totalLegible);
+            respuesta.put("porcentaje", porcentaje);
+            return ResponseEntity.ok(respuesta);
+
+
+        }catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).build();
+        }
+    }
+
+    //método para convertir datos.
+    private String bytesAString(long bytes) {
+        if (bytes < 1024) return bytes + " B";
+        int exp = (int) (Math.log(bytes) / Math.log(1024));
+        String pre = "KMGTPE".charAt(exp - 1) + "";
+        return String.format("%.1f %sB", bytes / Math.pow(1024, exp), pre);
     }
 
 

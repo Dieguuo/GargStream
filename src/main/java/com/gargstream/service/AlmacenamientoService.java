@@ -19,4 +19,11 @@ public interface AlmacenamientoService {
     //borrar
     void delete(String nombreArchivo);
     void deleteAll();
+
+
+    //obtener el espacio usado en el disco para la cuenta total ocuapado
+    long obtenerEspacioUsado();
+    //obtener el espacio total del disco
+    long obtenerEspacioTotal();
+
 }

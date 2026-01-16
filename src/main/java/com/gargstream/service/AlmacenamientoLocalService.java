@@ -9,6 +9,8 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.util.stream.Stream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -114,6 +116,28 @@ public class AlmacenamientoLocalService implements AlmacenamientoService{
 
     }
 
+    //borrar
     @Override
     public void deleteAll(){}
+
+
+    //método para obtener el espacio usado total en el disco
+    @Override
+    public long obtenerEspacioUsado() {
+        try (Stream<Path> walk = Files.walk(this.rootLocation)) {
+            return walk
+                    .filter(p -> p.toFile().isFile()) // para que solo sume archivos y no carpetas
+                    .mapToLong(p -> p.toFile().length()) // para obtener el peso
+                    .sum(); // sumarlo todo
+        } catch (IOException e) {
+            System.out.println("Error calculando espacio: " + e.getMessage());
+            return 0;
+        }
+    }
+
+    //sacar el espacio total del disco
+    @Override
+    public long obtenerEspacioTotal(){
+        return this.rootLocation.toFile().getTotalSpace();
+    }
 }
