@@ -43,6 +43,13 @@ public class ContenidoService {
         //recuperar el contenido antes de borrarlo para saber qué archivos tiene
         Contenido contenido = contenidoRepository.findById(id).orElseThrow(() -> new RuntimeException("Contenido no encontrado"));
 
+        //borrar subtitulso que haya
+        if(contenido.getSubtitulos() != null){
+            for(Subtitulo sub : contenido.getSubtitulos()){
+                borrarArchivoFisico(sub.getRutaArchivo());
+            }
+        }
+
         //según el tipo
         if(contenido instanceof Serie serie){
 

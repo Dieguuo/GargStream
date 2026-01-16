@@ -48,6 +48,15 @@
         .btn-cancelar { background-color: #666; margin-top: 10px; }
         .btn-cancelar:hover { background-color: #888; }
 
+        /* Botón de eliminar (Rojo oscuro) */
+        .btn-eliminar {
+            background-color: #8b0000; color: white; border: 1px solid #ff0000;
+            margin-top: 30px; /* Separado del resto */
+            padding: 12px 20px; cursor: pointer; font-size: 1em;
+            font-weight: bold; border-radius: 4px; width: 100%;
+        }
+        .btn-eliminar:hover { background-color: #ff0000; }
+
         .row { display: flex; gap: 10px; }
 
         /* CONSOLA DE RESULTADOS */
@@ -239,6 +248,8 @@
 
                 <button type="submit">💾 Guardar Cambios</button>
                 <button type="button" class="btn-cancelar" onclick="cerrarEditor()">Cancelar</button>
+
+                <button type="button" class="btn-eliminar" onclick="eliminarContenido()">🗑️ ELIMINAR CONTENIDO</button>
             </form>
         </div>
     </div>
@@ -411,6 +422,35 @@
         } finally {
             boton.disabled = false;
             boton.style.opacity = "1";
+        }
+    }
+
+    // --- 6. FUNCIÓN PARA BORRAR (NUEVA) ---
+    async function eliminarContenido() {
+        // 1. Obtener el ID oculto del formulario
+        const id = document.getElementById('edit-id').value;
+        const titulo = document.getElementById('edit-titulo-display').innerText;
+
+        // 2. Preguntar al usuario (Seguridad)
+        if(!confirm(`⚠️ ¿ESTÁS SEGURO?\n\nVas a eliminar "${titulo}" y todos sus archivos.\nEsta acción no se puede deshacer.`)) {
+            return; // Si dice "Cancelar", no hacemos nada
+        }
+
+        // 3. Llamar al servidor
+        try {
+            const response = await fetch('/api/admin/eliminar-contenido/' + id, {
+                method: 'DELETE'
+            });
+
+            if(response.ok) {
+                alert("✅ Eliminado correctamente");
+                cerrarEditor();           // Ocultar formulario
+                cargarContenidoParaEditar(); // Refrescar la lista (la peli desaparecerá)
+            } else {
+                alert("❌ Error al eliminar: " + await response.text());
+            }
+        } catch (e) {
+            alert("❌ Error de conexión");
         }
     }
 </script>

@@ -53,6 +53,7 @@ public class AlmacenamientoLocalService implements AlmacenamientoService{
             //si no es un vídeo lanzo la excepción
             if(tipoContenido == null || (
                     !tipoContenido.startsWith("video/") &&
+                            !tipoContenido.startsWith("image/") &&
                             !tipoContenido.equals("text/vtt") &&
                             !tipoContenido.equals("application/x-subrip") &&
                             !tipoContenido.equals("text/plain")

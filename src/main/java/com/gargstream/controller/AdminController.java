@@ -13,6 +13,8 @@ import com.gargstream.service.PeliculaService;
 import com.gargstream.model.Capitulo;
 import com.gargstream.model.Contenido;
 import com.gargstream.model.Subtitulo;
+import org.springframework.web.bind.annotation.DeleteMapping; // Importar esto
+import org.springframework.web.bind.annotation.PathVariable;
 
 
 
@@ -83,7 +85,7 @@ public class AdminController {
         return ResponseEntity.ok(capitulo);
     }
 
-    //borrar archivos
+    //borrar archivos (Este método sigue aquí por compatibilidad con otras funciones si las hay)
     @DeleteMapping("/eliminar/{id}")
     public ResponseEntity<Void> eliminarContenido(@PathVariable Long id){
 
@@ -125,16 +127,17 @@ public class AdminController {
 
             // añadir un nuevo subtítulo
             if (archivoSubtitulo != null && !archivoSubtitulo.isEmpty()) {
-                // guardar el archivo físico
+                // guardar el archivo físico y capturar su nombre REAL
                 String nombreArchivoFisico = almacenamientoService.store(archivoSubtitulo);
 
+                // IMPORTANTE: Aquí usamos el nombre del archivo físico, NO el nombre del idioma
                 String rutaFinal = "/api/archivos/" + nombreArchivoFisico;
 
                 // crear un objeto Subtitulo
                 Subtitulo nuevoSub = new Subtitulo();
                 nuevoSub.setRutaArchivo(rutaFinal);
 
-                // usar lo que ponga el usuario
+                // usar lo que ponga el usuario en el formulario
                 nuevoSub.setIdioma((idiomaSub != null && !idiomaSub.isBlank()) ? idiomaSub : "es");
                 nuevoSub.setEtiqueta((nombreSub != null && !nombreSub.isBlank()) ? nombreSub : "Español (Extra)");
                 nuevoSub.setContenido(contenido);
@@ -153,5 +156,21 @@ public class AdminController {
             return ResponseEntity.badRequest().body("Error al editar: " + e.getMessage());
         }
     }
+
+
+    //borrar contenido (DESCOMENTADO Y CORREGIDO PARA EL BOTÓN ROJO)
+    @DeleteMapping("/eliminar-contenido/{id}")
+    public ResponseEntity<String> eliminarContenidoAdmin(@PathVariable Long id){
+        try{
+            // Usamos tu servicio para borrar físico + DB
+            contenidoService.eliminarContenido(id);
+            return ResponseEntity.ok("Contenido y archivos eliminados correctamente");
+
+        } catch (Exception e){
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Error al eliminar: " + e.getMessage());
+        }
+    }
+
 
 }
