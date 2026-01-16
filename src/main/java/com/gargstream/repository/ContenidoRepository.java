@@ -15,6 +15,10 @@ public interface ContenidoRepository extends JpaRepository<Contenido, Long>{
     //buscar los contenidos subidos más recientes
     List<Contenido> findAllByOrderByFechaSubidaDesc();
 
+    //para las novedades
+    //encuentra los top 10 ordenados por id descendiente.
+    List<Contenido> findTop10ByOrderByIdDesc();
+
     //poner en el fuutro más métodos para buscar
 
 }

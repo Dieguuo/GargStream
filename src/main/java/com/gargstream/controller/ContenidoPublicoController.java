@@ -2,6 +2,7 @@ package com.gargstream.controller;
 
 import com.gargstream.model.Contenido;
 import com.gargstream.repository.ContenidoRepository;
+import com.gargstream.service.ContenidoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +17,7 @@ import java.util.*;
 public class ContenidoPublicoController {
 
     private final ContenidoRepository contenidoRepository;
+    private final ContenidoService contenidoService;
 
     //http://localhost:8080/api/public/catalogo
     @GetMapping("/catalogo")
@@ -30,5 +32,20 @@ public class ContenidoPublicoController {
         return contenidoRepository.findById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
+    //http://localhost:8080/api/public/novedades
+    @GetMapping("/novedades")
+    public ResponseEntity<List<Contenido>> obtenerListaNovedades() {
+        try {
+            // pedir las 10 últimas
+            List<Contenido> listaNovedades = contenidoService.obtenerNovedades();
+
+            // devolver la lista
+            return ResponseEntity.ok(listaNovedades);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 
 }

@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 
 @Service
 @AllArgsConstructor
@@ -87,6 +89,11 @@ public class ContenidoService {
                 System.out.println("Error al borrar el archivo físicamente: " + urlVideo);
             }
         }
+    }
+
+    //obtener las 10 últimas novedades
+    public List<Contenido> obtenerNovedades(){
+        return contenidoRepository.findTop10ByOrderByIdDesc();
     }
 
 }
