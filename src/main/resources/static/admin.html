@@ -22,7 +22,7 @@
     <button class="menu-btn" onclick="mostrar('sec-video')">📹 Video Personal</button>
     <button class="menu-btn" onclick="mostrar('sec-editar'); cargarContenidoParaEditar()">✏️ Editar / Gestionar</button>
 
-    <a href="index.html" class="back-link">← Volver al Catálogo</a>
+    <a href="/index.html" class="back-link">← Volver al Catálogo</a>
 </div>
 
 <div class="content">
@@ -68,10 +68,13 @@
         <form action="/api/admin/nueva-pelicula" onsubmit="enviarFormulario(event)">
             <label>Título:</label>
             <input type="text" name="titulo" required placeholder="Ej: El Padrino">
+
             <label>Archivo de Vídeo (Obligatorio):</label>
             <input type="file" name="archivo" required accept="video/*">
+
             <label>Subtítulos (.srt o .vtt) - Opcional:</label>
             <input type="file" name="subtitulo" accept=".srt,.vtt">
+
             <button type="submit">Subir Película</button>
         </form>
     </div>
@@ -92,6 +95,7 @@
             <select name="idSerie" id="selector-series" required>
                 <option value="" disabled selected>Cargando series...</option>
             </select>
+
             <div class="row">
                 <div style="flex:1">
                     <label>Temporada:</label>
@@ -102,12 +106,16 @@
                     <input type="number" name="numCapitulo" required value="1">
                 </div>
             </div>
+
             <label>Título del Capítulo:</label>
             <input type="text" name="titulo" placeholder="Ej: Piloto">
+
             <label>Archivo de Vídeo (Obligatorio):</label>
             <input type="file" name="archivo" required accept="video/*">
+
             <label>Subtítulos (.srt o .vtt) - Opcional:</label>
             <input type="file" name="subtitulo" accept=".srt,.vtt">
+
             <button type="submit">Subir Capítulo</button>
         </form>
     </div>
@@ -117,14 +125,19 @@
         <form action="/api/admin/nuevo-video" onsubmit="enviarFormulario(event)">
             <label>Título:</label>
             <input type="text" name="titulo" required>
+
             <label>Autor:</label>
             <input type="text" name="autor" placeholder="Yo">
+
             <label>Descripción:</label>
             <textarea name="descripcion" rows="3"></textarea>
+
             <label>Archivo de Vídeo (Obligatorio):</label>
             <input type="file" name="archivo" required accept="video/*">
+
             <label>Subtítulos (.srt o .vtt) - Opcional:</label>
             <input type="file" name="subtitulo" accept=".srt,.vtt">
+
             <button type="submit">Subir Video</button>
         </form>
     </div>
@@ -132,12 +145,15 @@
     <div id="sec-editar" class="form-section" style="max-width: 900px;">
         <h1>Gestionar Contenido</h1>
         <p style="color:#aaa;">Haz clic en una carátula para editar sus datos.</p>
+
         <div id="grid-edicion" class="grid-content"></div>
 
         <div id="formulario-edicion" class="edit-form-container">
             <h2 style="margin-top:0; font-family: 'Bebas Neue', sans-serif; letter-spacing: 1px;">Editando: <span id="edit-titulo-display" style="color:#e50914"></span></h2>
+
             <form action="/api/admin/editar-contenido" onsubmit="enviarFormulario(event)">
                 <input type="hidden" name="id" id="edit-id">
+
                 <div class="row">
                     <div style="flex:1">
                         <label>Título:</label>
@@ -148,15 +164,20 @@
                         <input type="text" name="youtubeTrailerId" id="edit-trailer" placeholder="Ej: dQw4w9WgXcQ">
                     </div>
                 </div>
+
                 <label>Sinopsis:</label>
                 <textarea name="sipnosis" id="edit-sinopsis" rows="4"></textarea>
+
                 <div class="section-separator"></div>
                 <div class="section-title">📂 Archivos (Opcional)</div>
                 <p style="font-size:0.8em; color:#777;">Solo sube archivos si quieres cambiar/añadir algo.</p>
+
                 <label>Cambiar Carátula:</label>
                 <input type="file" name="archivoCaratula" accept="image/*">
+
                 <div class="section-separator"></div>
                 <div class="section-title">🌍 Añadir Nuevo Subtítulo</div>
+
                 <div class="row">
                     <div style="flex:1">
                         <label>Idioma (código):</label>
@@ -176,8 +197,10 @@
                 </div>
                 <label>Archivo Subtítulo (.vtt / .srt):</label>
                 <input type="file" name="archivoSubtitulo" accept=".srt,.vtt">
+
                 <button type="submit">💾 Guardar Cambios</button>
                 <button type="button" class="btn-cancelar" onclick="cerrarEditor()">Cancelar</button>
+
                 <button type="button" class="btn-eliminar" onclick="eliminarContenido()">🗑️ ELIMINAR CONTENIDO</button>
             </form>
         </div>

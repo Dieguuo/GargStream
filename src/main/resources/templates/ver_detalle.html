@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalles - GargStream</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+
+    <link rel="stylesheet" href="css/detalle.css">
+</head>
+<body>
+
+<a href="/index.html" class="volver">← Volver al Catálogo</a>
+
+<div id="contenedor-principal">
+    <p style="text-align:center; margin-top:50px; font-size:1.5em; color:#666;">Cargando...</p>
+</div>
+
+<div id="overlay-reproductor">
+    <button class="btn-cerrar-video" onclick="cerrarVideo()">⬅ Volver a la Ficha</button>
+    <div id="video-container" style="width:100%; height:100%"></div>
+</div>
+
+<script src="js/detalle.js"></script>
+
+<script th:inline="javascript">
+    /* Recuperamos el estado de autenticación desde Java/Thymeleaf */
+    const isUserAuthenticated = [[${#authorization.expression('isAuthenticated()')}]];
+
+    // Escuchamos todos los clicks de la página (fase de captura)
+    document.addEventListener('click', function(e) {
+        // Buscamos si el elemento clickeado es un botón
+        const target = e.target.closest('button');
+
+        if (target) {
+            // Comprobamos si es un botón de reproducir (por texto o clase común)
+            // Esto funcionará aunque el botón se cree dinámicamente con JS
+            const textoBoton = target.innerText.toLowerCase();
+            if (textoBoton.includes('reproducir') || textoBoton.includes('ver') || target.classList.contains('play-icon')) {
+
+                // Si NO está logueado, cancelamos la acción y mandamos al login
+                if (!isUserAuthenticated) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log("Usuario invitado intentando reproducir. Redirigiendo...");
+                    window.location.href = '/login';
+                }
+            }
+        }
+    }, true); // 'true' hace que este evento se ejecute ANTES que el del archivo detalle.js
+</script>
+
+</body>
+</html>

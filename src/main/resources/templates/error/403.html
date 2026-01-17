@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Acceso Denegado | GargStream</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@300;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary-color: #ffb400; --bg-color: #141414; }
+        body {
+            background-color: var(--bg-color); color: white;
+            font-family: 'Roboto', sans-serif;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            height: 100vh; margin: 0; text-align: center;
+        }
+        h1 { font-family: 'Bebas Neue', sans-serif; font-size: 8em; margin: 0; color: var(--primary-color); line-height: 1;}
+        h2 { font-size: 2em; margin-top: 10px; text-transform: uppercase; letter-spacing: 2px;}
+        p { color: #999; max-width: 500px; font-size: 1.2em; line-height: 1.6; margin-bottom: 30px;}
+
+        .btn-home {
+            padding: 15px 40px; background-color: white; color: black;
+            text-decoration: none; font-weight: bold; border-radius: 4px;
+            font-size: 1.2em; transition: 0.3s;
+        }
+        .btn-home:hover { background-color: var(--primary-color); color: black;}
+
+        .lock-icon { font-size: 4em; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="lock-icon">🔒</div>
+<h1>403</h1>
+<h2>Acceso Denegado</h2>
+<p>Lo sentimos, no tienes los permisos necesarios para entrar en esta zona VIP. Esta área es exclusiva para los administradores de GargStream.</p>
+
+<a href="/index.html" class="btn-home">Volver al Inicio</a>
+
+</body>
+</html>

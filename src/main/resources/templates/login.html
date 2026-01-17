@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar sesión | GargStream</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@300;700&display=swap" rel="stylesheet">
+    <style>
+        /* Reutilizamos los mismos estilos del registro para mantener la imagen de marca */
+        :root { --primary-color: #ffb400; --bg-color: #141414; }
+        body {
+            background-color: var(--bg-color); color: white;
+            font-family: 'Roboto', sans-serif;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; margin: 0;
+            background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('img/fondo_cine.jpeg');
+            background-size: cover; background-position: center;
+        }
+        .login-card {
+            background: rgba(0, 0, 0, 0.85); padding: 60px;
+            border-radius: 10px; width: 100%; max-width: 450px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+        }
+        h1 { font-family: 'Bebas Neue', sans-serif; font-size: 3em; margin: 0 0 30px 0; color: white; letter-spacing: 2px;}
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 5px; color: #aaa; font-size: 0.9em; }
+        input {
+            width: 100%; padding: 15px; background: #333; border: 1px solid #333;
+            color: white; border-radius: 4px; font-size: 1em; box-sizing: border-box;
+        }
+        input:focus { outline: none; border-color: var(--primary-color); background: #444; }
+
+        .btn-login {
+            width: 100%; padding: 15px; background-color: var(--primary-color);
+            color: black; border: none; font-weight: bold; font-size: 1.2em;
+            cursor: pointer; border-radius: 4px; margin-top: 20px; font-family: 'Bebas Neue', sans-serif; letter-spacing: 1px;
+            transition: 0.3s;
+        }
+        .btn-login:hover { background-color: #e5a100; transform: scale(1.02); }
+
+        .register-link { text-align: center; margin-top: 20px; color: #aaa; }
+        .register-link a { color: var(--primary-color); text-decoration: none; font-weight: bold; }
+        .register-link a:hover { text-decoration: underline; }
+
+        .error-msg { background: #e50914; color: white; padding: 15px; border-radius: 4px; margin-bottom: 20px; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="login-card">
+    <h1>Iniciar Sesión</h1>
+
+    <div th:if="${param.error}" class="error-msg">
+        Email o contraseña incorrectos.
+    </div>
+
+    <div th:if="${param.logout}" class="error-msg" style="background-color: #2e7d32;">
+        Has cerrado sesión correctamente.
+    </div>
+
+    <form action="/login" method="POST">
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" name="username" placeholder="ejemplo@correo.com" required autofocus>
+        </div>
+
+        <div class="form-group">
+            <label>Contraseña</label>
+            <input type="password" name="password" placeholder="Tu contraseña" required>
+        </div>
+
+        <button type="submit" class="btn-login">Entrar</button>
+    </form>
+
+    <div class="register-link">
+        ¿Nuevo en GargStream? <a href="/register">Regístrate ahora</a>
+    </div>
+</div>
+
+</body>
+</html>

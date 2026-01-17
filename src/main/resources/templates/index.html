@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -9,6 +9,41 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
+
+  <style>
+    .btn-logout {
+        background-color: #e50914; /* Rojo Netflix */
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+        margin-left: 15px;
+        font-family: 'Roboto', sans-serif;
+        font-size: 0.9rem;
+        transition: background 0.3s;
+        text-decoration: none; /* Para los enlaces que parecen botones */
+        display: inline-block;
+    }
+    .btn-logout:hover { background-color: #b20710; }
+
+    /* Estilo para el botón de Registrarse (Dorado) */
+    .btn-register {
+        background-color: #ffb400;
+        color: black;
+    }
+    .btn-register:hover { background-color: #e5a100; }
+
+    /* Estilo para el botón de Entrar (Gris oscuro) */
+    .btn-login {
+        background-color: #333;
+        color: white;
+    }
+    .btn-login:hover { background-color: #555; }
+
+    .header-actions { display: flex; align-items: center; }
+  </style>
 </head>
 <body>
 
@@ -27,7 +62,19 @@
     <input type="text" id="buscador" class="search-input" placeholder="Títulos, géneros...">
   </div>
 
-  <a href="admin.html" class="btn-admin">⚙️ Panel Admin</a>
+  <div class="header-actions">
+    <a href="admin.html" class="btn-admin" sec:authorize="hasAuthority('ADMIN')">⚙️ Panel Admin</a>
+
+    <form th:action="@{/logout}" method="post" sec:authorize="isAuthenticated()" style="margin: 0;">
+      <button type="submit" class="btn-logout">Cerrar Sesión</button>
+    </form>
+
+    <div sec:authorize="isAnonymous()" style="display: flex; align-items: center;">
+      <a href="/login" class="btn-logout btn-login">Iniciar Sesión</a>
+      <a href="/register" class="btn-logout btn-register">Registrarse</a>
+    </div>
+
+  </div>
 </div>
 
 <div class="filter-bar" id="filter-bar">
