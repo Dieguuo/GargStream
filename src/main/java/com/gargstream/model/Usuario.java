@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "usuarios")
@@ -28,6 +29,11 @@ public class Usuario {
     //el rol que tiene el usuario
     @Enumerated(EnumType.STRING)
     private Rol rol;
+
+    //para verificare el email
+    private String codigoVerificacion;
+    private LocalDateTime expiracionCodigo;
+    private String nuevoEmailPendiente;
 
 }
 

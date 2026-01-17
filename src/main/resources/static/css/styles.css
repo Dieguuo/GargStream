@@ -25,12 +25,58 @@ body {
     flex-wrap: nowrap;
 }
 
+/* --- LOGO CSS: NEÓN OUTLINE --- */
 .brand-section h1 {
     margin: 0;
-    color: var(--primary-color);
-    font-family: 'Bebas Neue', sans-serif; font-size: 2.5em; letter-spacing: 2px;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.5); cursor: pointer;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3em;
+    letter-spacing: 4px; /* Muy espaciado para que se lea bien el borde */
+    cursor: pointer;
     white-space: nowrap;
+    position: relative;
+
+    /* ESTILO APAGADO (Inicial) */
+    color: transparent; /* Texto transparente */
+    /* Creamos el borde dorado fino */
+    -webkit-text-stroke: 1px rgba(255, 180, 0, 0.6);
+
+    /* Una transición suave para el encendido */
+    transition: all 0.4s ease;
+}
+
+/* EFECTO HOVER: EL NEÓN SE ENCIENDE */
+.brand-section h1:hover {
+    /* El texto se rellena de dorado */
+    color: var(--primary-color);
+    /* Quitamos el borde (o lo integramos) */
+    -webkit-text-stroke: 0px;
+
+    /* El brillo exterior (Glow) */
+    text-shadow:
+        0 0 10px rgba(255, 180, 0, 0.8),
+        0 0 20px rgba(255, 180, 0, 0.4),
+        0 0 40px rgba(255, 180, 0, 0.2);
+
+    /* Pequeño chispazo de movimiento */
+    transform: scale(1.02);
+}
+
+/* DETALLE EXTRA: SUBRAYADO LÁSER */
+.brand-section h1::after {
+    content: '';
+    display: block;
+    width: 0%; /* Empieza invisible */
+    height: 2px;
+    background-color: var(--primary-color);
+    margin: 0 auto; /* Centrado */
+    margin-top: 5px;
+    box-shadow: 0 0 10px var(--primary-color); /* Brillo en la línea */
+    transition: width 0.4s ease;
+}
+
+/* Al pasar el ratón, la línea crece */
+.brand-section h1:hover::after {
+    width: 100%;
 }
 
 .search-box {
@@ -52,17 +98,7 @@ body {
 }
 .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #aaa; }
 
-.btn-admin {
-    background: rgba(51, 51, 51, 0.8); color: white; text-decoration: none;
-    padding: 8px 15px; border-radius: 4px; border: 1px solid #555;
-    font-weight: bold; transition: 0.3s; backdrop-filter: blur(5px);
-    white-space: nowrap;
-}
-.btn-admin:hover {
-    background: var(--primary-color);
-    border-color: var(--primary-color);
-    color: #000; /* Texto negro sobre dorado */
-}
+.header-actions { display: flex; align-items: center; }
 
 /* --- BARRA DE FILTROS --- */
 .filter-bar {
@@ -190,7 +226,7 @@ body {
     .header-container { gap: 10px; flex-wrap: wrap; }
     .search-box { width: 100%; max-width: none; margin-top: 10px; order: 3; }
     .brand-section { flex: 1; order: 1; }
-    .btn-admin { order: 2; }
+    /* El orden cambia un poco */
 }
 
 /* --- LOADER INICIAL --- */
@@ -214,3 +250,103 @@ body {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+/* =========================================
+   NUEVOS ESTILOS PARA MENÚ USUARIO Y LOGIN
+   ========================================= */
+
+/* Dropdown Container */
+.user-menu-container {
+    position: relative;
+    display: inline-block;
+    margin-left: 15px;
+}
+
+/* Avatar Circular */
+.avatar-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: 0.3s;
+}
+.avatar-circle:hover { border-color: var(--primary-color); }
+
+/* El menú desplegable */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    background-color: rgba(0, 0, 0, 0.95);
+    min-width: 160px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+    z-index: 1000;
+    border: 1px solid #333;
+    border-radius: 4px;
+    overflow: hidden;
+    padding: 5px 0;
+}
+
+/* Mostrar menú al pasar el ratón */
+.user-menu-container:hover .dropdown-content { display: block; }
+
+/* Items del menú */
+.dropdown-item {
+    color: white;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.9em;
+    transition: 0.2s;
+}
+.dropdown-item:hover { background-color: #333; color: var(--primary-color); }
+
+/* Botón logout específico dentro del menú */
+.btn-logout-menu {
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    color: #e50914; /* Rojo */
+    font-weight: bold;
+    border-top: 1px solid #333;
+    margin-top: 5px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.9em;
+    padding: 12px 16px;
+}
+.btn-logout-menu:hover { background-color: #333; color: #ff555e; }
+
+/* Botones para Invitados (Login/Register) */
+.btn-register {
+    background-color: var(--primary-color);
+    color: black;
+    padding: 8px 15px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+    margin-left: 10px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.9em;
+    transition: 0.3s;
+}
+.btn-register:hover { background-color: #e5a100; }
+
+.btn-login {
+    background-color: #333;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+    margin-left: 10px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.9em;
+    transition: 0.3s;
+}
+.btn-login:hover { background-color: #555; }
