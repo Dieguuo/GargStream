@@ -10,7 +10,7 @@ body {
 /* BARRA LATERAL */
 .sidebar { width: 250px; background-color: #000; padding: 20px; border-right: 1px solid #333; display: flex; flex-direction: column; }
 .sidebar h2 {
-    color: #e50914;
+    color: #ffb400; /* DORADO */
     margin-bottom: 30px;
     font-family: 'Bebas Neue', sans-serif;
     font-size: 2.2em;
@@ -40,7 +40,7 @@ h1 { font-family: 'Bebas Neue', sans-serif; letter-spacing: 1px; font-size: 2.5e
 
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-label { display: block; margin-top: 15px; color: #e50914; font-weight: bold; font-size: 0.9em; }
+label { display: block; margin-top: 15px; color: #ffb400; font-weight: bold; font-size: 0.9em; }
 input[type="text"], input[type="number"], textarea, input[type="file"], select {
     width: 100%; padding: 10px; margin-top: 5px;
     background-color: #333; border: 1px solid #444; color: white; border-radius: 4px;
@@ -51,16 +51,22 @@ select { cursor: pointer; color: white; }
 select option { background-color: #333; }
 
 button[type="submit"], .btn-cancelar {
-    background-color: #e50914; color: white; border: none;
+    background-color: #ffb400; /* DORADO */
+    color: #000;
+    border: none;
     padding: 12px 20px; margin-top: 20px; cursor: pointer;
     font-size: 1em; font-weight: bold; border-radius: 4px; width: 100%;
     font-family: 'Roboto', sans-serif; text-transform: uppercase;
 }
-button[type="submit"]:hover { background-color: #f40612; }
+button[type="submit"]:hover {
+    background-color: #e5a100; /* Un poco más oscuro */
+    box-shadow: 0 0 15px rgba(255, 180, 0, 0.4);
+}
 
-.btn-cancelar { background-color: #666; margin-top: 10px; }
-.btn-cancelar:hover { background-color: #888; }
+.btn-cancelar { background-color: #666; margin-top: 10px; color: white; }
+.btn-cancelar:hover { background-color: #888; box-shadow: none; }
 
+/* ELIMINAR (ROJO) */
 .btn-eliminar {
     background-color: #8b0000; color: white; border: 1px solid #ff0000;
     margin-top: 30px;
@@ -91,7 +97,11 @@ button[type="submit"]:hover { background-color: #f40612; }
     background: #222; border-radius: 5px; overflow: hidden;
     cursor: pointer; transition: transform 0.2s; border: 1px solid transparent;
 }
-.card-edit:hover { transform: scale(1.05); border-color: #e50914; }
+.card-edit:hover {
+    transform: scale(1.05);
+    border-color: #ffb400;
+    box-shadow: 0 0 10px rgba(255, 180, 0, 0.3);
+}
 .card-edit img { width: 100%; height: 220px; object-fit: cover; }
 .card-edit p {
     padding: 10px; margin: 0; font-size: 0.9em; text-align: center; color: #ddd;
@@ -100,7 +110,10 @@ button[type="submit"]:hover { background-color: #f40612; }
 
 .edit-form-container { display: none; border: 1px solid #444; padding: 20px; border-radius: 10px; background: #1a1a1a; }
 .section-separator { border-top: 1px solid #333; margin: 20px 0; padding-top: 10px; }
-.section-title { color: #aaa; margin-bottom: 10px; font-size: 1.1em; border-left: 3px solid #e50914; padding-left: 10px; }
+.section-title {
+    color: #aaa; margin-bottom: 10px; font-size: 1.1em;
+    border-left: 3px solid #ffb400; padding-left: 10px;
+}
 
 /* DASHBOARD */
 .dash-grid {
@@ -111,11 +124,47 @@ button[type="submit"]:hover { background-color: #f40612; }
 }
 .dash-number {
     font-size: 4em;
-    color: #e50914; margin: 10px 0;
+    color: #ffb400;
+    margin: 10px 0;
     font-family: 'Bebas Neue', sans-serif;
 }
 .dash-label { color: #aaa; font-size: 1.1em; text-transform: uppercase; font-weight: bold;}
 
 .progress-container { width: 100%; background-color: #444; border-radius: 5px; height: 10px; margin-top: 10px; overflow: hidden;}
-.progress-bar { height: 100%; width: 0%; background-color: #e50914; transition: width 1s; }
+.progress-bar { height: 100%; width: 0%; background-color: #ffb400; transition: width 1s; }
 .disk-info { display: flex; justify-content: space-between; font-size: 0.8em; color: #888; margin-top: 5px;}
+
+/* OVERLAY DE CARGA */
+#overlay-loading {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.85);
+    z-index: 99999;
+    display: none;
+    flex-direction: column; justify-content: center; align-items: center;
+    backdrop-filter: blur(5px);
+}
+
+.spinner {
+    width: 60px; height: 60px;
+    border: 6px solid rgba(255,255,255,0.1);
+    border-top: 6px solid #ffb400; /* DORADO */
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+}
+
+.loading-text {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2em; letter-spacing: 2px;
+    color: white; margin-bottom: 10px;
+}
+
+.loading-subtext {
+    font-family: 'Roboto', sans-serif;
+    color: #aaa; font-size: 1em;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

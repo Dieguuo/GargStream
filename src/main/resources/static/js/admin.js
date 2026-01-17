@@ -131,19 +131,20 @@ function cerrarEditor() {
     document.querySelector('#formulario-edicion form').reset();
 }
 
-// --- 6. ENVÍO DE FORMULARIOS ---
+// --- 6. ENVÍO DE FORMULARIOS (CON OVERLAY) ---
 async function enviarFormulario(event) {
     event.preventDefault();
     const form = event.target;
+
     const consola = document.getElementById('console-box');
     const contenidoConsola = document.getElementById('console-content');
-    const boton = form.querySelector('button[type="submit"]');
+    const overlay = document.getElementById('overlay-loading'); // Referencia al overlay
 
-    consola.style.display = 'block';
-    contenidoConsola.textContent = "⏳ Procesando solicitud...";
+    // 1. ACTIVAR MODO CARGA
+    overlay.style.display = 'flex'; // Bloquear pantalla
+    consola.style.display = 'block'; // Asegurar que la consola se ve
+    contenidoConsola.textContent = "⏳ Procesando solicitud... espera por favor.";
     contenidoConsola.style.color = "#ffff00";
-    boton.disabled = true;
-    boton.style.opacity = "0.5";
 
     try {
         const formData = new FormData(form);
@@ -151,16 +152,19 @@ async function enviarFormulario(event) {
 
         if (response.ok) {
             const json = await response.json();
-            contenidoConsola.textContent = "✅ ¡ÉXITO!\n" + JSON.stringify(json, null, 4);
-            contenidoConsola.style.color = "#0f0";
 
+            // 2. ÉXITO: MOSTRAR JSON
+            contenidoConsola.textContent = "✅ ¡ÉXITO!\nDatos recibidos del servidor:\n" + JSON.stringify(json, null, 4);
+            contenidoConsola.style.color = "#0f0"; // Verde hacker
+
+            // Lógica de limpieza
             if(!form.action.includes("editar-contenido")) {
                 form.reset();
             } else {
+                // Si editamos, esperamos un poco antes de cerrar el editor
                 setTimeout(() => {
                     cerrarEditor();
                     cargarContenidoParaEditar();
-                    consola.style.display = 'none';
                     cargarMetricas();
                 }, 1500);
             }
@@ -169,18 +173,22 @@ async function enviarFormulario(event) {
                 cargarSeriesEnSelector();
             }
             cargarMetricas();
+
         } else {
+            // ERROR DEL SERVIDOR
             const textoError = await response.text();
-            contenidoConsola.textContent = textoError;
+            contenidoConsola.textContent = "❌ ERROR:\n" + textoError;
             contenidoConsola.style.color = "#ff4444";
         }
     } catch (error) {
+        // ERROR DE RED
         console.error(error);
         contenidoConsola.textContent = "❌ Error de conexión: " + error.message;
         contenidoConsola.style.color = "#ff4444";
     } finally {
-        boton.disabled = false;
-        boton.style.opacity = "1";
+        // 3. FINALIZAR: QUITAMOS EL BLOQUEO
+        // El JSON se queda visible en la consola debajo
+        overlay.style.display = 'none';
     }
 }
 

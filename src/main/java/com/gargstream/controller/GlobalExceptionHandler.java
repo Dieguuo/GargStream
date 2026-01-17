@@ -7,11 +7,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    //cuando se sube un formato que no es vídeo
+    //cuando se sube un formato que no es válido
     @ExceptionHandler(FormatoInvalidoException.class)
     public ResponseEntity<String> manejarFormatoInvalido(FormatoInvalidoException ex) {
         String tituloError = "Formato Incorrecto";
@@ -22,7 +23,7 @@ public class GlobalExceptionHandler {
                 .body(tituloError + ": " + mensajeError);
     }
 
-    //cuando el archivo es muy grande
+    // cuando el archivo es demasiado grande
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<String> manejarArchivoMuyGrande(MaxUploadSizeExceededException ex) {
         String tituloError = "Archivo Muy Grande";
@@ -33,7 +34,7 @@ public class GlobalExceptionHandler {
                 .body(tituloError + ": " + mensajeError);
     }
 
-    //archivo no encontrado e le disco
+    // error de archivo no enonctrado
     @ExceptionHandler(StorageFileNotFoundException.class)
     public ResponseEntity<String> manejarArchivoNoEncontrado(StorageFileNotFoundException ex) {
         String tituloError = "Archivo No Disponible";
@@ -44,12 +45,17 @@ public class GlobalExceptionHandler {
                 .body(tituloError + ": " + mensajeError);
     }
 
-    // 4. Error Genérico (Red de seguridad para todo lo demás)
+    //erorr 404
+    @ExceptionHandler(NoResourceFoundException.class)
+    public void manejar404(NoResourceFoundException ex) throws NoResourceFoundException {
+        throw ex; // Lo relanzamos para que Spring Boot use su sistema de plantillas (tu carpeta /error)
+    }
+
+    // error genérico
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> manejarErrorGeneral(Exception ex) {
         ex.printStackTrace();
 
-        // Estructura anterior: Titulo + Mensaje
         String tituloError = "Error Inesperado";
         String mensajeError = "Ha ocurrido un error: " + ex.getMessage();
 

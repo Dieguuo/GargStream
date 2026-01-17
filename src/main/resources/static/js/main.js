@@ -15,21 +15,35 @@ let touchEndX = 0;
 let isWheelCooldown = false;
 
 
-// --- 1. CARGA INICIAL ---
+// --- 1. CARGA INICIAL (CON LOADER) ---
 document.addEventListener('DOMContentLoaded', () => {
-    fetch('/api/public/novedades')
-        .then(res => res.json())
-        .then(data => renderHero(data))
-        .catch(err => console.error("Error novedades", err));
 
-    fetch('/api/public/catalogo')
-        .then(res => res.json())
-        .then(data => {
-            catalogoCompleto = data;
-            generarFiltros(data);
-            distribuirCatalogo(data);
-        })
-        .catch(err => console.error("Error catalogo", err));
+    const loader = document.getElementById('main-loader');
+
+    // Cargar todo simultáneamente
+    Promise.all([
+        fetch('/api/public/novedades').then(res => res.json()),
+        fetch('/api/public/catalogo').then(res => res.json())
+    ])
+    .then(([dataNovedades, dataCatalogo]) => {
+        // 1. Renderizar Novedades
+        renderHero(dataNovedades);
+
+        // 2. Renderizar Catálogo
+        catalogoCompleto = dataCatalogo;
+        generarFiltros(dataCatalogo);
+        distribuirCatalogo(dataCatalogo);
+
+        // 3. OCULTAR LOADER
+        loader.style.opacity = '0';
+        setTimeout(() => {
+            loader.style.display = 'none';
+        }, 500);
+    })
+    .catch(err => {
+        console.error("Error cargando la web:", err);
+        loader.style.display = 'none'; // Quitar loader aunque falle para no bloquear
+    });
 
     // Listeners del buscador
     document.getElementById('buscador').addEventListener('keyup', (e) => {
@@ -216,7 +230,6 @@ function renderRow(lista, containerId) {
 
         const div = document.createElement('div');
         div.className = 'standard-card';
-        // HTML simplificado sin botón borrar
         div.innerHTML = `
             <div onclick="window.location.href='${link}'">
                 <img src="${img}" loading="lazy" alt="${item.titulo}">
