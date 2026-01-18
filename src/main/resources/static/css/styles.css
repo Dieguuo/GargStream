@@ -30,60 +30,35 @@ body {
     margin: 0;
     font-family: 'Bebas Neue', sans-serif;
     font-size: 3em;
-    letter-spacing: 4px; /* Muy espaciado para que se lea bien el borde */
+    letter-spacing: 4px;
     cursor: pointer;
     white-space: nowrap;
     position: relative;
-
-    /* ESTILO APAGADO (Inicial) */
-    color: transparent; /* Texto transparente */
-    /* Creamos el borde dorado fino */
+    color: transparent;
     -webkit-text-stroke: 1px rgba(255, 180, 0, 0.6);
-
-    /* Una transición suave para el encendido */
     transition: all 0.4s ease;
 }
 
-/* EFECTO HOVER: EL NEÓN SE ENCIENDE */
 .brand-section h1:hover {
-    /* El texto se rellena de dorado */
     color: var(--primary-color);
-    /* Quitamos el borde (o lo integramos) */
     -webkit-text-stroke: 0px;
-
-    /* El brillo exterior (Glow) */
     text-shadow:
         0 0 10px rgba(255, 180, 0, 0.8),
         0 0 20px rgba(255, 180, 0, 0.4),
         0 0 40px rgba(255, 180, 0, 0.2);
-
-    /* Pequeño chispazo de movimiento */
     transform: scale(1.02);
 }
 
-/* DETALLE EXTRA: SUBRAYADO LÁSER */
 .brand-section h1::after {
-    content: '';
-    display: block;
-    width: 0%; /* Empieza invisible */
-    height: 2px;
+    content: ''; display: block; width: 0%; height: 2px;
     background-color: var(--primary-color);
-    margin: 0 auto; /* Centrado */
-    margin-top: 5px;
-    box-shadow: 0 0 10px var(--primary-color); /* Brillo en la línea */
+    margin: 0 auto; margin-top: 5px;
+    box-shadow: 0 0 10px var(--primary-color);
     transition: width 0.4s ease;
 }
+.brand-section h1:hover::after { width: 100%; }
 
-/* Al pasar el ratón, la línea crece */
-.brand-section h1:hover::after {
-    width: 100%;
-}
-
-.search-box {
-    flex: 1;
-    max-width: 600px;
-    position: relative;
-}
+.search-box { flex: 1; max-width: 600px; position: relative; }
 
 .search-input {
     width: 100%; padding: 10px 15px 10px 40px;
@@ -93,8 +68,7 @@ body {
     box-sizing: border-box;
 }
 .search-input:focus {
-    border-color: var(--primary-color);
-    outline: none; background-color: rgba(0,0,0,0.8);
+    border-color: var(--primary-color); outline: none; background-color: rgba(0,0,0,0.8);
 }
 .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #aaa; }
 
@@ -105,6 +79,7 @@ body {
     display: flex; gap: 10px; overflow-x: auto;
     padding: 10px 4%; margin-bottom: 10px;
     -ms-overflow-style: none; scrollbar-width: none;
+    z-index: 90; position: relative;
 }
 .filter-bar::-webkit-scrollbar { display: none; }
 
@@ -118,66 +93,121 @@ body {
 .filter-chip:hover { background-color: rgba(255,255,255,0.3); }
 
 .filter-chip.active {
-    background-color: var(--primary-color);
-    color: #000;
-    border-color: var(--primary-color);
-    font-weight: bold;
-    box-shadow: 0 0 15px rgba(255, 180, 0, 0.4); /* Resplandor dorado */
+    background-color: var(--primary-color); color: #000;
+    border-color: var(--primary-color); font-weight: bold;
+    box-shadow: 0 0 15px rgba(255, 180, 0, 0.4);
 }
 
-/* --- SECCIÓN HERO --- */
-.hero-section {
-    position: relative; padding: 20px 0; margin-bottom: 20px;
-    overflow: hidden; touch-action: pan-y;
-    transition: opacity 0.5s, height 0.5s;
-}
-.hero-section.oculto { display: none; }
+/* --- HERO SLIDER (ESTILO TARJETA FLOTANTE) --- */
+.hero-wrapper {
+    position: relative;
+    /* Flotante: No toca los bordes y está centrado */
+    width: 94%;
+    max-width: 1600px;
+    margin: 20px auto 40px auto;
 
-.hero-title {
-    padding-left: 4%; margin-bottom: 0;
-    font-family: 'Bebas Neue', sans-serif; font-size: 2em; letter-spacing: 1px; color: #fff;
-}
-.hero-track {
-    display: flex; gap: 20px; width: max-content;
-    padding: 60px 0; will-change: transform; cursor: grab;
-}
-.hero-track:active { cursor: grabbing; }
+    height: 70vh;
+    min-height: 500px;
 
-.hero-card {
-    flex: 0 0 220px; height: 330px; border-radius: 10px;
-    background-size: cover; background-position: center;
-    opacity: 0.4; transform: scale(0.85); filter: grayscale(80%);
-    box-shadow: 0 5px 10px rgba(0,0,0,0.5);
-    transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
-    position: relative; border: 2px solid transparent;
-    user-select: none; -webkit-user-drag: none;
-}
-.hero-card.active {
-    opacity: 1; transform: scale(1.15); filter: grayscale(0%);
-    border-color: rgba(255,255,255,0.4); z-index: 10;
-    box-shadow: 0 0 40px rgba(255, 180, 0, 0.6); /* Resplandor dorado */
-    cursor: pointer;
+    overflow: hidden; /* Mantiene los bordes redondos */
+    display: none; /* Se activa con JS */
+
+    /* EFECTOS DE TARJETA PREMIUM */
+    border-radius: 24px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.hero-nav {
-    position: absolute; top: 55%; transform: translateY(-50%);
-    width: 100%; display: flex; justify-content: space-between;
-    pointer-events: none; padding: 0 2%; box-sizing: border-box; z-index: 20;
+/* Slide individual */
+.hero-slide {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    opacity: 0; transition: opacity 1s ease-in-out;
+    background-size: cover; background-position: center center;
 }
-.nav-btn, .row-btn {
-    pointer-events: auto; background: rgba(0,0,0,0.7); color: white;
-    border: 1px solid rgba(255,255,255,0.3); font-size: 2em;
-    width: 50px; height: 50px; border-radius: 50%;
-    cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center;
-    z-index: 10;
+.hero-slide.active { opacity: 1; z-index: 1; }
+
+/* Capa oscura (Gradiente) */
+.hero-overlay {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(to right, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 50%, transparent 100%),
+                linear-gradient(to top, #141414 0%, transparent 20%);
 }
-.nav-btn:hover, .row-btn:hover {
+
+/* Contenido del texto del Hero */
+.hero-content {
+    position: absolute; bottom: 20%; left: 4%;
+    width: 45%; max-width: 700px; z-index: 2;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+}
+
+.hero-logo-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 5em; line-height: 0.9;
+    margin-bottom: 15px; color: var(--primary-color);
+    text-transform: uppercase;
+}
+
+.hero-desc {
+    font-size: 1.1em; line-height: 1.5; color: #ddd; margin-bottom: 25px;
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+
+/* Botones Hero (Estilo Cápsula) */
+.hero-btn {
+    padding: 12px 35px;
+    font-size: 1.1em; font-weight: bold; border: none;
+    border-radius: 50px; /* Redondos */
+    cursor: pointer; display: inline-flex; align-items: center; gap: 10px;
+    text-decoration: none; transition: all 0.3s ease;
+    text-transform: uppercase; letter-spacing: 1px;
+}
+
+.btn-primary {
+    background: white; color: black;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+.btn-primary:hover {
     background: var(--primary-color);
-    border-color: var(--primary-color);
-    color: #000;
-    transform: scale(1.1);
-    box-shadow: 0 0 15px rgba(255, 180, 0, 0.5);
+    box-shadow: 0 0 30px rgba(255, 180, 0, 0.6);
+    transform: scale(1.05);
 }
+
+.btn-secondary {
+    background: rgba(109, 109, 110, 0.6); color: white; margin-left: 15px;
+    backdrop-filter: blur(5px);
+}
+.btn-secondary:hover {
+    background: rgba(150, 150, 150, 0.8);
+    transform: scale(1.05);
+}
+
+/* Flechas Hero (Redondeadas y separadas del borde) */
+.hero-arrow {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    background: rgba(0,0,0,0.3); color: white; border: none;
+    font-size: 2.5em;
+    width: 60px; height: 60px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; z-index: 10; opacity: 0; transition: 0.3s;
+    margin: 0 20px;
+}
+.hero-wrapper:hover .hero-arrow { opacity: 1; }
+.hero-arrow:hover {
+    background: white; color: black;
+    transform: scale(1.1) translateY(-50%);
+}
+.hero-arrow.left { left: 0; }
+.hero-arrow.right { right: 0; }
+
+/* Indicadores (puntos) */
+.hero-indicators {
+    position: absolute; bottom: 20px; right: 4%; z-index: 10; display: flex; gap: 10px;
+}
+.indicator {
+    width: 12px; height: 12px; background: rgba(255,255,255,0.5); border-radius: 50%; cursor: pointer;
+}
+.indicator.active { background: white; transform: scale(1.2); }
+
 
 /* --- FILAS ESTÁNDAR --- */
 .category-row { margin-bottom: 40px; position: relative; min-height: 100px; }
@@ -201,11 +231,12 @@ body {
     position: absolute; top: 50%; transform: translateY(-50%);
     font-size: 1.5em; width: 40px; height: 40px;
     background: rgba(20, 20, 20, 0.8); border: none; opacity: 0;
-    transition: opacity 0.3s, transform 0.2s, background 0.2s;
+    transition: opacity 0.3s, transform 0.2s, background 0.2s; z-index: 20; color: white; border-radius: 50%;
 }
 .row-btn.left { left: 1%; }
 .row-btn.right { right: 1%; }
 .category-row:hover .row-btn { opacity: 1; }
+.row-btn:hover { background: var(--primary-color); color: black; }
 
 .standard-card {
     flex: 0 0 160px; background-color: var(--card-bg);
@@ -226,7 +257,9 @@ body {
     .header-container { gap: 10px; flex-wrap: wrap; }
     .search-box { width: 100%; max-width: none; margin-top: 10px; order: 3; }
     .brand-section { flex: 1; order: 1; }
-    /* El orden cambia un poco */
+    .hero-content { width: 90%; bottom: 10%; }
+    .hero-logo-title { font-size: 3em; }
+    .hero-wrapper { height: 60vh; width: 96%; } /* En móvil un poco más ancho */
 }
 
 /* --- LOADER INICIAL --- */
@@ -246,107 +279,20 @@ body {
     animation: spin 0.8s linear infinite;
 }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-/* =========================================
-   NUEVOS ESTILOS PARA MENÚ USUARIO Y LOGIN
-   ========================================= */
-
-/* Dropdown Container */
-.user-menu-container {
-    position: relative;
-    display: inline-block;
-    margin-left: 15px;
-}
-
-/* Avatar Circular */
-.avatar-circle {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    object-fit: cover;
-    cursor: pointer;
-    border: 2px solid transparent;
-    transition: 0.3s;
-}
+/* MENÚ USUARIO */
+.user-menu-container { position: relative; display: inline-block; margin-left: 15px; }
+.avatar-circle { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; cursor: pointer; border: 2px solid transparent; transition: 0.3s; }
 .avatar-circle:hover { border-color: var(--primary-color); }
-
-/* El menú desplegable */
-.dropdown-content {
-    display: none;
-    position: absolute;
-    right: 0;
-    top: 100%;
-    background-color: rgba(0, 0, 0, 0.95);
-    min-width: 160px;
-    box-shadow: 0 8px 16px rgba(0,0,0,0.5);
-    z-index: 1000;
-    border: 1px solid #333;
-    border-radius: 4px;
-    overflow: hidden;
-    padding: 5px 0;
-}
-
-/* Mostrar menú al pasar el ratón */
+.dropdown-content { display: none; position: absolute; right: 0; top: 100%; background-color: rgba(0, 0, 0, 0.95); min-width: 160px; box-shadow: 0 8px 16px rgba(0,0,0,0.5); z-index: 1000; border: 1px solid #333; border-radius: 4px; overflow: hidden; padding: 5px 0; }
 .user-menu-container:hover .dropdown-content { display: block; }
-
-/* Items del menú */
-.dropdown-item {
-    color: white;
-    padding: 12px 16px;
-    text-decoration: none;
-    display: block;
-    font-family: 'Roboto', sans-serif;
-    font-size: 0.9em;
-    transition: 0.2s;
-}
+.dropdown-item { color: white; padding: 12px 16px; text-decoration: none; display: block; font-family: 'Roboto', sans-serif; font-size: 0.9em; transition: 0.2s; }
 .dropdown-item:hover { background-color: #333; color: var(--primary-color); }
-
-/* Botón logout específico dentro del menú */
-.btn-logout-menu {
-    background: none;
-    border: none;
-    width: 100%;
-    text-align: left;
-    cursor: pointer;
-    color: #e50914; /* Rojo */
-    font-weight: bold;
-    border-top: 1px solid #333;
-    margin-top: 5px;
-    font-family: 'Roboto', sans-serif;
-    font-size: 0.9em;
-    padding: 12px 16px;
-}
+.btn-logout-menu { background: none; border: none; width: 100%; text-align: left; cursor: pointer; color: #e50914; font-weight: bold; border-top: 1px solid #333; margin-top: 5px; font-family: 'Roboto', sans-serif; font-size: 0.9em; padding: 12px 16px; }
 .btn-logout-menu:hover { background-color: #333; color: #ff555e; }
-
-/* Botones para Invitados (Login/Register) */
-.btn-register {
-    background-color: var(--primary-color);
-    color: black;
-    padding: 8px 15px;
-    border-radius: 4px;
-    text-decoration: none;
-    font-weight: bold;
-    margin-left: 10px;
-    font-family: 'Roboto', sans-serif;
-    font-size: 0.9em;
-    transition: 0.3s;
-}
+.btn-register, .btn-login { padding: 8px 15px; border-radius: 4px; text-decoration: none; font-weight: bold; margin-left: 10px; font-family: 'Roboto', sans-serif; font-size: 0.9em; transition: 0.3s; }
+.btn-register { background-color: var(--primary-color); color: black; }
 .btn-register:hover { background-color: #e5a100; }
-
-.btn-login {
-    background-color: #333;
-    color: white;
-    padding: 8px 15px;
-    border-radius: 4px;
-    text-decoration: none;
-    font-weight: bold;
-    margin-left: 10px;
-    font-family: 'Roboto', sans-serif;
-    font-size: 0.9em;
-    transition: 0.3s;
-}
+.btn-login { background-color: #333; color: white; }
 .btn-login:hover { background-color: #555; }

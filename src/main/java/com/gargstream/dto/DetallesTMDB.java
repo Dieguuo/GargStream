@@ -20,6 +20,9 @@ public class DetallesTMDB {
     @JsonProperty("poster_path")
     private String rutaPoster;
 
+    @JsonProperty("backdrop_path")
+    private String rutaFondo;
+
     @JsonProperty("vote_average")
     private Double puntuacionMedia;
 

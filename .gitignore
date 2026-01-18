@@ -71,4 +71,5 @@ contenido-fisico/
 
 src/main/java/com/gargstream/config/DataInitializer.java
 
-src/main/resources/application.properties
+application-secret.properties
+src/main/resources/application-secret.properties

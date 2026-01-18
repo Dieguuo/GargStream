@@ -58,15 +58,13 @@
   <div class="filter-chip active" onclick="filtrarPorGenero('Todos', this)">Todos</div>
 </div>
 
-<div class="hero-section" id="hero-section">
-  <div class="hero-title">🔥 Novedades y Tendencias</div>
-  <div class="hero-nav">
-    <button class="nav-btn" onclick="moverCarrusel(-1)">❮</button>
-    <button class="nav-btn" onclick="moverCarrusel(1)">❯</button>
-  </div>
-  <div style="width: 100%; overflow-x: hidden; overflow-y: visible;">
-    <div class="hero-track" id="hero-track"></div>
-  </div>
+<div class="hero-wrapper" id="hero-section">
+  <div id="hero-slider-container"></div>
+
+  <button class="hero-arrow left" id="hero-prev" onclick="cambiarHero(-1)">❮</button>
+  <button class="hero-arrow right" id="hero-next" onclick="cambiarHero(1)">❯</button>
+
+  <div class="hero-indicators" id="hero-indicators"></div>
 </div>
 
 <div class="category-row" id="cat-peliculas">

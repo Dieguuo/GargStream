@@ -25,6 +25,8 @@ public abstract class Contenido {
     //imagen de la portada
     @Column(length = 1000)
     private String rutaCaratula;
+    @Column(length = 1000)
+    private String rutaFondo;
     //genero del contenido
     private String genero;
     //para la fecha de subida

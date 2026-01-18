@@ -24,20 +24,24 @@ body {
     min-height: 400px; transition: min-height 0.3s; overflow: hidden;
 }
 
+/* CLASE NUEVA: Si no hay fondo HD, desenfocamos para disimular */
+.backdrop.blur-bg::after {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    backdrop-filter: blur(20px) brightness(0.6); /* Desenfoque fuerte + oscurecer */
+    z-index: 0;
+}
+
 .backdrop.movie-mode {
     min-height: 85vh; padding-bottom: 80px;
     border-radius: 0 0 20px 20px; margin: -20px -20px 30px -20px;
     align-items: center; justify-content: center;
 }
 
-.backdrop.movie-mode::before {
-    background: linear-gradient(to top, #141414 10%, rgba(20,20,20,0.8) 50%, rgba(20,20,20,0.4) 100%);
-}
-
+/* Degradado superior para que el texto sea legible */
 .backdrop::before {
     content: ''; position: absolute; top:0; left:0; right:0; bottom:0;
     background: linear-gradient(to top, #141414 5%, rgba(20,20,20,0.8) 60%, rgba(20,20,20,0.3) 100%);
-    z-index: 0;
+    z-index: 0; /* Por encima de la imagen de fondo, por debajo del contenido */
 }
 
 .poster {

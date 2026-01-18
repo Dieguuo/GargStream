@@ -1,33 +1,23 @@
 // --- VARIABLES GLOBALES ---
 let catalogoCompleto = [];
 
-// Variables Hero
-let heroIndex = 0;
-let totalRealItems = 0;
-let cardWidth = 240;
-let isTransitioning = false;
-const heroTrack = document.getElementById('hero-track');
-const heroSection = document.getElementById('hero-section');
-
-// Variables Táctil y Rueda
-let touchStartX = 0;
-let touchEndX = 0;
-let isWheelCooldown = false;
-
+// Variables Hero Slider
+let currentHeroIndex = 0;
+let heroSlidesData = [];
+let heroInterval = null; // Para el bucle automático
 
 // --- 1. CARGA INICIAL (CON LOADER) ---
 document.addEventListener('DOMContentLoaded', () => {
 
     const loader = document.getElementById('main-loader');
 
-    // Cargar todo simultáneamente
     Promise.all([
         fetch('/api/public/novedades').then(res => res.json()),
         fetch('/api/public/catalogo').then(res => res.json())
     ])
     .then(([dataNovedades, dataCatalogo]) => {
-        // 1. Renderizar Novedades
-        renderHero(dataNovedades);
+        // 1. Renderizar Novedades (Slider Gigante)
+        renderHeroSlider(dataNovedades);
 
         // 2. Renderizar Catálogo
         catalogoCompleto = dataCatalogo;
@@ -42,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     })
     .catch(err => {
         console.error("Error cargando la web:", err);
-        loader.style.display = 'none'; // Quitar loader aunque falle para no bloquear
+        loader.style.display = 'none';
     });
 
     // Listeners del buscador
@@ -52,60 +42,52 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('.filter-chip').classList.add('active');
 
         if (texto.length > 0) {
-            heroSection.classList.add('oculto');
+            document.getElementById('hero-section').style.display = 'none'; // Ocultar hero al buscar
             const filtrados = catalogoCompleto.filter(item =>
                 item.titulo.toLowerCase().includes(texto)
             );
             distribuirCatalogo(filtrados);
         } else {
-            heroSection.classList.remove('oculto');
+            // Volver a mostrar si hay novedades
+            if(heroSlidesData.length > 0) document.getElementById('hero-section').style.display = 'block';
             distribuirCatalogo(catalogoCompleto);
         }
     });
 });
 
-
 // --- 2. GENERADOR DE FILTROS ---
 function generarFiltros(lista) {
     const contenedor = document.getElementById('filter-bar');
     const generos = new Set();
-
     lista.forEach(item => {
         if(item.genero && item.genero.trim() !== "") {
-            const generosIndividuales = item.genero.split(',');
-            generosIndividuales.forEach(subGenero => {
-                const generoLimpio = subGenero.trim();
-                if(generoLimpio.length > 0) {
-                    generos.add(generoLimpio);
-                }
+            item.genero.split(',').forEach(sub => {
+                const g = sub.trim();
+                if(g.length > 0) generos.add(g);
             });
         }
     });
-
-    const generosOrdenados = Array.from(generos).sort();
-
-    generosOrdenados.forEach(genero => {
+    Array.from(generos).sort().forEach(genero => {
         const chip = document.createElement('div');
         chip.className = 'filter-chip';
         chip.innerText = genero;
-        chip.onclick = function() {
-            filtrarPorGenero(genero, this);
-        };
+        chip.onclick = function() { filtrarPorGenero(genero, this); };
         contenedor.appendChild(chip);
     });
 }
 
-// --- 3. LÓGICA DE FILTRADO ---
 function filtrarPorGenero(genero, elementoChip) {
     document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
     elementoChip.classList.add('active');
     document.getElementById('buscador').value = "";
 
+    const hero = document.getElementById('hero-section');
+
     if (genero === 'Todos') {
-        heroSection.classList.remove('oculto');
+        if(heroSlidesData.length > 0) hero.style.display = 'block';
         distribuirCatalogo(catalogoCompleto);
     } else {
-        heroSection.classList.add('oculto');
+        hero.style.display = 'none';
         const filtrados = catalogoCompleto.filter(item =>
             item.genero && item.genero.includes(genero)
         );
@@ -113,7 +95,7 @@ function filtrarPorGenero(genero, elementoChip) {
     }
 }
 
-// --- 4. DISTRIBUCIÓN ---
+// --- 3. DISTRIBUCIÓN FILAS ---
 function distribuirCatalogo(lista) {
     const pelis = lista.filter(item => item.rutaVideo && item.director);
     const series = lista.filter(item => !item.rutaVideo);
@@ -130,95 +112,139 @@ function distribuirCatalogo(lista) {
 
 function toggleFila(idSeccion, items) {
     const seccion = document.getElementById(idSeccion);
-    if(items.length === 0) seccion.style.display = 'none';
-    else seccion.style.display = 'block';
+    seccion.style.display = items.length === 0 ? 'none' : 'block';
 }
 
-// --- 5. RENDERIZADO HERO ---
-function renderHero(lista) {
-    heroTrack.innerHTML = "";
-    if(lista.length === 0) return;
+// --- 4. NUEVO HERO SLIDER (GIGANTE) ---
+function renderHeroSlider(lista) {
+    const heroWrapper = document.getElementById('hero-section');
+    const container = document.getElementById('hero-slider-container');
+    const indicators = document.getElementById('hero-indicators');
+    const prevBtn = document.getElementById('hero-prev');
+    const nextBtn = document.getElementById('hero-next');
 
-    totalRealItems = lista.length;
-    const clonesInicio = lista.slice(-5);
-    const clonesFin = lista.slice(0, 5);
-    const listaInfinita = [...clonesInicio, ...lista, ...clonesFin];
+    // Limpieza previa
+    container.innerHTML = "";
+    indicators.innerHTML = "";
+    if (heroInterval) clearInterval(heroInterval);
 
-    listaInfinita.forEach((item, index) => {
-        const div = document.createElement('div');
-        div.className = 'hero-card';
-        div.style.backgroundImage = `url('${item.rutaCaratula || 'https://via.placeholder.com/220x330'}')`;
-        div.onclick = () => {
-            if(div.classList.contains('active')) {
-                window.location.href = `/ver_detalle.html?id=${item.id}`;
-            } else {
-                const clickedIndex = index;
-                const diff = clickedIndex - heroIndex;
-                moverCarrusel(diff);
-            }
-        };
-        heroTrack.appendChild(div);
+    // Filtramos para coger solo las últimas 5
+    if (!lista || lista.length === 0) {
+        heroWrapper.style.display = 'none';
+        return;
+    }
+
+    // Cogemos máximo 5 ítems
+    heroSlidesData = lista.slice(0, 5);
+    heroWrapper.style.display = 'block';
+
+    // Generar Slides
+    heroSlidesData.forEach((item, index) => {
+        const slide = document.createElement('div');
+        slide.className = index === 0 ? 'hero-slide active' : 'hero-slide';
+
+        // LÓGICA DE FONDO:
+        // Si hay 'rutaFondo' (Horizontal), úsala.
+        // Si no, usa 'rutaCaratula' (Vertical) pero añade un filtro borroso en CSS inline para que no se vea mal.
+        let bgImage = item.rutaFondo ? item.rutaFondo : item.rutaCaratula;
+        let styleExtra = "";
+
+        // Si estamos forzados a usar la vertical en un contenedor horizontal, ajustamos:
+        if (!item.rutaFondo) {
+            // Truco: Fondo borroso
+            styleExtra = "filter: blur(20px) brightness(0.5); transform: scale(1.1);";
+            // Nota: El contenido de texto va en capa superior, así que necesitamos una estructura doble
+            // Pero para simplificar en este diseño, usaremos un background-size cover estándar
+            // o aceptamos que se corte. Lo ideal es el blur.
+
+            // Re-enfoque: Como el div entero se borraría, mejor ponemos la imagen
+            // como un pseudo-elemento o gestionamos el background.
+            // Para simplificar: Background-size cover centra la imagen.
+        }
+
+        slide.style.backgroundImage = `url('${bgImage}')`;
+
+        // Contenido del slide
+        slide.innerHTML = `
+            <div class="hero-overlay"></div>
+            <div class="hero-content">
+                <div class="hero-logo-title">${item.titulo}</div>
+                <div class="hero-desc">${item.sipnosis || 'Sin sinopsis disponible.'}</div>
+                <div class="hero-actions">
+                    <a href="/ver_detalle.html?id=${item.id}" class="hero-btn btn-primary">
+                        ▶ Reproducir
+                    </a>
+                    <a href="/ver_detalle.html?id=${item.id}" class="hero-btn btn-secondary">
+                        ℹ Más Información
+                    </a>
+                </div>
+            </div>
+        `;
+        container.appendChild(slide);
+
+        // Indicadores
+        const dot = document.createElement('div');
+        dot.className = index === 0 ? 'indicator active' : 'indicator';
+        dot.onclick = () => irASlide(index);
+        indicators.appendChild(dot);
     });
-    heroIndex = 5;
-    actualizarPosicion(false);
-    heroTrack.addEventListener('transitionend', () => { isTransitioning = false; verificarLimites(); });
+
+    // Configuración de controles
+    if (heroSlidesData.length > 1) {
+        prevBtn.style.display = 'block';
+        nextBtn.style.display = 'block';
+        // Iniciar bucle automático (7 segundos)
+        iniciarAutoPlay();
+    } else {
+        prevBtn.style.display = 'none';
+        nextBtn.style.display = 'none';
+    }
 }
 
-// --- 6. EVENTOS HERO ---
-heroTrack.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, {passive: true});
-heroTrack.addEventListener('touchend', e => {
-    touchEndX = e.changedTouches[0].screenX;
-    if (touchEndX < touchStartX - 50) moverCarrusel(1);
-    if (touchEndX > touchStartX + 50) moverCarrusel(-1);
-}, {passive: true});
+function irASlide(index) {
+    const slides = document.querySelectorAll('.hero-slide');
+    const dots = document.querySelectorAll('.indicator');
 
-heroTrack.addEventListener('wheel', (e) => {
-    if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) return;
-    e.preventDefault(); if (isWheelCooldown) return;
-    if (e.deltaY > 0 || e.deltaX > 0) { moverCarrusel(1); activarCooldownRueda(); }
-    else if (e.deltaY < 0 || e.deltaX < 0) { moverCarrusel(-1); activarCooldownRueda(); }
-}, { passive: false });
+    // Quitar activo actual
+    slides[currentHeroIndex].classList.remove('active');
+    dots[currentHeroIndex].classList.remove('active');
 
-function activarCooldownRueda() {
-    isWheelCooldown = true; setTimeout(() => { isWheelCooldown = false; }, 500);
+    // Poner nuevo activo
+    currentHeroIndex = index;
+
+    // Loop cíclico
+    if (currentHeroIndex >= slides.length) currentHeroIndex = 0;
+    if (currentHeroIndex < 0) currentHeroIndex = slides.length - 1;
+
+    slides[currentHeroIndex].classList.add('active');
+    dots[currentHeroIndex].classList.add('active');
+
+    // Reiniciar temporizador si se interactúa manualmente
+    reiniciarAutoPlay();
 }
 
-function moverCarrusel(direccion) {
-    if (isTransitioning) return;
-    isTransitioning = true;
-    heroIndex += direccion;
-    actualizarPosicion(true);
+function cambiarHero(direccion) {
+    irASlide(currentHeroIndex + direccion);
 }
 
-function actualizarPosicion(animar) {
-    const screenCenter = window.innerWidth / 2;
-    const cardCenter = 110;
-    const position = -(heroIndex * cardWidth) + screenCenter - cardCenter;
-    if(animar) heroTrack.style.transition = 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
-    else heroTrack.style.transition = 'none';
-    heroTrack.style.transform = `translateX(${position}px)`;
-    actualizarEstilosVisuales();
+function iniciarAutoPlay() {
+    if (heroInterval) clearInterval(heroInterval);
+    heroInterval = setInterval(() => {
+        cambiarHero(1);
+    }, 7000); // 7 segundos
 }
 
-function verificarLimites() {
-    if (heroIndex >= totalRealItems + 5) { heroIndex = 5; actualizarPosicion(false); void heroTrack.offsetWidth; }
-    else if (heroIndex < 5) { heroIndex = totalRealItems + 5 - 1; actualizarPosicion(false); void heroTrack.offsetWidth; }
+function reiniciarAutoPlay() {
+    clearInterval(heroInterval);
+    if (heroSlidesData.length > 1) {
+        iniciarAutoPlay();
+    }
 }
 
-function actualizarEstilosVisuales() {
-    const cards = document.querySelectorAll('.hero-card');
-    cards.forEach((card, index) => {
-        if(index === heroIndex) card.classList.add('active');
-        else card.classList.remove('active');
-    });
-}
-window.addEventListener('resize', () => actualizarPosicion(false));
-
-// --- 7. RENDERIZADO FILAS ---
+// --- 5. RENDERIZADO FILAS ESTÁNDAR ---
 function renderRow(lista, containerId) {
     const container = document.getElementById(containerId);
     container.innerHTML = "";
-
     container.addEventListener('wheel', (evt) => {
         evt.preventDefault(); container.scrollLeft += evt.deltaY;
     });
@@ -241,7 +267,7 @@ function renderRow(lista, containerId) {
           `;
           container.appendChild(div);
       });
-  }
+}
 
 function deslizarFila(idContainer, direccion) {
     const container = document.getElementById(idContainer);

@@ -100,6 +100,11 @@ public class SerieService {
 
                     }
 
+                    //imagen de fondo
+                    if(detalles.getRutaFondo() != null){
+                        serie.setRutaFondo("https://image.tmdb.org/t/p/original" + detalles.getRutaFondo());
+                    }
+
                     //si me da tiempo, añadir función de descargar series
 
                 }

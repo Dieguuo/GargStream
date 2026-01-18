@@ -13,7 +13,13 @@ if(id) {
             const div = document.getElementById('contenedor-principal');
 
             const titulo = c.titulo;
-            const imagen = c.rutaCaratula || 'https://via.placeholder.com/300x450?text=No+Cover';
+            // Imagen POSTER (Vertical)
+            const poster = c.rutaCaratula || 'https://via.placeholder.com/300x450?text=No+Cover';
+
+            // Imagen FONDO (Horizontal - HD)
+            // Si no hay fondo horizontal, usamos el poster como fallback
+            const fondo = c.rutaFondo ? c.rutaFondo : poster;
+
             const sinopsis = c.sinopsis || c.sipnosis || "Sin descripción disponible.";
             const anio = c.anioLanzamiento || '----';
             const duracion = c.duracionMinutos ? c.duracionMinutos + ' min' : '';
@@ -25,14 +31,18 @@ if(id) {
             const esSerie = !c.rutaVideo;
             const claseModo = esSerie ? '' : 'movie-mode';
 
+            // Truco visual: Si no tenemos fondo horizontal real, añadimos clase 'blur-bg'
+            // para desenfocar el poster estirado y que no se vea pixelado.
+            const claseBlur = !c.rutaFondo ? 'blur-bg' : '';
+
             if(!esSerie) {
                 rutaVideoPeli = c.rutaVideo;
                 subsPeli = c.subtitulos || [];
             }
 
             let html = `
-                <div class="backdrop ${claseModo}" style="background-image: url('${imagen}');">
-                    <img class="poster" src="${imagen}" alt="${titulo}">
+                <div class="backdrop ${claseModo} ${claseBlur}" style="background-image: url('${fondo}');">
+                    <img class="poster" src="${poster}" alt="${titulo}">
 
                     <div class="info">
                         <h1>${titulo}</h1>

@@ -26,6 +26,9 @@ public class RespuestaTMDB {
         @JsonProperty("poster_path")
         private String rutaPoster;
 
+        @JsonProperty("backdrop_path")
+        private String rutaFondo;
+
         @JsonProperty("vote_average")
         private Double puntuacionMedia;
         //el id en la db de tmdb

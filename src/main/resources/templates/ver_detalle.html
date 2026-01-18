@@ -39,7 +39,6 @@
 
         if (target) {
             // Comprobamos si es un botón de reproducir (por texto o clase común)
-            // Esto funcionará aunque el botón se cree dinámicamente con JS
             const textoBoton = target.innerText.toLowerCase();
             if (textoBoton.includes('reproducir') || textoBoton.includes('ver') || target.classList.contains('play-icon')) {
 
@@ -52,7 +51,7 @@
                 }
             }
         }
-    }, true); // 'true' hace que este evento se ejecute ANTES que el del archivo detalle.js
+    }, true);
 </script>
 
 </body>
