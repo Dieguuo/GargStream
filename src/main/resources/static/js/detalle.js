@@ -5,124 +5,169 @@ let rutaVideoPeli = "";
 let subsPeli = [];
 let episodiosData = {};
 let miReproductorPlyr = null;
+let enMiLista = false; // Estado actual del favorito
 
 if(id) {
+    // 1. Cargamos datos de la película
     fetch('/api/public/contenido/' + id)
         .then(response => response.json())
         .then(c => {
-            const div = document.getElementById('contenedor-principal');
-
-            const titulo = c.titulo;
-            // Imagen POSTER (Vertical)
-            const poster = c.rutaCaratula || 'https://via.placeholder.com/300x450?text=No+Cover';
-
-            // Imagen FONDO (Horizontal - HD)
-            // Si no hay fondo horizontal, usamos el poster como fallback
-            const fondo = c.rutaFondo ? c.rutaFondo : poster;
-
-            const sinopsis = c.sinopsis || c.sipnosis || "Sin descripción disponible.";
-            const anio = c.anioLanzamiento || '----';
-            const duracion = c.duracionMinutos ? c.duracionMinutos + ' min' : '';
-            const director = c.director || c.creador || c.autor || 'Desconocido';
-            const genero = c.genero || '';
-            const puntuacion = c.puntuacionMedia ? c.puntuacionMedia + '/10' : '-';
-            const youtubeId = c.youtubeTrailerId || "";
-
-            const esSerie = !c.rutaVideo;
-            const claseModo = esSerie ? '' : 'movie-mode';
-
-            // Truco visual: Si no tenemos fondo horizontal real, añadimos clase 'blur-bg'
-            // para desenfocar el poster estirado y que no se vea pixelado.
-            const claseBlur = !c.rutaFondo ? 'blur-bg' : '';
-
-            if(!esSerie) {
-                rutaVideoPeli = c.rutaVideo;
-                subsPeli = c.subtitulos || [];
-            }
-
-            let html = `
-                <div class="backdrop ${claseModo} ${claseBlur}" style="background-image: url('${fondo}');">
-                    <img class="poster" src="${poster}" alt="${titulo}">
-
-                    <div class="info">
-                        <h1>${titulo}</h1>
-                        <div class="meta-data">
-                            <span class="score">⭐ ${puntuacion}</span>
-                            <span>${anio}</span>
-                            ${duracion ? `<span class="meta-tag">${duracion}</span>` : ''}
-                            ${genero ? `<span class="meta-tag">${genero}</span>` : ''}
-                        </div>
-                        <div class="director-cast">
-                            ${esSerie ? 'Creador' : 'Director'}: <strong>${director}</strong>
-                        </div>
-                        <p class="sinopsis">${sinopsis}</p>
-
-                        <div class="actions">
-            `;
-
-            if (!esSerie) {
-                html += `
-                    <button onclick="reproducirPeli()" class="btn-play-big">
-                        ▶ Reproducir
-                    </button>
-                `;
-            }
-
-            if(youtubeId) {
-                html += `
-                    <button onclick="verTrailer('${youtubeId}')" class="btn-trailer">
-                        🎬 Ver Tráiler
-                    </button>
-                `;
-            }
-
-            html += `   </div> </div> </div> `;
-
-            if (esSerie) {
-                html += `
-                    <h2 style="padding-left:20px; margin-bottom:20px;">Temporadas y Episodios</h2>
-                    <div id="lista-episodios">
-                `;
-                if (c.temporadas && c.temporadas.length > 0) {
-                    const mapTemps = {};
-                    c.temporadas.forEach(t => {
-                        if(!mapTemps[t.numeroTemporada]) mapTemps[t.numeroTemporada] = [];
-                        mapTemps[t.numeroTemporada].push(...t.capitulos);
-                    });
-
-                    Object.keys(mapTemps).sort((a,b)=>a-b).forEach((num, index) => {
-                        const caps = mapTemps[num].sort((a,b)=>a.numeroCapitulo - b.numeroCapitulo);
-                        const isOpen = index === 0 ? 'open' : '';
-                        html += `<details ${isOpen}><summary>Temporada ${num} <span style="font-weight:normal; font-size:0.9em; color:#aaa">${caps.length} episodios</span></summary><div>`;
-
-                        caps.forEach(cap => {
-                            const urlVideoCap = cap.rutaVideo;
-                            episodiosData[cap.id] = cap.subtitulos || [];
-
-                            html += `
-                                <div class="capitulo-card">
-                                    <div style="display:flex; flex-direction:column;">
-                                        <span style="font-weight:bold; font-size:1em;">${cap.numeroCapitulo}. ${cap.titulo || 'Episodio ' + cap.numeroCapitulo}</span>
-                                    </div>
-
-                                    <button class="btn-cap" onclick="reproducirCapitulo('${urlVideoCap}', ${cap.id})">
-                                        ▶ Reproducir
-                                    </button>
-                                </div>
-                            `;
-                        });
-                        html += `</div></details>`;
-                    });
-                } else { html += '<p style="padding-left:20px;">No hay capítulos disponibles.</p>'; }
-                html += `</div>`;
-            }
-
-            div.innerHTML = html;
+            // 2. Comprobamos si ya es favorito (fetch anidado)
+            fetch(`/api/lista/estado?idContenido=${c.id}`)
+                .then(res => res.json())
+                .then(esFavorito => {
+                    enMiLista = esFavorito;
+                    renderizarDetalle(c); // Pintamos todo
+                })
+                .catch(() => {
+                    enMiLista = false; // Si falla (no logueado), asumimos false
+                    renderizarDetalle(c);
+                });
         })
         .catch(e => {
             console.error(e);
             document.getElementById('contenedor-principal').innerHTML = "<h1>Error</h1><p>No se pudieron cargar los datos.</p>";
         });
+}
+
+function renderizarDetalle(c) {
+    const div = document.getElementById('contenedor-principal');
+
+    const titulo = c.titulo;
+    const poster = c.rutaCaratula || 'https://via.placeholder.com/300x450?text=No+Cover';
+    const fondo = c.rutaFondo ? c.rutaFondo : poster;
+    const claseBlur = !c.rutaFondo ? 'blur-bg' : '';
+
+    const sinopsis = c.sinopsis || c.sipnosis || "Sin descripción disponible.";
+    const anio = c.anioLanzamiento || '----';
+    const duracion = c.duracionMinutos ? c.duracionMinutos + ' min' : '';
+    const director = c.director || c.creador || c.autor || 'Desconocido';
+    const genero = c.genero || '';
+    const puntuacion = c.puntuacionMedia ? c.puntuacionMedia + '/10' : '-';
+    const youtubeId = c.youtubeTrailerId || "";
+
+    const esSerie = !c.rutaVideo;
+    const claseModo = esSerie ? '' : 'movie-mode';
+
+    if(!esSerie) {
+        rutaVideoPeli = c.rutaVideo;
+        subsPeli = c.subtitulos || [];
+    }
+
+    // Elegir icono según estado
+    const iconoCorazon = enMiLista ? '/img/corazon_lleno.svg' : '/img/corazon_vacio.svg';
+    const textoLista = enMiLista ? 'En mi lista' : 'Mi lista';
+
+    let html = `
+        <div class="backdrop ${claseModo} ${claseBlur}" style="background-image: url('${fondo}');">
+            <img class="poster" src="${poster}" alt="${titulo}">
+
+            <div class="info">
+                <h1>${titulo}</h1>
+                <div class="meta-data">
+                    <span class="score">⭐ ${puntuacion}</span>
+                    <span>${anio}</span>
+                    ${duracion ? `<span class="meta-tag">${duracion}</span>` : ''}
+                    ${genero ? `<span class="meta-tag">${genero}</span>` : ''}
+                </div>
+                <div class="director-cast">
+                    ${esSerie ? 'Creador' : 'Director'}: <strong>${director}</strong>
+                </div>
+                <p class="sinopsis">${sinopsis}</p>
+
+                <div class="actions">
+    `;
+
+    if (!esSerie) {
+        html += `
+            <button onclick="reproducirPeli()" class="btn-play-big">
+                ▶ Reproducir
+            </button>
+        `;
+    }
+
+    // BOTÓN MI LISTA (NUEVO)
+    html += `
+        <button onclick="toggleMiLista(${c.id})" class="btn-lista" title="${textoLista}">
+            <img id="icono-fav" src="${iconoCorazon}" alt="Favorito" style="width:28px; height:28px;">
+        </button>
+    `;
+
+    if(youtubeId) {
+        html += `
+            <button onclick="verTrailer('${youtubeId}')" class="btn-trailer">
+                🎬 Ver Tráiler
+            </button>
+        `;
+    }
+
+    html += `   </div> </div> </div> `;
+
+    if (esSerie) {
+        html += `
+            <h2 style="padding-left:20px; margin-bottom:20px;">Temporadas y Episodios</h2>
+            <div id="lista-episodios">
+        `;
+        if (c.temporadas && c.temporadas.length > 0) {
+            const mapTemps = {};
+            c.temporadas.forEach(t => {
+                if(!mapTemps[t.numeroTemporada]) mapTemps[t.numeroTemporada] = [];
+                mapTemps[t.numeroTemporada].push(...t.capitulos);
+            });
+
+            Object.keys(mapTemps).sort((a,b)=>a-b).forEach((num, index) => {
+                const caps = mapTemps[num].sort((a,b)=>a.numeroCapitulo - b.numeroCapitulo);
+                const isOpen = index === 0 ? 'open' : '';
+                html += `<details ${isOpen}><summary>Temporada ${num} <span style="font-weight:normal; font-size:0.9em; color:#aaa">${caps.length} episodios</span></summary><div>`;
+
+                caps.forEach(cap => {
+                    const urlVideoCap = cap.rutaVideo;
+                    episodiosData[cap.id] = cap.subtitulos || [];
+
+                    html += `
+                        <div class="capitulo-card">
+                            <div style="display:flex; flex-direction:column;">
+                                <span style="font-weight:bold; font-size:1em;">${cap.numeroCapitulo}. ${cap.titulo || 'Episodio ' + cap.numeroCapitulo}</span>
+                            </div>
+
+                            <button class="btn-cap" onclick="reproducirCapitulo('${urlVideoCap}', ${cap.id})">
+                                ▶ Reproducir
+                            </button>
+                        </div>
+                    `;
+                });
+                html += `</div></details>`;
+            });
+        } else { html += '<p style="padding-left:20px;">No hay capítulos disponibles.</p>'; }
+        html += `</div>`;
+    }
+
+    div.innerHTML = html;
+}
+
+// LÓGICA DE AÑADIR/QUITAR FAVORITO
+function toggleMiLista(idContenido) {
+    fetch(`/api/lista/toggle?idContenido=${idContenido}`, { method: 'POST' })
+        .then(res => {
+            if (res.status === 403 || res.status === 401) {
+                // Si no autorizado, redirigir al login
+                window.location.href = '/login';
+                throw new Error("No autorizado");
+            }
+            return res.json();
+        })
+        .then(data => {
+            enMiLista = data.enLista; // Actualizar estado local
+
+            // Cambiar icono visualmente
+            const img = document.getElementById('icono-fav');
+            if (enMiLista) {
+                img.src = '/img/corazon_lleno.svg';
+            } else {
+                img.src = '/img/corazon_vacio.svg';
+            }
+        })
+        .catch(err => console.error("Error al cambiar lista", err));
 }
 
 function reproducirPeli() {

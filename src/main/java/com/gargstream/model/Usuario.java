@@ -11,7 +11,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "usuarios")
@@ -87,4 +89,15 @@ public class Usuario implements UserDetails {
             this.fechaRegistro = LocalDate.now();
         }
     }
+
+    //la relación de la lista de favoritos
+    //una tabla intermedia usuario_favoritos
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "usuario_favoritos",
+            joinColumns = @JoinColumn(name = "usuario_id"),
+            inverseJoinColumns = @JoinColumn(name = "contenido_id")
+    )
+    //mejor usar set para que no haya duplicados
+    private Set<Contenido> miLista = new HashSet<>();
 }

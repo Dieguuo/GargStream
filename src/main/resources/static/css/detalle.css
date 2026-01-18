@@ -97,6 +97,27 @@ body {
 }
 .btn-trailer:hover { background-color: rgba(109, 109, 110, 0.4); transform: scale(1.05); }
 
+/* --- BOTÓN MI LISTA (NUEVO) --- */
+.btn-lista {
+    background-color: rgba(60, 60, 60, 0.6); /* Oscuro semitransparente */
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    width: 55px; height: 55px; /* Redondo */
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex; justify-content: center; align-items: center;
+    transition: all 0.2s ease;
+}
+
+.btn-lista:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: #ffb400; /* Borde dorado al pasar ratón */
+    transform: scale(1.1);
+}
+
+.btn-lista img {
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
+
 /* REPRODUCTOR */
 #overlay-reproductor {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
