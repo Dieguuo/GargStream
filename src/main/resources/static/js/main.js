@@ -1,6 +1,7 @@
 // --- VARIABLES GLOBALES ---
 let catalogoCompleto = [];
-let miListaCompleta = []; // <--- NUEVA: Para guardar los favoritos y poder filtrarlos
+let miListaCompleta = [];
+let historialCompleto = []; // <--- NUEVA: Para guardar historial
 
 // Variables Hero Slider
 let currentHeroIndex = 0;
@@ -15,22 +16,34 @@ document.addEventListener('DOMContentLoaded', () => {
     Promise.all([
         fetch('/api/public/novedades').then(res => res.json()),
         fetch('/api/public/catalogo').then(res => res.json()),
-        fetch('/api/public/mi-lista').then(res => res.json())
+        fetch('/api/public/mi-lista').then(res => res.json()),
+        fetch('/api/historial/continuar-viendo').then(res => res.json()) // <--- FETCH HISTORIAL
     ])
-    .then(([dataNovedades, dataCatalogo, dataMiLista]) => {
+    .then(([dataNovedades, dataCatalogo, dataMiLista, dataHistorial]) => {
         // 1. Renderizar Novedades
         renderHeroSlider(dataNovedades);
 
         // 2. Guardar datos globales
         catalogoCompleto = dataCatalogo;
-        miListaCompleta = dataMiLista || []; // Guardamos la lista original
+        miListaCompleta = dataMiLista || [];
+
+        // TRUCO: Aplanamos el historial para que sea compatible con el renderRow normal
+        // El DTO trae: { contenido: {...}, porcentaje: 45 }
+        // Lo convertimos a: { ...contenido, porcentaje: 45 }
+        historialCompleto = (dataHistorial || []).map(h => {
+            return {
+                ...h.contenido,
+                porcentajeVisto: h.porcentaje // Añadimos campo nuevo al objeto peli
+            };
+        });
 
         // 3. Generar filtros y distribuir contenido inicial
         generarFiltros(dataCatalogo);
         distribuirCatalogo(catalogoCompleto);
 
-        // 4. Renderizar Mi Lista inicial (sin filtros)
+        // 4. Renderizar Mi Lista y Historial
         actualizarFilaMiLista(miListaCompleta);
+        actualizarFilaHistorial(historialCompleto);
 
         // 5. OCULTAR LOADER
         loader.style.opacity = '0';
@@ -47,51 +60,60 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('buscador').addEventListener('keyup', (e) => {
         const texto = e.target.value.toLowerCase();
 
-        // Resetear visualmente los chips de género si se busca por texto
         document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-        document.querySelector('.filter-chip').classList.add('active'); // Activar "Todos"
+        document.querySelector('.filter-chip').classList.add('active');
 
         aplicarFiltrosGlobales(texto, 'Todos');
     });
 });
 
 // --- FUNCIÓN CENTRAL DE FILTRADO ---
-// Esta función filtra TANTO el catálogo general COMO la lista de favoritos
 function aplicarFiltrosGlobales(textoBusqueda, generoSeleccionado) {
     const hero = document.getElementById('hero-section');
     const esBusquedaTexto = textoBusqueda.length > 0;
     const esFiltroGenero = generoSeleccionado !== 'Todos';
 
-    // 1. Gestión del Hero Slider (se oculta si hay filtros activos)
     if (esBusquedaTexto || esFiltroGenero) {
         hero.style.display = 'none';
     } else {
         if(heroSlidesData.length > 0) hero.style.display = 'block';
     }
 
-    // 2. Filtrar el Catálogo General
-    const catalogoFiltrado = catalogoCompleto.filter(item => {
+    // Función auxiliar de filtrado
+    const filtrarItem = (item) => {
         const cumpleTexto = item.titulo.toLowerCase().includes(textoBusqueda);
         const cumpleGenero = generoSeleccionado === 'Todos' || (item.genero && item.genero.includes(generoSeleccionado));
         return cumpleTexto && cumpleGenero;
-    });
+    };
+
+    // 2. Filtrar Catálogo
+    const catalogoFiltrado = catalogoCompleto.filter(filtrarItem);
     distribuirCatalogo(catalogoFiltrado);
 
-    // 3. Filtrar "Mi Lista"
-    const miListaFiltrada = miListaCompleta.filter(item => {
-        const cumpleTexto = item.titulo.toLowerCase().includes(textoBusqueda);
-        const cumpleGenero = generoSeleccionado === 'Todos' || (item.genero && item.genero.includes(generoSeleccionado));
-        return cumpleTexto && cumpleGenero;
-    });
+    // 3. Filtrar Mi Lista
+    const miListaFiltrada = miListaCompleta.filter(filtrarItem);
     actualizarFilaMiLista(miListaFiltrada);
+
+    // 4. Filtrar Historial
+    const historialFiltrado = historialCompleto.filter(filtrarItem);
+    actualizarFilaHistorial(historialFiltrado);
 }
 
-// --- ACTUALIZAR VISUALMENTE LA FILA DE MI LISTA ---
 function actualizarFilaMiLista(lista) {
     const contenedorFila = document.getElementById('cat-milista');
     if (lista && lista.length > 0) {
         contenedorFila.style.display = 'block';
         renderRow(lista, 'row-milista');
+    } else {
+        contenedorFila.style.display = 'none';
+    }
+}
+
+function actualizarFilaHistorial(lista) {
+    const contenedorFila = document.getElementById('cat-historial');
+    if (lista && lista.length > 0) {
+        contenedorFila.style.display = 'block';
+        renderRow(lista, 'row-historial');
     } else {
         contenedorFila.style.display = 'none';
     }
@@ -118,17 +140,13 @@ function generarFiltros(lista) {
     });
 }
 
-// --- LISTENER DE GÉNEROS ---
 function filtrarPorGenero(genero, elementoChip) {
-    // Gestión visual de los chips
     document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
     elementoChip.classList.add('active');
 
-    // Limpiamos el buscador de texto al cambiar de género para evitar confusiones
     const buscador = document.getElementById('buscador');
     buscador.value = "";
 
-    // Llamamos a la función central
     aplicarFiltrosGlobales("", genero);
 }
 
@@ -142,9 +160,6 @@ function distribuirCatalogo(lista) {
     toggleFila('cat-series', series);
     toggleFila('cat-videos', videos);
 
-    // Solo renderizamos si hay contenido, para optimizar
-    // Nota: Limpiamos el contenedor dentro de renderRow, así que si length es 0
-    // renderRow dejará vacío el div, lo cual es correcto.
     if(pelis.length > 0) renderRow(pelis, 'row-peliculas');
     if(series.length > 0) renderRow(series, 'row-series');
     if(videos.length > 0) renderRow(videos, 'row-videos');
@@ -155,7 +170,7 @@ function toggleFila(idSeccion, items) {
     seccion.style.display = items.length === 0 ? 'none' : 'block';
 }
 
-// --- 4. HERO SLIDER (GIGANTE) ---
+// --- 4. HERO SLIDER ---
 function renderHeroSlider(lista) {
     const heroWrapper = document.getElementById('hero-section');
     const container = document.getElementById('hero-slider-container');
@@ -180,10 +195,8 @@ function renderHeroSlider(lista) {
         slide.className = index === 0 ? 'hero-slide active' : 'hero-slide';
 
         let bgImage = item.rutaFondo ? item.rutaFondo : item.rutaCaratula;
-        let styleExtra = "";
-
         if (!item.rutaFondo) {
-            styleExtra = "filter: blur(20px) brightness(0.5); transform: scale(1.1);";
+            // styleExtra = "filter: blur(20px) brightness(0.5); transform: scale(1.1);"; // Opcional
         }
 
         slide.style.backgroundImage = `url('${bgImage}')`;
@@ -229,13 +242,11 @@ function irASlide(index) {
     dots[currentHeroIndex].classList.remove('active');
 
     currentHeroIndex = index;
-
     if (currentHeroIndex >= slides.length) currentHeroIndex = 0;
     if (currentHeroIndex < 0) currentHeroIndex = slides.length - 1;
 
     slides[currentHeroIndex].classList.add('active');
     dots[currentHeroIndex].classList.add('active');
-
     reiniciarAutoPlay();
 }
 
@@ -270,11 +281,24 @@ function renderRow(lista, containerId) {
         const link = `/ver_detalle.html?id=${item.id}`;
         const rating = item.puntuacionMedia ? `⭐ ${item.puntuacionMedia}` : '';
 
+        // --- LÓGICA DE BARRA DE PROGRESO ---
+        let barraHtml = '';
+        if (item.porcentajeVisto !== undefined && item.porcentajeVisto > 0) {
+            // Dibujamos la barra si hay progreso
+            barraHtml = `
+                <div class="progress-container">
+                    <div class="progress-bar" style="width: ${item.porcentajeVisto}%"></div>
+                </div>
+            `;
+        }
+
         const div = document.createElement('div');
         div.className = 'standard-card';
         div.innerHTML = `
             <div onclick="window.location.href='${link}'">
-                <img src="${img}" loading="lazy" alt="${item.titulo}">
+                <div class="img-wrapper">
+                    <img src="${img}" loading="lazy" alt="${item.titulo}">
+                    ${barraHtml} </div>
                 <div class="standard-info">
                       <div class="st-title">${item.titulo}</div>
                       <div class="st-rating">${rating}</div>

@@ -54,14 +54,17 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         http
                 .authorizeHttpRequests(requests -> requests
-                        // Recursos estáticos (CSS, JS, Imágenes)
-                        .requestMatchers("/css/**", "/js/**", "/img/**", "/logo.svg", "/error/**").permitAll()
+                        // Recursos estáticos (CSS, JS, Imágenes) y Uploads (Carátulas)
+                        .requestMatchers("/css/**", "/js/**", "/img/**", "/logo.svg", "/error/**", "/uploads/**").permitAll()
 
-                        // Rutas Públicas: Inicio, Login, Registro y Detalles (para ver la sinopsis)
-                        .requestMatchers("/", "/index", "/index.html", "/api/public/**", "/ver_detalle.html", "/register", "/login").permitAll()
+                        // Rutas Públicas: Inicio, Login, Registro, Detalles y H2 Console
+                        .requestMatchers("/", "/index", "/index.html", "/api/public/**", "/ver_detalle.html", "/register", "/login", "/h2-console/**").permitAll()
 
                         // Rutas Privadas (Admin)
                         .requestMatchers("/admin.html", "/api/admin/**").hasAuthority("ADMIN")
+
+                        // Rutas Privadas (Funcionalidades de Usuario: Historial y Favoritos)
+                        .requestMatchers("/api/historial/**", "/api/lista/**").authenticated()
 
                         // Resto protegido (Todo lo demás requiere login)
                         .anyRequest().authenticated()
@@ -80,7 +83,12 @@ public class SecurityConfig {
                         .permitAll()
                 );
 
+        // Desactivar CSRF para que funcionen las peticiones POST de Javascript (Latido y Favoritos)
         http.csrf(csrf -> csrf.disable());
+
+        // Permitir Frames (Necesario para que la consola H2 funcione)
+        // CORRECCIÓN AQUÍ: Se usa una lambda dentro de frameOptions
+        http.headers(headers -> headers.frameOptions(frame -> frame.disable()));
 
         return http.build();
     }

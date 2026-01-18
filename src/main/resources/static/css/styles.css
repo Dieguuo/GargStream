@@ -296,3 +296,32 @@ body {
 .btn-register:hover { background-color: #e5a100; }
 .btn-login { background-color: #333; color: white; }
 .btn-login:hover { background-color: #555; }
+
+
+
+/* --- BARRA DE PROGRESO (HISTORIAL) --- */
+.img-wrapper {
+    position: relative; /* Para que la barra se pegue abajo */
+    width: 100%;
+    height: 100%;
+}
+
+/* El fondo gris de la barra */
+.progress-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 4px; /* Grosor de la barra */
+    background-color: rgba(255, 255, 255, 0.3); /* Gris semitransparente */
+    z-index: 10;
+}
+
+/* El relleno rojo/dorado */
+.progress-bar {
+    height: 100%;
+    background-color: #ff0000; /* Rojo Netflix */
+    /* background-color: #ffb400;  <-- O usa tu dorado corporativo si prefieres */
+    width: 0%; /* Se llena con JS */
+    transition: width 0.3s ease;
+}
