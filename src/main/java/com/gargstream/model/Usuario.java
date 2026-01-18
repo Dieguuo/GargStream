@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -34,6 +36,16 @@ public class Usuario {
     private String codigoVerificacion;
     private LocalDateTime expiracionCodigo;
     private String nuevoEmailPendiente;
+
+    //fecha en la que se registra un usuario
+    private LocalDate fechaRegistro;
+
+    @PrePersist
+    public void prePersist() {
+        if (this.fechaRegistro == null) {
+            this.fechaRegistro = LocalDate.now(); // pone la fecha de hoy
+        }
+    }
 
 }
 

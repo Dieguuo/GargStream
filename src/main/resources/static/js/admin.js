@@ -3,6 +3,9 @@ document.addEventListener("DOMContentLoaded", () => {
     cargarMetricas();
 });
 
+// Variable global para guardar los usuarios y filtrar sin recargar
+let listaUsuariosGlobal = [];
+
 // --- 1. GESTIÓN DE PESTAÑAS ---
 function mostrar(idSeccion) {
     document.querySelectorAll('.form-section').forEach(div => div.classList.remove('active'));
@@ -11,12 +14,14 @@ function mostrar(idSeccion) {
     document.getElementById('console-box').style.display = 'none';
 
     const botones = document.querySelectorAll('.menu-btn');
+    // Mapeo manual de índices para activar el botón correcto
     if(idSeccion === 'sec-dashboard') botones[0].classList.add('active');
-    if(idSeccion === 'sec-cine') botones[1].classList.add('active');
-    if(idSeccion === 'sec-serie') botones[2].classList.add('active');
-    if(idSeccion === 'sec-capitulo') botones[3].classList.add('active');
-    if(idSeccion === 'sec-video') botones[4].classList.add('active');
-    if(idSeccion === 'sec-editar') botones[5].classList.add('active');
+    if(idSeccion === 'sec-usuarios')  botones[1].classList.add('active'); // Nuevo
+    if(idSeccion === 'sec-cine')      botones[2].classList.add('active');
+    if(idSeccion === 'sec-serie')     botones[3].classList.add('active');
+    if(idSeccion === 'sec-capitulo')  botones[4].classList.add('active');
+    if(idSeccion === 'sec-video')     botones[5].classList.add('active');
+    if(idSeccion === 'sec-editar')    botones[6].classList.add('active');
 }
 
 // --- 2. MÉTRICAS ---
@@ -43,7 +48,81 @@ async function cargarMetricas() {
     }
 }
 
-// --- 3. CARGAR SERIES SELECTOR ---
+// --- 3. GESTIÓN DE USUARIOS (NUEVO) ---
+async function cargarUsuarios() {
+    const tbody = document.getElementById('tabla-usuarios-body');
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">Cargando directorio...</td></tr>';
+
+    try {
+        const res = await fetch('/api/admin/usuarios');
+        if(res.ok) {
+            listaUsuariosGlobal = await res.json(); // Guardamos en memoria
+            renderizarTablaUsuarios(listaUsuariosGlobal);
+        } else {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:red;">Error al cargar usuarios</td></tr>';
+        }
+    } catch (e) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:red;">Error de conexión</td></tr>';
+    }
+}
+
+function renderizarTablaUsuarios(usuarios) {
+    const tbody = document.getElementById('tabla-usuarios-body');
+    tbody.innerHTML = ''; // Limpiar
+
+    if(usuarios.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">No se encontraron usuarios.</td></tr>';
+        return;
+    }
+
+    usuarios.forEach(u => {
+        const tr = document.createElement('tr');
+
+        // Avatar por defecto si es null
+        const avatar = u.avatarUrl ? u.avatarUrl : '/img/default-avatar.png';
+
+        // Estilo del badge según rol
+        const badgeClass = u.rol === 'ADMIN' ? 'badge-admin' : 'badge-user';
+
+        // Formatear fecha simple
+        const fecha = u.fechaRegistro ? new Date(u.fechaRegistro).toLocaleDateString() : '-';
+
+        tr.innerHTML = `
+            <td>
+                <img src="${avatar}" class="table-avatar" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png'">
+            </td>
+            <td class="user-identity">
+                <div class="name">${u.nombre}</div>
+                <div class="email">${u.email}</div>
+            </td>
+            <td><span class="badge ${badgeClass}">${u.rol}</span></td>
+            <td>${fecha}</td>
+            <td style="text-align: right;">
+                <button class="action-btn btn-edit-user" title="Editar Rol (Próximamente)" onclick="alert('Función de editar rol próximamente')">✏️</button>
+                <button class="action-btn btn-delete-user" title="Eliminar Usuario" onclick="eliminarUsuario(${u.id}, '${u.nombre}')">🗑️</button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function filtrarUsuarios() {
+    const texto = document.getElementById('buscador-usuarios').value.toLowerCase();
+    const filtrados = listaUsuariosGlobal.filter(u =>
+        u.nombre.toLowerCase().includes(texto) ||
+        u.email.toLowerCase().includes(texto)
+    );
+    renderizarTablaUsuarios(filtrados);
+}
+
+function eliminarUsuario(id, nombre) {
+    if(confirm(`¿Estás seguro de eliminar al usuario ${nombre}?\nEsta acción borrará sus datos permanentemente.`)) {
+        // Aquí iría la llamada fetch DELETE (Aún no implementada en backend)
+        alert("Simulación: Usuario eliminado (Implementar endpoint DELETE)");
+    }
+}
+
+// --- 4. CARGAR SERIES SELECTOR ---
 async function cargarSeriesEnSelector() {
     const selector = document.getElementById('selector-series');
     selector.innerHTML = '<option value="" disabled selected>⏳ Buscando series...</option>';
@@ -73,7 +152,7 @@ async function cargarSeriesEnSelector() {
     }
 }
 
-// --- 4. CARGAR CONTENIDO PARA EDITAR ---
+// --- 5. CARGAR CONTENIDO PARA EDITAR ---
 async function cargarContenidoParaEditar() {
     cerrarEditor();
     const grid = document.getElementById('grid-edicion');
@@ -103,7 +182,7 @@ async function cargarContenidoParaEditar() {
     }
 }
 
-// --- 5. ABRIR EDITOR ---
+// --- 6. ABRIR EDITOR ---
 async function abrirEditor(id) {
     document.getElementById('grid-edicion').style.display = 'none';
     const formContainer = document.getElementById('formulario-edicion');
@@ -131,7 +210,7 @@ function cerrarEditor() {
     document.querySelector('#formulario-edicion form').reset();
 }
 
-// --- 6. ENVÍO DE FORMULARIOS (CON OVERLAY) ---
+// --- 7. ENVÍO DE FORMULARIOS (CON OVERLAY) ---
 async function enviarFormulario(event) {
     event.preventDefault();
     const form = event.target;
@@ -192,7 +271,7 @@ async function enviarFormulario(event) {
     }
 }
 
-// --- 7. ELIMINAR CONTENIDO ---
+// --- 8. ELIMINAR CONTENIDO ---
 async function eliminarContenido() {
     const id = document.getElementById('edit-id').value;
     const titulo = document.getElementById('edit-titulo-display').innerText;

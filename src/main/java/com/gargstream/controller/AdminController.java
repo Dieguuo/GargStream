@@ -1,8 +1,8 @@
 package com.gargstream.controller;
-import com.gargstream.model.Pelicula;
-import com.gargstream.model.Serie;
-import com.gargstream.model.VideoPersonal;
+import com.gargstream.dto.UsuarioDTO;
+import com.gargstream.model.*;
 import com.gargstream.repository.ContenidoRepository;
+import com.gargstream.repository.UsuarioRepository;
 import com.gargstream.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,14 +10,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import com.gargstream.service.PeliculaService;
-import com.gargstream.model.Capitulo;
-import com.gargstream.model.Contenido;
-import com.gargstream.model.Subtitulo;
 import org.springframework.web.bind.annotation.DeleteMapping; // Importar esto
 import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -30,6 +30,8 @@ public class AdminController {
     private final ContenidoRepository contenidoRepository;
     private final AlmacenamientoService almacenamientoService;
     private final SerieService serieService;
+    private final UsuarioRepository usuarioRepository;
+
 
     /*VIDEOS PERSONALES*/
     //http://localhost:8080/api/admin/nuevo-video
@@ -219,6 +221,25 @@ public class AdminController {
         int exp = (int) (Math.log(bytes) / Math.log(1024));
         String pre = "KMGTPE".charAt(exp - 1) + "";
         return String.format("%.1f %sB", bytes / Math.pow(1024, exp), pre);
+    }
+
+
+    //ver los usuarios
+    @GetMapping("/usuarios")
+    public ResponseEntity<List<UsuarioDTO>> listarUsuario(){
+        //buscar todos los usuarios en la bd
+        List<Usuario> usuarios = usuarioRepository.findAll();
+        //covertir cada usuario con contraseña y datos que no se deben mostrar a uno que sí.
+        List<UsuarioDTO> listaSegura = usuarios.stream().map(u -> new UsuarioDTO(
+                u.getId(),
+                u.getNombre(),
+                u.getEmail(),
+                u.getRol().toString(),
+                u.getAvatarUrl(),
+                u.getFechaRegistro()
+        )).toList();
+
+        return ResponseEntity.ok(listaSegura);
     }
 
 

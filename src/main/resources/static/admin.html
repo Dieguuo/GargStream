@@ -16,6 +16,9 @@
     <h2>⚙️ Admin Panel</h2>
 
     <button class="menu-btn active" onclick="mostrar('sec-dashboard'); cargarMetricas()">📊 Resumen</button>
+
+    <button class="menu-btn" onclick="mostrar('sec-usuarios'); cargarUsuarios()">👥 Usuarios</button>
+
     <button class="menu-btn" onclick="mostrar('sec-cine')">🎬 Nueva Película</button>
     <button class="menu-btn" onclick="mostrar('sec-serie')">📺 Nueva Serie</button>
     <button class="menu-btn" onclick="mostrar('sec-capitulo'); cargarSeriesEnSelector()">▶️ Nuevo Capítulo</button>
@@ -60,6 +63,30 @@
             </div>
         </div>
         <p style="color:#666; text-align: center;">Bienvenido al panel de control de GargStream.</p>
+    </div>
+
+    <div id="sec-usuarios" class="form-section" style="max-width: 100%;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h1>Directorio de Usuarios</h1>
+            <input type="text" id="buscador-usuarios" placeholder="🔍 Buscar por nombre o email..." onkeyup="filtrarUsuarios()" style="width: 300px; margin-top: 0;">
+        </div>
+
+        <div class="table-container">
+            <table class="user-table">
+                <thead>
+                <tr>
+                    <th style="width: 60px;">Avatar</th>
+                    <th>Identidad</th>
+                    <th>Rol</th>
+                    <th>Fecha Registro</th>
+                    <th style="text-align: right;">Acciones</th>
+                </tr>
+                </thead>
+                <tbody id="tabla-usuarios-body">
+                <tr><td colspan="5" style="text-align:center; padding: 20px; color:#666;">Cargando datos...</td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <div id="sec-cine" class="form-section">
