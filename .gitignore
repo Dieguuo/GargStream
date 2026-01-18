@@ -63,3 +63,8 @@ logs/
 
 #ignorar contenido-fisico
 contenido-fisico/
+
+
+#para las fotos de perfil
+/uploads/**
+!/uploads/.gitkeep
