@@ -68,3 +68,7 @@ contenido-fisico/
 #para las fotos de perfil
 /uploads/**
 !/uploads/.gitkeep
+
+src/main/java/com/gargstream/config/DataInitializer.java
+
+src/main/resources/application.properties

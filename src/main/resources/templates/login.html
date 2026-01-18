@@ -51,7 +51,16 @@
     <h1>Iniciar Sesión</h1>
 
     <div th:if="${param.error}" class="error-msg">
-        Email o contraseña incorrectos.
+
+        <span th:if="${param.error[0] == 'blocked'}">
+            ⛔ <strong>ACCESO DENEGADO</strong><br>
+            Tu cuenta ha sido bloqueada por un administrador.
+        </span>
+
+        <span th:if="${param.error[0] != 'blocked'}">
+            Email o contraseña incorrectos.
+        </span>
+
     </div>
 
     <div th:if="${param.logout}" class="error-msg" style="background-color: #2e7d32;">

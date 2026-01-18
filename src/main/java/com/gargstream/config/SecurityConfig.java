@@ -1,12 +1,21 @@
 package com.gargstream.config;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.LockedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
+
+import java.io.IOException;
 
 @Configuration
 @EnableWebSecurity
@@ -17,6 +26,27 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
+    }
+
+    //manejador de errores
+    @Bean
+    public AuthenticationFailureHandler falloPersonalizadoHandler() {
+        return new SimpleUrlAuthenticationFailureHandler() {
+            @Override
+            public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
+
+                // Por defecto, mandamos error genérico
+                String redirectUrl = "/login?error=true";
+
+                // Si la excepción es de tipo "Bloqueado"
+                if (exception instanceof LockedException) {
+                    redirectUrl = "/login?error=blocked";
+                }
+
+                super.setDefaultFailureUrl(redirectUrl);
+                super.onAuthenticationFailure(request, response, exception);
+            }
+        };
     }
 
     // 2. FILTRO DE SEGURIDAD
@@ -40,6 +70,7 @@ public class SecurityConfig {
                 .formLogin(form -> form
                         .loginPage("/login")
                         .defaultSuccessUrl("/index.html", true) // Al entrar, te manda al inicio
+                        .failureHandler(falloPersonalizadoHandler())
                         .permitAll() // Todos pueden ver el login
                 )
                 // Cerrar sesión

@@ -77,15 +77,35 @@
                 <tr>
                     <th style="width: 60px;">Avatar</th>
                     <th>Identidad</th>
+                    <th>Estado</th>
                     <th>Rol</th>
                     <th>Fecha Registro</th>
-                    <th style="text-align: right;">Acciones</th>
+                    <th style="text-align: right;">Gestión</th>
                 </tr>
                 </thead>
                 <tbody id="tabla-usuarios-body">
-                <tr><td colspan="5" style="text-align:center; padding: 20px; color:#666;">Cargando datos...</td></tr>
                 </tbody>
             </table>
+        </div>
+
+        <div id="modal-usuario" class="edit-form-container" style="display: none; margin-top: 20px; border: 1px solid #ffb400;">
+            <h2 style="margin-top:0; color: #ffb400;">Panel de Control de Usuario</h2>
+
+            <div style="background: #222; padding: 15px; border-radius: 5px; margin-bottom: 20px; border: 1px solid #333;">
+                <p style="margin: 5px 0; color: #aaa;">ID: <span id="user-info-id" style="color:white; font-family:monospace;"></span></p>
+                <p style="margin: 5px 0; color: #aaa;">Usuario: <span id="user-info-nombre" style="color:white; font-weight:bold; font-size:1.1em;"></span></p>
+                <p style="margin: 5px 0; color: #aaa;">Email: <span id="user-info-email" style="color:white"></span></p>
+                <p style="margin: 5px 0; color: #aaa;">Estado: <span id="user-info-estado"></span></p>
+            </div>
+
+            <div class="section-title">⚡ Acciones Disponibles</div>
+
+            <div class="row" style="margin-top: 15px;">
+                <div id="action-bloqueo" style="flex: 1;"></div>
+                <div id="action-rol" style="flex: 1;"></div>
+            </div>
+
+            <button type="button" class="btn-cancelar" onclick="cerrarEditorUsuario()" style="margin-top: 20px; width: 100%;">Cerrar Panel</button>
         </div>
     </div>
 

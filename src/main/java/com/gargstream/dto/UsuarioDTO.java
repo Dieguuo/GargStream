@@ -17,4 +17,5 @@ public class UsuarioDTO {
     private String rol;
     private String avatarUrl;
     private LocalDate fechaRegistro;
+    private boolean bloqueado;
 }

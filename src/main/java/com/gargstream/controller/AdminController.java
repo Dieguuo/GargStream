@@ -4,20 +4,21 @@ import com.gargstream.model.*;
 import com.gargstream.repository.ContenidoRepository;
 import com.gargstream.repository.UsuarioRepository;
 import com.gargstream.service.*;
+import jakarta.persistence.Id;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import com.gargstream.service.PeliculaService;
-import org.springframework.web.bind.annotation.DeleteMapping; // Importar esto
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 
 @RestController
@@ -31,6 +32,10 @@ public class AdminController {
     private final AlmacenamientoService almacenamientoService;
     private final SerieService serieService;
     private final UsuarioRepository usuarioRepository;
+
+    //email supremo
+    @Value("${gargstream.security.admin.supremo}")
+    private String emailSupremo;
 
 
     /*VIDEOS PERSONALES*/
@@ -236,10 +241,101 @@ public class AdminController {
                 u.getEmail(),
                 u.getRol().toString(),
                 u.getAvatarUrl(),
-                u.getFechaRegistro()
+                u.getFechaRegistro(),
+                u.isBloqueado()
         )).toList();
 
         return ResponseEntity.ok(listaSegura);
+    }
+
+    //bloquear/desbloquear
+    @PostMapping("/usuario/bloqueo")
+    public ResponseEntity<String> alternarBloqueo(@RequestParam Long id, @AuthenticationPrincipal UserDetails adminLogueado){
+        Usuario usuario = usuarioRepository.findById(id).orElseThrow();
+
+        //no se puede al admin supremo
+        if (usuario.getEmail().equals(emailSupremo)) {
+            return ResponseEntity.badRequest().body("ACCESO DENEGADO: No puedes hacer nada con el admin supremo");
+        }
+
+        //para que no se autobloquee
+        if (usuario.getEmail().equals(adminLogueado.getUsername())) {
+            return ResponseEntity.badRequest().body("ERROR: No puedes bloquear tu propia cuenta.");
+        }
+
+        //para no poder bloquear a un admin
+        if(usuario.getRol() == Rol.ADMIN){
+            return ResponseEntity.badRequest().body("No puedes bloquear a un Admin. Degrádalo a usuario.");
+
+        }
+
+        boolean nuevoEstado = !usuario.isBloqueado();
+        usuario.setBloqueado(nuevoEstado);
+        usuarioRepository.save(usuario);
+
+        String accion = nuevoEstado ? "BLOQUEADO" : "DESBLOQUEADO";
+        return ResponseEntity.ok("Usuario " + accion + " correctamente.");
+    }
+
+
+    //para cambiar el rol del usuario
+    @PostMapping("/usuario/cambiar-rol")
+    public ResponseEntity<String> cambiarRol(
+            @RequestParam Long id,
+            @RequestParam String nuevoRol,
+            @AuthenticationPrincipal UserDetails adminLogueado
+    ){
+        Usuario usuario = usuarioRepository.findById(id).orElseThrow();
+
+        //el admin supremo siempre es admin
+        if (usuario.getEmail().equals(emailSupremo)) {
+            return ResponseEntity.badRequest().body("IMPOSIBLE: El Admin Supremo no puede ser degradado.");
+        }
+
+        //que no se pueda autodegradar
+        if (usuario.getEmail().equals(adminLogueado.getUsername())) {
+            return ResponseEntity.badRequest().body("⛔ SEGURIDAD: No puedes quitarte permisos a ti mismo.");
+        }
+
+        try{
+            Rol rolEnum = Rol.valueOf(nuevoRol);
+            usuario.setRol(rolEnum);
+
+            //asegurar que no esté bloqueado al hacerle admin
+            if(rolEnum == Rol.ADMIN){
+                usuario.setBloqueado(false);
+            }
+
+            usuarioRepository.save(usuario);
+            return  ResponseEntity.ok("Rol cambiado a "+ nuevoRol);
+
+        }catch (IllegalArgumentException e){
+            return ResponseEntity.badRequest().body("Rol no válido");
+        }
+    }
+
+    //eliminar a un usuario
+    @DeleteMapping("/usuario/eliminar/{id}")
+    public ResponseEntity<String> eliminarUsuario(@PathVariable Long id){
+        Usuario usuario = usuarioRepository.findById(id).orElse(null);
+
+        if(usuario == null){
+            return ResponseEntity.notFound().build();
+        }
+
+        //el admin supremo no se puede borrar
+        if (usuario.getEmail().equals(emailSupremo)) {
+            return ResponseEntity.status(403).body("No se puede eliminar al admin supremo");
+        }
+
+        //no se puede borrar un admin
+        if(usuario.getRol() == Rol.ADMIN){
+            return ResponseEntity.status(403).body("No puedes borrar a un admin.");
+        }
+
+        //borrarlo
+        usuarioRepository.delete(usuario);
+        return ResponseEntity.ok("Usuario eliminado correctamente");
     }
 
 

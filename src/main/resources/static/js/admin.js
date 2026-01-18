@@ -16,7 +16,7 @@ function mostrar(idSeccion) {
     const botones = document.querySelectorAll('.menu-btn');
     // Mapeo manual de índices para activar el botón correcto
     if(idSeccion === 'sec-dashboard') botones[0].classList.add('active');
-    if(idSeccion === 'sec-usuarios')  botones[1].classList.add('active'); // Nuevo
+    if(idSeccion === 'sec-usuarios')  botones[1].classList.add('active');
     if(idSeccion === 'sec-cine')      botones[2].classList.add('active');
     if(idSeccion === 'sec-serie')     botones[3].classList.add('active');
     if(idSeccion === 'sec-capitulo')  botones[4].classList.add('active');
@@ -48,58 +48,63 @@ async function cargarMetricas() {
     }
 }
 
-// --- 3. GESTIÓN DE USUARIOS (NUEVO) ---
+// --- 3. GESTIÓN DE USUARIOS ---
 async function cargarUsuarios() {
+    cerrarEditorUsuario();
     const tbody = document.getElementById('tabla-usuarios-body');
-    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">Cargando directorio...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px;">Cargando directorio...</td></tr>';
 
     try {
         const res = await fetch('/api/admin/usuarios');
         if(res.ok) {
-            listaUsuariosGlobal = await res.json(); // Guardamos en memoria
+            listaUsuariosGlobal = await res.json();
             renderizarTablaUsuarios(listaUsuariosGlobal);
         } else {
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:red;">Error al cargar usuarios</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:red;">Error al cargar usuarios</td></tr>';
         }
     } catch (e) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:red;">Error de conexión</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:red;">Error de conexión</td></tr>';
     }
 }
 
 function renderizarTablaUsuarios(usuarios) {
     const tbody = document.getElementById('tabla-usuarios-body');
-    tbody.innerHTML = ''; // Limpiar
+    tbody.innerHTML = '';
 
     if(usuarios.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">No se encontraron usuarios.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px;">No se encontraron usuarios.</td></tr>';
         return;
     }
 
     usuarios.forEach(u => {
         const tr = document.createElement('tr');
 
-        // Avatar por defecto si es null
+        // Si está bloqueado, lo pintamos rojizo y semi-transparente
+        if (u.bloqueado) {
+            tr.style.background = "rgba(255, 0, 0, 0.1)";
+        }
+
         const avatar = u.avatarUrl ? u.avatarUrl : '/img/default-avatar.png';
-
-        // Estilo del badge según rol
         const badgeClass = u.rol === 'ADMIN' ? 'badge-admin' : 'badge-user';
-
-        // Formatear fecha simple
         const fecha = u.fechaRegistro ? new Date(u.fechaRegistro).toLocaleDateString() : '-';
 
+        // Icono visual de estado
+        const estadoHTML = u.bloqueado
+            ? '<span style="color:red; font-weight:bold;">🔒 BLOQ</span>'
+            : '<span style="color:#46d369; font-weight:bold;">✅ ACTIVO</span>';
+
         tr.innerHTML = `
-            <td>
-                <img src="${avatar}" class="table-avatar" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png'">
-            </td>
+            <td><img src="${avatar}" class="table-avatar" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png'"></td>
             <td class="user-identity">
                 <div class="name">${u.nombre}</div>
                 <div class="email">${u.email}</div>
             </td>
+            <td>${estadoHTML}</td>
             <td><span class="badge ${badgeClass}">${u.rol}</span></td>
             <td>${fecha}</td>
             <td style="text-align: right;">
-                <button class="action-btn btn-edit-user" title="Editar Rol (Próximamente)" onclick="alert('Función de editar rol próximamente')">✏️</button>
-                <button class="action-btn btn-delete-user" title="Eliminar Usuario" onclick="eliminarUsuario(${u.id}, '${u.nombre}')">🗑️</button>
+                <button class="action-btn" title="Gestionar" onclick="abrirEditorUsuario(${u.id})">⚙️</button>
+                <button class="action-btn" title="Eliminar" onclick="eliminarUsuario(${u.id}, '${u.nombre}', '${u.rol}')" style="color:#ff4444;">🗑️</button>
             </td>
         `;
         tbody.appendChild(tr);
@@ -115,12 +120,107 @@ function filtrarUsuarios() {
     renderizarTablaUsuarios(filtrados);
 }
 
-function eliminarUsuario(id, nombre) {
-    if(confirm(`¿Estás seguro de eliminar al usuario ${nombre}?\nEsta acción borrará sus datos permanentemente.`)) {
-        // Aquí iría la llamada fetch DELETE (Aún no implementada en backend)
-        alert("Simulación: Usuario eliminado (Implementar endpoint DELETE)");
+// --- FUNCIONES DEL PANEL DE USUARIO (MODAL) ---
+
+function abrirEditorUsuario(id) {
+    const usuario = listaUsuariosGlobal.find(u => u.id === id);
+    if(!usuario) return;
+
+    // 1. Rellenar datos informativos (SOLO LECTURA)
+    document.getElementById('user-info-id').innerText = usuario.id;
+    document.getElementById('user-info-nombre').innerText = usuario.nombre;
+    document.getElementById('user-info-email').innerText = usuario.email;
+
+    const spanEstado = document.getElementById('user-info-estado');
+    spanEstado.innerHTML = usuario.bloqueado
+        ? "<span style='color:red; font-weight:bold;'>⛔ CUENTA BLOQUEADA (Acceso denegado)</span>"
+        : "<span style='color:#46d369; font-weight:bold;'>✅ CUENTA ACTIVA (Acceso permitido)</span>";
+
+    // 2. Botón Bloqueo
+    const divBloqueo = document.getElementById('action-bloqueo');
+    if (usuario.rol === 'ADMIN') {
+        divBloqueo.innerHTML = `<p style="color:#666; font-size:0.8em;">No puedes bloquear a un Admin.</p>`;
+    } else {
+        if (usuario.bloqueado) {
+            divBloqueo.innerHTML = `<button type="button" onclick="toggleBloqueo(${usuario.id}, '${usuario.nombre}')" style="background:#1a441a; border:1px solid #46d369; color:#46d369; width:100%;">🔓 DESBLOQUEAR</button>`;
+        } else {
+            divBloqueo.innerHTML = `<button type="button" onclick="toggleBloqueo(${usuario.id}, '${usuario.nombre}')" style="background:#331111; border:1px solid red; color:red; width:100%;">🔒 BLOQUEAR</button>`;
+        }
+    }
+
+    // 3. Botón Rol
+    const divRol = document.getElementById('action-rol');
+    if (usuario.rol === 'USER') {
+        divRol.innerHTML = `<button type="button" onclick="cambiarRolUsuario(${usuario.id}, 'ADMIN')" style="background:#333; border:1px solid #ffb400; color:#ffb400; width:100%;">⬆️ Hacer ADMIN</button>`;
+    } else {
+        divRol.innerHTML = `<button type="button" onclick="cambiarRolUsuario(${usuario.id}, 'USER')" style="background:#333; border:1px solid #aaa; color:#aaa; width:100%;">⬇️ Hacer USUARIO</button>`;
+    }
+
+    document.getElementById('modal-usuario').style.display = 'block';
+    document.getElementById('modal-usuario').scrollIntoView({ behavior: 'smooth' });
+}
+
+function cerrarEditorUsuario() {
+    document.getElementById('modal-usuario').style.display = 'none';
+}
+
+// --- ACCIONES DE USUARIO CON FETCH ---
+
+async function toggleBloqueo(id, nombre) {
+    if(!confirm(`¿Cambiar el estado de bloqueo para ${nombre}?`)) return;
+    try {
+        const res = await fetch('/api/admin/usuario/bloqueo?id=' + id, { method: 'POST' });
+        if(res.ok) {
+            alert(await res.text());
+            cargarUsuarios(); // Recargar tabla
+            abrirEditorUsuario(id); // Recargar modal para ver cambios
+        } else {
+            alert("❌ Error: " + await res.text());
+        }
+    } catch(e) { alert("Error de conexión"); }
+}
+
+async function cambiarRolUsuario(id, nuevoRol) {
+    let msg = nuevoRol === 'ADMIN' ? "¿Estás seguro de ASCENDER a este usuario? Tendrá control total." : "¿Estás seguro de DEGRADAR a este administrador?";
+    if(!confirm(msg)) return;
+
+    // Doble confirmación para ascender
+    if(nuevoRol === 'ADMIN' && !confirm("⚠️ ¿Confirmas dar permisos de Administrador?")) return;
+
+    const params = new URLSearchParams();
+    params.append('id', id);
+    params.append('nuevoRol', nuevoRol);
+
+    try {
+        const res = await fetch('/api/admin/usuario/cambiar-rol', { method: 'POST', body: params });
+        if(res.ok) {
+            alert("✅ Rol actualizado");
+            cargarUsuarios();
+            abrirEditorUsuario(id);
+        } else {
+            alert("❌ Error: " + await res.text());
+        }
+    } catch(e) { alert("Error de conexión"); }
+}
+
+async function eliminarUsuario(id, nombre, rol) {
+    if(rol === 'ADMIN') {
+        alert("⛔ No puedes eliminar a un Admin. Primero degrádalo a usuario.");
+        return;
+    }
+    if(confirm(`⚠️ ¿ELIMINAR DEFINITIVAMENTE A "${nombre}"?\nEsta acción es irreversible.`)) {
+        try {
+            const res = await fetch(`/api/admin/usuario/eliminar/${id}`, { method: 'DELETE' });
+            if(res.ok) {
+                alert("🗑️ Usuario eliminado");
+                cargarUsuarios();
+            } else {
+                alert("❌ Error: " + await res.text());
+            }
+        } catch(e) { alert("Error de conexión"); }
     }
 }
+
 
 // --- 4. CARGAR SERIES SELECTOR ---
 async function cargarSeriesEnSelector() {
@@ -182,7 +282,7 @@ async function cargarContenidoParaEditar() {
     }
 }
 
-// --- 6. ABRIR EDITOR ---
+// --- 6. ABRIR EDITOR (CONTENIDO) ---
 async function abrirEditor(id) {
     document.getElementById('grid-edicion').style.display = 'none';
     const formContainer = document.getElementById('formulario-edicion');
