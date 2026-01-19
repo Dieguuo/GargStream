@@ -14,13 +14,37 @@
             height: 100vh; margin: 0;
             background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('/img/fondo_cine.jpeg');
             background-size: cover; background-position: center;
+            position: relative; /* Para posicionar el botón de volver */
         }
+
+        /* --- BOTÓN VOLVER (NUEVO) --- */
+        .back-home {
+            position: absolute;
+            top: 25px;
+            left: 30px;
+            color: white;
+            text-decoration: none;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.5em;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.3s;
+            z-index: 10;
+        }
+        .back-home:hover {
+            color: var(--primary-color);
+            transform: translateX(-5px);
+        }
+
         .register-card {
-            background: rgba(0, 0, 0, 0.85); padding: 60px;
+            background: rgba(0, 0, 0, 0.85); padding: 40px 60px;
             border-radius: 10px; width: 100%; max-width: 450px;
             box-shadow: 0 0 20px rgba(0,0,0,0.8);
+            position: relative;
         }
-        h1 { font-family: 'Bebas Neue', sans-serif; font-size: 3em; margin: 0 0 30px 0; color: white; letter-spacing: 2px;}
+        h1 { font-family: 'Bebas Neue', sans-serif; font-size: 3em; margin: 0 0 20px 0; color: white; letter-spacing: 2px; text-align: center;}
         .form-group { margin-bottom: 20px; }
         label { display: block; margin-bottom: 5px; color: #aaa; font-size: 0.9em; }
         input {
@@ -32,7 +56,7 @@
         .btn-register {
             width: 100%; padding: 15px; background-color: var(--primary-color);
             color: black; border: none; font-weight: bold; font-size: 1.2em;
-            cursor: pointer; border-radius: 4px; margin-top: 20px; font-family: 'Bebas Neue', sans-serif; letter-spacing: 1px;
+            cursor: pointer; border-radius: 4px; margin-top: 10px; font-family: 'Bebas Neue', sans-serif; letter-spacing: 1px;
             transition: 0.3s;
         }
         .btn-register:hover { background-color: #e5a100; transform: scale(1.02); }
@@ -42,9 +66,23 @@
         .login-link a:hover { text-decoration: underline; }
 
         .error-msg { background: #e50914; color: white; padding: 10px; border-radius: 4px; margin-bottom: 20px; text-align: center; font-weight: bold; }
+
+        /* ESTILOS AVATARES */
+        .avatar-selection { display: flex; justify-content: center; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; }
+        .avatar-option {
+            width: 60px; height: 60px; border-radius: 50%; cursor: pointer;
+            border: 3px solid transparent; opacity: 0.6; transition: all 0.2s ease; object-fit: cover;
+        }
+        .avatar-option:hover { opacity: 1; transform: scale(1.1); }
+        .avatar-option.selected {
+            border-color: var(--primary-color); opacity: 1; transform: scale(1.15);
+            box-shadow: 0 0 15px rgba(255, 180, 0, 0.4);
+        }
     </style>
 </head>
 <body>
+
+<a href="/index.html" class="back-home">← Volver al Catálogo</a>
 
 <div class="register-card">
     <h1>Crear Cuenta</h1>
@@ -54,6 +92,19 @@
     </div>
 
     <form action="/register" method="POST">
+
+        <div class="form-group" style="text-align: center;">
+            <label style="margin-bottom: 10px; color: #fff;">Elige tu Personaje</label>
+            <input type="hidden" id="avatarUrl" name="avatarUrl" value="">
+            <div class="avatar-selection">
+                <img src="/img/avatars/1.png" class="avatar-option" onclick="seleccionarAvatar(this, '/img/avatars/1.png')">
+                <img src="/img/avatars/2.png" class="avatar-option" onclick="seleccionarAvatar(this, '/img/avatars/2.png')">
+                <img src="/img/avatars/3.png" class="avatar-option" onclick="seleccionarAvatar(this, '/img/avatars/3.png')">
+                <img src="/img/avatars/4.png" class="avatar-option" onclick="seleccionarAvatar(this, '/img/avatars/4.png')">
+                <img src="/img/avatars/5.png" class="avatar-option" onclick="seleccionarAvatar(this, '/img/avatars/5.png')">
+            </div>
+        </div>
+
         <div class="form-group">
             <label>Nombre</label>
             <input type="text" name="nombre" placeholder="Tu nombre" required>
@@ -76,6 +127,14 @@
         ¿Ya tienes cuenta? <a href="/login">Inicia Sesión</a>
     </div>
 </div>
+
+<script>
+    function seleccionarAvatar(elementoImg, ruta) {
+        document.querySelectorAll('.avatar-option').forEach(img => img.classList.remove('selected'));
+        elementoImg.classList.add('selected');
+        document.getElementById('avatarUrl').value = ruta;
+    }
+</script>
 
 </body>
 </html>

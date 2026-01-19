@@ -40,6 +40,7 @@ public class AuthController {
             @RequestParam String nombre,
             @RequestParam String email,
             @RequestParam String password,
+            @RequestParam(required = false) String avatarUrl,
             Model model
     ){
         //comprobar si ya existe el email
@@ -55,8 +56,13 @@ public class AuthController {
         //encriptar la contraseña antes de guardarla
         nuevoUsuario.setPassword(passwordEncoder.encode(password));
         nuevoUsuario.setRol(Rol.USER);
-        //poner avatar por defecto en el futuro
-        nuevoUsuario.setAvatarUrl(null);
+
+        //si se ha elegido una foto se pone, si no null
+        if(avatarUrl != null && !avatarUrl.isEmpty()){
+            nuevoUsuario.setAvatarUrl(avatarUrl);
+        }else{
+            nuevoUsuario.setAvatarUrl(null);
+        }
 
         //guardar en la bd
         usuarioRepository.save(nuevoUsuario);

@@ -81,16 +81,17 @@ function renderizarDetalle(c) {
 
     // Generar Estrellas HTML
     let estrellasHtml = '';
-    const puedeVotar = (typeof isUserAuthenticated !== 'undefined' && isUserAuthenticated);
+    // Comprobamos si el usuario está autenticado
+    const estaLogueado = (typeof isUserAuthenticated !== 'undefined' && isUserAuthenticated);
 
     for(let i=1; i<=5; i++) {
         const claseRellena = i <= miVotoActual ? 'filled' : '';
         // Eventos solo si está logueado
-        const eventos = puedeVotar ?
+        const eventos = estaLogueado ?
             `onclick="enviarVoto(${i}, ${c.id})" onmouseover="iluminar(${i})" onmouseout="restaurar()"` : '';
 
         // Estilo inline cursor
-        const estiloCursor = puedeVotar ? 'cursor:pointer;' : 'cursor:default;';
+        const estiloCursor = estaLogueado ? 'cursor:pointer;' : 'cursor:default;';
 
         estrellasHtml += `<span class="star ${claseRellena}" data-value="${i}" ${eventos} style="${estiloCursor}">★</span>`;
     }
@@ -111,7 +112,7 @@ function renderizarDetalle(c) {
                         ${textoLocal}
                     </div>
 
-                    ${ !puedeVotar ? '<small style="color:#bbb; display:block; margin-top:8px; font-size:0.8em;">Inicia sesión para votar</small>' : '' }
+                    ${ !estaLogueado ? '<small style="color:#bbb; display:block; margin-top:8px; font-size:0.8em;">Inicia sesión para votar</small>' : '' }
                 </div>
             </div>
 
@@ -134,22 +135,35 @@ function renderizarDetalle(c) {
                 <div class="actions">
     `;
 
+    // --- CORRECCIÓN 1: PROTECCIÓN BOTÓN REPRODUCIR (PELÍCULAS) ---
     if (!esSerie) {
-        html += `<button onclick="reproducirPeli(${c.id})" class="btn-play-big">▶ Reproducir</button>`;
+        if (estaLogueado) {
+            html += `<button onclick="reproducirPeli(${c.id})" class="btn-play-big">▶ Reproducir</button>`;
+        } else {
+            // Botón bloqueado que manda al login
+            html += `<button onclick="window.location.href='/login'" class="btn-play-big" style="background-color:#444; color:#aaa; cursor:pointer;">🔒 Inicia sesión para ver</button>`;
+        }
     }
 
+    // Botón Lista (Ya estaba protegido por el backend, pero visualmente lo dejamos)
     html += `
         <button onclick="toggleMiLista(${c.id})" class="btn-lista" title="${textoLista}">
             <img id="icono-fav" src="${iconoCorazon}" alt="Favorito" style="width:28px; height:28px;">
         </button>
     `;
 
+    // --- CORRECCIÓN 2: PROTECCIÓN BOTÓN TRÁILER ---
     if(youtubeId) {
-        html += `<button onclick="verTrailer('${youtubeId}')" class="btn-trailer">🎬 Ver Tráiler</button>`;
+        if (estaLogueado) {
+            html += `<button onclick="verTrailer('${youtubeId}')" class="btn-trailer">🎬 Ver Tráiler</button>`;
+        } else {
+            html += `<button onclick="window.location.href='/login'" class="btn-trailer" style="background-color:#333; color:#888;">🔒 Tráiler</button>`;
+        }
     }
 
     html += `</div></div></div>`;
 
+    // Renderizado de Temporadas
     if (esSerie) {
         html += `
             <h2 style="padding-left:20px; margin-bottom:20px;">Temporadas y Episodios</h2>
@@ -170,12 +184,21 @@ function renderizarDetalle(c) {
                 caps.forEach(cap => {
                     const urlVideoCap = cap.rutaVideo;
                     episodiosData[cap.id] = cap.subtitulos || [];
+
+                    // --- CORRECCIÓN 3: PROTECCIÓN BOTONES EPISODIOS ---
+                    let botonCapitulo = '';
+                    if (estaLogueado) {
+                        botonCapitulo = `<button class="btn-cap" onclick="reproducirCapitulo('${urlVideoCap}', ${cap.id})">▶ Reproducir</button>`;
+                    } else {
+                        botonCapitulo = `<button class="btn-cap" onclick="window.location.href='/login'" style="background:#333; color:#777;">🔒 Bloqueado</button>`;
+                    }
+
                     html += `
                         <div class="capitulo-card">
                             <div style="display:flex; flex-direction:column;">
                                 <span style="font-weight:bold; font-size:1em;">${cap.numeroCapitulo}. ${cap.titulo || 'Episodio ' + cap.numeroCapitulo}</span>
                             </div>
-                            <button class="btn-cap" onclick="reproducirCapitulo('${urlVideoCap}', ${cap.id})">▶ Reproducir</button>
+                            ${botonCapitulo}
                         </div>
                     `;
                 });
