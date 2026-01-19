@@ -45,7 +45,11 @@ public class Usuario implements UserDetails {
 
     private boolean bloqueado = false;
 
-    // --- MÉTODOS DE SEGURIDAD (AQUÍ ESTABA EL PROBLEMA) ---
+    //recuperar contraseña
+    private String codigoRecuperacion;
+    private LocalDateTime expiracionRecuperacion;
+
+    // metodos de seguridad ---
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -75,14 +79,13 @@ public class Usuario implements UserDetails {
         return true;
     }
 
-    // 4. ¿USUARIO HABILITADO? (Faltaba: devolver true)
-    // Sin esto, Spring piensa que el usuario está "apagado"
+    // 4. ¿USUARIO HABILITADO?
     @Override
     public boolean isEnabled() {
         return true;
     }
 
-    // --- TRIGGER FECHA ---
+
     @PrePersist
     public void prePersist() {
         if (this.fechaRegistro == null) {

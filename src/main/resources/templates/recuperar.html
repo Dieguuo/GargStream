@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Recuperar Contraseña - GargStream</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css"> <style>
+    /* Estilos específicos para esta caja centrada */
+    body {
+        background-color: #141414;
+        color: #fff;
+        font-family: 'Roboto', sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('/img/hero-bg.jpg'); /* Opcional: fondo */
+        background-size: cover;
+    }
+
+    .recovery-card {
+        background: rgba(0, 0, 0, 0.85);
+        padding: 40px;
+        border-radius: 8px;
+        width: 100%;
+        max-width: 400px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        text-align: center;
+    }
+
+    h2 {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 2.5em;
+        color: #ffb400;
+        margin-bottom: 20px;
+        letter-spacing: 1px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+        text-align: left;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 5px;
+        color: #ccc;
+        font-size: 0.9em;
+    }
+
+    input {
+        width: 100%;
+        padding: 12px;
+        border-radius: 4px;
+        border: 1px solid #333;
+        background: #333;
+        color: white;
+        font-size: 1em;
+        box-sizing: border-box; /* Para que el padding no rompa el ancho */
+    }
+
+    input:focus {
+        outline: none;
+        border-color: #ffb400;
+    }
+
+    button {
+        width: 100%;
+        padding: 12px;
+        background-color: #ffb400;
+        color: #000;
+        border: none;
+        border-radius: 4px;
+        font-size: 1.1em;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.3s;
+        font-family: 'Bebas Neue', sans-serif;
+        letter-spacing: 1px;
+    }
+
+    button:hover {
+        background-color: #e6a300;
+    }
+
+    .step {
+        display: none; /* Ocultos por defecto */
+        animation: fadeIn 0.5s;
+    }
+
+    .step.active {
+        display: block;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message {
+        margin-top: 15px;
+        font-size: 0.9em;
+        padding: 10px;
+        border-radius: 4px;
+        display: none;
+    }
+    .error { background: rgba(255, 0, 0, 0.2); color: #ff6b6b; border: 1px solid #ff6b6b; }
+    .success { background: rgba(0, 255, 0, 0.1); color: #4cd137; border: 1px solid #4cd137; }
+
+    .back-link {
+        display: block;
+        margin-top: 20px;
+        color: #888;
+        text-decoration: none;
+        font-size: 0.9em;
+    }
+    .back-link:hover { color: #fff; }
+</style>
+</head>
+<body>
+
+<div class="recovery-card">
+    <h2>Recuperar Cuenta</h2>
+
+    <div id="step1" class="step active">
+        <p style="color:#aaa; margin-bottom:20px;">Introduce tu correo electrónico y te enviaremos un código de seguridad.</p>
+        <div class="form-group">
+            <label>Correo Electrónico</label>
+            <input type="email" id="email" placeholder="ejemplo@correo.com" required>
+        </div>
+        <button onclick="solicitarCodigo()" id="btn-step1">Enviar Código</button>
+    </div>
+
+    <div id="step2" class="step">
+        <p style="color:#aaa; margin-bottom:20px;">Hemos enviado un código a tu correo. Introdúcelo aquí:</p>
+        <div class="form-group">
+            <label>Código de 6 caracteres</label>
+            <input type="text" id="codigo" placeholder="Ej: A1B2C3" style="text-align:center; letter-spacing: 5px; font-weight:bold; text-transform:uppercase;" maxlength="6">
+        </div>
+        <button onclick="verificarCodigo()" id="btn-step2">Verificar</button>
+        <p class="back-link" onclick="mostrarPaso(1)" style="cursor:pointer;">← Corregir correo</p>
+    </div>
+
+    <div id="step3" class="step">
+        <p style="color:#aaa; margin-bottom:20px;">¡Código correcto! Crea tu nueva contraseña.</p>
+        <div class="form-group">
+            <label>Nueva Contraseña</label>
+            <input type="password" id="pass1" placeholder="Mínimo 6 caracteres">
+        </div>
+        <div class="form-group">
+            <label>Confirmar Contraseña</label>
+            <input type="password" id="pass2" placeholder="Repite la contraseña">
+        </div>
+        <button onclick="cambiarPassword()" id="btn-step3">Cambiar Contraseña</button>
+    </div>
+
+    <div id="msg-box" class="message"></div>
+
+    <a href="/login" class="back-link">Volver al Login</a>
+</div>
+
+<script>
+    // Variables globales para guardar estado
+    let emailGuardado = "";
+    let codigoGuardado = "";
+
+    function mostrarMensaje(texto, tipo) {
+        const box = document.getElementById('msg-box');
+        box.innerText = texto;
+        box.className = 'message ' + tipo;
+        box.style.display = 'block';
+        setTimeout(() => box.style.display = 'none', 5000);
+    }
+
+    function mostrarPaso(num) {
+        document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+        document.getElementById('step' + num).classList.add('active');
+        document.getElementById('msg-box').style.display = 'none'; // Limpiar mensajes
+    }
+
+    // --- LÓGICA PASO 1: ENVIAR EMAIL ---
+    function solicitarCodigo() {
+        const email = document.getElementById('email').value.trim();
+        if (!email) return mostrarMensaje("Escribe tu correo.", "error");
+
+        const btn = document.getElementById('btn-step1');
+        btn.disabled = true;
+        btn.innerText = "Enviando...";
+
+        const formData = new URLSearchParams();
+        formData.append('email', email);
+
+        fetch('/api/public/recuperar/solicitar', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            emailGuardado = email;
+            mostrarMensaje(data.mensaje || "Código enviado.", "success");
+            setTimeout(() => mostrarPaso(2), 1500);
+        })
+        .catch(err => mostrarMensaje("Error de conexión.", "error"))
+        .finally(() => {
+            btn.disabled = false;
+            btn.innerText = "Enviar Código";
+        });
+    }
+
+    // --- LÓGICA PASO 2: VERIFICAR CÓDIGO ---
+    function verificarCodigo() {
+        const codigo = document.getElementById('codigo').value.trim().toUpperCase();
+        if (codigo.length < 6) return mostrarMensaje("El código debe tener 6 caracteres.", "error");
+
+        const btn = document.getElementById('btn-step2');
+        btn.disabled = true;
+        btn.innerText = "Verificando...";
+
+        const formData = new URLSearchParams();
+        formData.append('email', emailGuardado);
+        formData.append('codigo', codigo);
+
+        fetch('/api/public/recuperar/verificar', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => {
+            if (res.ok) {
+                codigoGuardado = codigo;
+                mostrarPaso(3);
+            } else {
+                return res.text().then(text => { throw new Error(text) });
+            }
+        })
+        .catch(err => mostrarMensaje("Código incorrecto o expirado.", "error"))
+        .finally(() => {
+            btn.disabled = false;
+            btn.innerText = "Verificar";
+        });
+    }
+
+    // --- LÓGICA PASO 3: CAMBIAR PASSWORD ---
+    function cambiarPassword() {
+        const p1 = document.getElementById('pass1').value;
+        const p2 = document.getElementById('pass2').value;
+
+        if (p1.length < 4) return mostrarMensaje("La contraseña es muy corta.", "error");
+        if (p1 !== p2) return mostrarMensaje("Las contraseñas no coinciden.", "error");
+
+        const btn = document.getElementById('btn-step3');
+        btn.disabled = true;
+        btn.innerText = "Guardando...";
+
+        const formData = new URLSearchParams();
+        formData.append('email', emailGuardado);
+        formData.append('codigo', codigoGuardado);
+        formData.append('nuevaPassword', p1);
+
+        fetch('/api/public/recuperar/cambiar', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => {
+            if (res.ok) {
+                document.querySelector('.recovery-card').innerHTML = `
+                    <h2 style="color:#4cd137">¡Éxito!</h2>
+                    <p>Tu contraseña se ha cambiado correctamente.</p>
+                    <a href="/login" class="button" style="display:block; margin-top:20px; background:#4cd137; padding:10px; color:white; text-decoration:none; border-radius:4px;">Ir al Login</a>
+                `;
+            } else {
+                return res.text().then(text => { throw new Error(text) });
+            }
+        })
+        .catch(err => {
+            mostrarMensaje("Error al cambiar la contraseña.", "error");
+            btn.disabled = false;
+            btn.innerText = "Cambiar Contraseña";
+        });
+    }
+</script>
+
+</body>
+</html>

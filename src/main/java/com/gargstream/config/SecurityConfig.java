@@ -58,7 +58,7 @@ public class SecurityConfig {
                         .requestMatchers("/css/**", "/js/**", "/img/**", "/logo.svg", "/error/**", "/uploads/**").permitAll()
 
                         // Rutas Públicas: Inicio, Login, Registro, Detalles y H2 Console
-                        .requestMatchers("/", "/index", "/index.html", "/api/public/**", "/api/archivos/**", "/ver_detalle.html", "/register", "/login", "/h2-console/**").permitAll()
+                        .requestMatchers("/", "/index", "/index.html", "/api/public/**", "/api/archivos/**", "/ver_detalle.html", "/register", "/login", "/recuperar", "/h2-console/**").permitAll()
 
                         // Rutas Privadas (Admin)
                         .requestMatchers("/admin.html", "/api/admin/**").hasAuthority("ADMIN")
