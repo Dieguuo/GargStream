@@ -16,8 +16,6 @@ public class Pelicula extends Contenido{
     private Integer anioLanzamiento;
     //la duracción en mins
     private Integer duracionMinutos;
-    //puntuacion media
-    private Double puntuacionMedia;
     //la ruta de la pelicula
     private String rutaVideo;
 

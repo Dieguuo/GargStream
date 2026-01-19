@@ -325,3 +325,51 @@ body {
     width: 0%; /* Se llena con JS */
     transition: width 0.3s ease;
 }
+
+
+/* --- SISTEMA DE VALORACIÓN (ESTRELLAS) --- */
+.rating-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 10px 0;
+    font-family: 'Roboto', sans-serif;
+}
+
+.stars {
+    display: flex;
+    gap: 2px;
+    cursor: pointer;
+}
+
+.star {
+    font-size: 28px;
+    color: #555; /* Gris apagado por defecto */
+    transition: color 0.2s, transform 0.1s;
+}
+
+/* Estrella rellena (dorada) */
+.star.filled {
+    color: #ffb400;
+}
+
+/* Efecto al pasar el ratón */
+.star:hover {
+    transform: scale(1.2);
+}
+
+.rating-text {
+    font-size: 0.9em;
+    color: #ccc;
+    margin-left: 5px;
+}
+
+/* Animación pequeña al votar */
+@keyframes pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.4); }
+    100% { transform: scale(1); }
+}
+.star.animate {
+    animation: pop 0.3s ease;
+}

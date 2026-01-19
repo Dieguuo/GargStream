@@ -178,3 +178,34 @@ input:disabled { opacity: 0.5; cursor: not-allowed; }
 @media (max-width: 768px) {
     .profile-container { grid-template-columns: 1fr; }
 }
+
+
+/* --- ESTRELLAS --- */
+.star {
+    font-size: 32px; /* Un poco más grandes */
+    color: #ccc;     /* GRIS CLARO para que se vea sobre fondo negro */
+    cursor: pointer;
+    transition: color 0.2s, transform 0.1s;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5); /* Sombra para que resalten */
+}
+
+/* Estrella rellena (Dorada) */
+.star.filled {
+    color: #ffcc00; /* Un dorado más brillante */
+}
+
+/* Efecto hover */
+.star:hover {
+    color: #ffe066;
+    transform: scale(1.2);
+}
+
+/* Animación al votar */
+@keyframes pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.4); }
+    100% { transform: scale(1); }
+}
+.star.animate {
+    animation: pop 0.3s ease;
+}

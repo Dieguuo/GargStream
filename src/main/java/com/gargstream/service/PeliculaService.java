@@ -87,6 +87,7 @@ public class PeliculaService {
 
                 //la fecha está en yyyymmdd, voy a sacar solo el año
                 if(datos != null){
+
                     //mapear los datos básicos
                     pelicula.setSipnosis(datos.getSinopsis());
                     pelicula.setPuntuacionMedia(datos.getPuntuacionMedia());

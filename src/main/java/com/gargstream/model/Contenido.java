@@ -31,6 +31,13 @@ public abstract class Contenido {
     //para la fecha de subida
     private LocalDateTime fechaSubida;
 
+    //media de tmdb
+    private Double puntuacionMedia;
+
+    //medias locales
+    private Double notaPromedioLocal = 0.0;
+    private Integer contadorVotos = 0;
+
     //trailer
     @Column(name = "youtube_trailer_id")
     private String youtubeTrailerId;
