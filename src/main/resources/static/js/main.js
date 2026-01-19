@@ -1,7 +1,7 @@
 // --- VARIABLES GLOBALES ---
 let catalogoCompleto = [];
 let miListaCompleta = [];
-let historialCompleto = []; // <--- NUEVA: Para guardar historial
+let historialCompleto = [];
 
 // Variables Hero Slider
 let currentHeroIndex = 0;
@@ -13,11 +13,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const loader = document.getElementById('main-loader');
 
+    // FUNCIÓN SEGURA: Si falla la petición (ej: 403 no logueado), devuelve lista vacía []
+    // en lugar de romper toda la página.
+    const fetchSafe = (url) =>
+        fetch(url)
+            .then(res => {
+                if (!res.ok) return []; // Si hay error (403, 404, 500), devolvemos array vacío
+                return res.json();
+            })
+            .catch(() => []); // Si hay error de red, devolvemos array vacío
+
     Promise.all([
         fetch('/api/public/novedades').then(res => res.json()),
         fetch('/api/public/catalogo').then(res => res.json()),
-        fetch('/api/public/mi-lista').then(res => res.json()),
-        fetch('/api/historial/continuar-viendo').then(res => res.json()) // <--- FETCH HISTORIAL
+        // Usamos la versión segura para las listas personales
+        fetchSafe('/api/public/mi-lista'),
+        fetchSafe('/api/historial/continuar-viendo')
     ])
     .then(([dataNovedades, dataCatalogo, dataMiLista, dataHistorial]) => {
         // 1. Renderizar Novedades
@@ -27,21 +38,19 @@ document.addEventListener('DOMContentLoaded', () => {
         catalogoCompleto = dataCatalogo;
         miListaCompleta = dataMiLista || [];
 
-        // TRUCO: Aplanamos el historial para que sea compatible con el renderRow normal
-        // El DTO trae: { contenido: {...}, porcentaje: 45 }
-        // Lo convertimos a: { ...contenido, porcentaje: 45 }
+        // Aplanar el historial
         historialCompleto = (dataHistorial || []).map(h => {
             return {
                 ...h.contenido,
-                porcentajeVisto: h.porcentaje // Añadimos campo nuevo al objeto peli
+                porcentajeVisto: h.porcentaje
             };
         });
 
-        // 3. Generar filtros y distribuir contenido inicial
+        // 3. Generar filtros y distribuir contenido
         generarFiltros(dataCatalogo);
         distribuirCatalogo(catalogoCompleto);
 
-        // 4. Renderizar Mi Lista y Historial
+        // 4. Renderizar Mi Lista y Historial (si existen)
         actualizarFilaMiLista(miListaCompleta);
         actualizarFilaHistorial(historialCompleto);
 
@@ -54,6 +63,8 @@ document.addEventListener('DOMContentLoaded', () => {
     .catch(err => {
         console.error("Error cargando la web:", err);
         loader.style.display = 'none';
+        // Opcional: Mostrar mensaje de error en pantalla
+        document.body.insertAdjacentHTML('beforeend', '<p style="color:white; text-align:center">Error de conexión con el servidor.</p>');
     });
 
     // --- LISTENER DEL BUSCADOR ---
@@ -79,22 +90,19 @@ function aplicarFiltrosGlobales(textoBusqueda, generoSeleccionado) {
         if(heroSlidesData.length > 0) hero.style.display = 'block';
     }
 
-    // Función auxiliar de filtrado
     const filtrarItem = (item) => {
         const cumpleTexto = item.titulo.toLowerCase().includes(textoBusqueda);
         const cumpleGenero = generoSeleccionado === 'Todos' || (item.genero && item.genero.includes(generoSeleccionado));
         return cumpleTexto && cumpleGenero;
     };
 
-    // 2. Filtrar Catálogo
+    // Filtrar todo
     const catalogoFiltrado = catalogoCompleto.filter(filtrarItem);
     distribuirCatalogo(catalogoFiltrado);
 
-    // 3. Filtrar Mi Lista
     const miListaFiltrada = miListaCompleta.filter(filtrarItem);
     actualizarFilaMiLista(miListaFiltrada);
 
-    // 4. Filtrar Historial
     const historialFiltrado = historialCompleto.filter(filtrarItem);
     actualizarFilaHistorial(historialFiltrado);
 }
@@ -160,9 +168,9 @@ function distribuirCatalogo(lista) {
     toggleFila('cat-series', series);
     toggleFila('cat-videos', videos);
 
-    if(pelis.length > 0) renderRow(pelis, 'row-peliculas');
-    if(series.length > 0) renderRow(series, 'row-series');
-    if(videos.length > 0) renderRow(videos, 'row-videos');
+    renderRow(pelis, 'row-peliculas');
+    renderRow(series, 'row-series');
+    renderRow(videos, 'row-videos');
 }
 
 function toggleFila(idSeccion, items) {
@@ -195,10 +203,6 @@ function renderHeroSlider(lista) {
         slide.className = index === 0 ? 'hero-slide active' : 'hero-slide';
 
         let bgImage = item.rutaFondo ? item.rutaFondo : item.rutaCaratula;
-        if (!item.rutaFondo) {
-            // styleExtra = "filter: blur(20px) brightness(0.5); transform: scale(1.1);"; // Opcional
-        }
-
         slide.style.backgroundImage = `url('${bgImage}')`;
 
         slide.innerHTML = `
@@ -281,10 +285,9 @@ function renderRow(lista, containerId) {
         const link = `/ver_detalle.html?id=${item.id}`;
         const rating = item.puntuacionMedia ? `⭐ ${item.puntuacionMedia}` : '';
 
-        // --- LÓGICA DE BARRA DE PROGRESO ---
+        // Barra de progreso
         let barraHtml = '';
         if (item.porcentajeVisto !== undefined && item.porcentajeVisto > 0) {
-            // Dibujamos la barra si hay progreso
             barraHtml = `
                 <div class="progress-container">
                     <div class="progress-bar" style="width: ${item.porcentajeVisto}%"></div>
@@ -298,7 +301,8 @@ function renderRow(lista, containerId) {
             <div onclick="window.location.href='${link}'">
                 <div class="img-wrapper">
                     <img src="${img}" loading="lazy" alt="${item.titulo}">
-                    ${barraHtml} </div>
+                    ${barraHtml}
+                </div>
                 <div class="standard-info">
                       <div class="st-title">${item.titulo}</div>
                       <div class="st-rating">${rating}</div>
