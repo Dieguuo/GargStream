@@ -20,7 +20,7 @@
 
 <div class="header-container">
   <div class="brand-section">
-    <h1 onclick="resetearVista()">GargStream</h1>
+    <h1 onclick="resetearVista()" style="cursor: pointer;">GargStream</h1>
   </div>
 
   <div class="search-box">
@@ -67,49 +67,53 @@
   <div class="hero-indicators" id="hero-indicators"></div>
 </div>
 
-<div class="category-row" id="cat-historial" style="display: none;">
-  <div class="category-title" style="color: #ddd;">↻ Continuar viendo</div>
-  <div class="row-wrapper">
-    <button class="row-btn left" onclick="deslizarFila('row-historial', -1)">❮</button>
-    <div class="scroller" id="row-historial"></div>
-    <button class="row-btn right" onclick="deslizarFila('row-historial', 1)">❯</button>
-  </div>
-</div>
+<div class="main-content" style="padding-bottom: 50px;">
 
-<div class="category-row" id="cat-milista" style="display: none;">
-  <div class="category-title" style="color: #ffb400;">❤️ Mi Lista <span>Tus favoritos</span></div>
-  <div class="row-wrapper">
-    <button class="row-btn left" onclick="deslizarFila('row-milista', -1)">❮</button>
-    <div class="scroller" id="row-milista"></div>
-    <button class="row-btn right" onclick="deslizarFila('row-milista', 1)">❯</button>
+  <div class="category-row" id="cat-historial" style="display: none;">
+    <div class="category-title" style="color: #ddd;">↻ Continuar viendo</div>
+    <div class="row-wrapper">
+      <button class="row-btn left" onclick="deslizarFila('row-historial', -1)">❮</button>
+      <div class="scroller" id="row-historial"></div>
+      <button class="row-btn right" onclick="deslizarFila('row-historial', 1)">❯</button>
+    </div>
   </div>
-</div>
 
-<div class="category-row" id="cat-peliculas">
-  <div class="category-title">Películas <span>Blockbusters y Cine</span></div>
-  <div class="row-wrapper">
-    <button class="row-btn left" onclick="deslizarFila('row-peliculas', -1)">❮</button>
-    <div class="scroller" id="row-peliculas"></div>
-    <button class="row-btn right" onclick="deslizarFila('row-peliculas', 1)">❯</button>
+  <div class="category-row" id="cat-milista" style="display: none;">
+    <div class="category-title" style="color: #ffb400;">❤️ Mi Lista <span>Tus favoritos</span></div>
+    <div class="row-wrapper">
+      <button class="row-btn left" onclick="deslizarFila('row-milista', -1)">❮</button>
+      <div class="scroller" id="row-milista"></div>
+      <button class="row-btn right" onclick="deslizarFila('row-milista', 1)">❯</button>
+    </div>
   </div>
-</div>
 
-<div class="category-row" id="cat-series">
-  <div class="category-title">Series de TV <span>Maratones épicas</span></div>
-  <div class="row-wrapper">
-    <button class="row-btn left" onclick="deslizarFila('row-series', -1)">❮</button>
-    <div class="scroller" id="row-series"></div>
-    <button class="row-btn right" onclick="deslizarFila('row-series', 1)">❯</button>
+  <div class="category-row" id="cat-peliculas">
+    <div class="category-title">Películas <span>Blockbusters y Cine</span></div>
+    <div class="row-wrapper">
+      <button class="row-btn left" onclick="deslizarFila('row-peliculas', -1)">❮</button>
+      <div class="scroller" id="row-peliculas"></div>
+      <button class="row-btn right" onclick="deslizarFila('row-peliculas', 1)">❯</button>
+    </div>
   </div>
-</div>
 
-<div class="category-row" id="cat-videos">
-  <div class="category-title">Vídeos Personales <span>Tus recuerdos</span></div>
-  <div class="row-wrapper">
-    <button class="row-btn left" onclick="deslizarFila('row-videos', -1)">❮</button>
-    <div class="scroller" id="row-videos"></div>
-    <button class="row-btn right" onclick="deslizarFila('row-videos', 1)">❯</button>
+  <div class="category-row" id="cat-series">
+    <div class="category-title">Series de TV <span>Maratones épicas</span></div>
+    <div class="row-wrapper">
+      <button class="row-btn left" onclick="deslizarFila('row-series', -1)">❮</button>
+      <div class="scroller" id="row-series"></div>
+      <button class="row-btn right" onclick="deslizarFila('row-series', 1)">❯</button>
+    </div>
   </div>
+
+  <div class="category-row" id="cat-videos">
+    <div class="category-title">Vídeos Personales <span>Tus recuerdos</span></div>
+    <div class="row-wrapper">
+      <button class="row-btn left" onclick="deslizarFila('row-videos', -1)">❮</button>
+      <div class="scroller" id="row-videos"></div>
+      <button class="row-btn right" onclick="deslizarFila('row-videos', 1)">❯</button>
+    </div>
+  </div>
+
 </div>
 
 <script src="js/main.js"></script>

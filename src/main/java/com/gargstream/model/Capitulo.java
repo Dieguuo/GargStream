@@ -7,25 +7,13 @@ import lombok.Data;
 @Entity
 @Data
 @Table(name = "capitulos")
-public class Capitulo {
+public class Capitulo extends Contenido{
 
-    //el id del cap
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
     //el num del cap
     private Integer numeroCapitulo;
-    //el título
-    private String titulo;
-    //resumen del cap
-    @Column(length = 2000)
-    private String sipnosis;
-    //duración
-    private Integer duracionMinutos;
-    //la caratula del cap
-    private String rutaCaratula;
-    //ruta del cap
+    //la ruta del vídeo
     private String rutaVideo;
+
 
     //muchos capitulos solo a una temporada
     @ManyToOne

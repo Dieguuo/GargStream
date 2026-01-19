@@ -3,11 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Panel de Administración - GargStream</title>
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-
     <link rel="stylesheet" href="css/admin.css">
 </head>
 <body>
@@ -16,9 +14,7 @@
     <h2>⚙️ Admin Panel</h2>
 
     <button class="menu-btn active" onclick="mostrar('sec-dashboard'); cargarMetricas()">📊 Resumen</button>
-
     <button class="menu-btn" onclick="mostrar('sec-usuarios'); cargarUsuarios()">👥 Usuarios</button>
-
     <button class="menu-btn" onclick="mostrar('sec-cine')">🎬 Nueva Película</button>
     <button class="menu-btn" onclick="mostrar('sec-serie')">📺 Nueva Serie</button>
     <button class="menu-btn" onclick="mostrar('sec-capitulo'); cargarSeriesEnSelector()">▶️ Nuevo Capítulo</button>
@@ -62,7 +58,6 @@
                 </div>
             </div>
         </div>
-        <p style="color:#666; text-align: center;">Bienvenido al panel de control de GargStream.</p>
     </div>
 
     <div id="sec-usuarios" class="form-section" style="max-width: 100%;">
@@ -90,38 +85,29 @@
 
         <div id="modal-usuario" class="edit-form-container" style="display: none; margin-top: 20px; border: 1px solid #ffb400;">
             <h2 style="margin-top:0; color: #ffb400;">Panel de Control de Usuario</h2>
-
-            <div style="background: #222; padding: 15px; border-radius: 5px; margin-bottom: 20px; border: 1px solid #333;">
-                <p style="margin: 5px 0; color: #aaa;">ID: <span id="user-info-id" style="color:white; font-family:monospace;"></span></p>
-                <p style="margin: 5px 0; color: #aaa;">Usuario: <span id="user-info-nombre" style="color:white; font-weight:bold; font-size:1.1em;"></span></p>
-                <p style="margin: 5px 0; color: #aaa;">Email: <span id="user-info-email" style="color:white"></span></p>
-                <p style="margin: 5px 0; color: #aaa;">Estado: <span id="user-info-estado"></span></p>
+            <div style="background: #222; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+                <p>ID: <span id="user-info-id" style="color:white; font-family:monospace;"></span></p>
+                <p>Usuario: <span id="user-info-nombre" style="font-weight:bold;"></span></p>
+                <p>Email: <span id="user-info-email"></span></p>
+                <p>Estado: <span id="user-info-estado"></span></p>
             </div>
-
-            <div class="section-title">⚡ Acciones Disponibles</div>
-
             <div class="row" style="margin-top: 15px;">
                 <div id="action-bloqueo" style="flex: 1;"></div>
                 <div id="action-rol" style="flex: 1;"></div>
             </div>
-
             <button type="button" class="btn-cancelar" onclick="cerrarEditorUsuario()" style="margin-top: 20px; width: 100%;">Cerrar Panel</button>
         </div>
     </div>
 
     <div id="sec-cine" class="form-section">
         <h1>Subir Película</h1>
-        <p style="color:#aaa; font-size:0.9em;">Escribe el título y sube el archivo. El servidor buscará la carátula y sinopsis automáticamente.</p>
         <form action="/api/admin/nueva-pelicula" onsubmit="enviarFormulario(event)">
             <label>Título:</label>
             <input type="text" name="titulo" required placeholder="Ej: El Padrino">
-
             <label>Archivo de Vídeo (Obligatorio):</label>
             <input type="file" name="archivo" required accept="video/*">
-
             <label>Subtítulos (.srt o .vtt) - Opcional:</label>
             <input type="file" name="subtitulo" accept=".srt,.vtt">
-
             <button type="submit">Subir Película</button>
         </form>
     </div>
@@ -142,7 +128,6 @@
             <select name="idSerie" id="selector-series" required>
                 <option value="" disabled selected>Cargando series...</option>
             </select>
-
             <div class="row">
                 <div style="flex:1">
                     <label>Temporada:</label>
@@ -153,16 +138,12 @@
                     <input type="number" name="numCapitulo" required value="1">
                 </div>
             </div>
-
-            <label>Título del Capítulo:</label>
+            <label>Título del Capítulo (Opcional - TMDB):</label>
             <input type="text" name="titulo" placeholder="Ej: Piloto">
-
             <label>Archivo de Vídeo (Obligatorio):</label>
             <input type="file" name="archivo" required accept="video/*">
-
             <label>Subtítulos (.srt o .vtt) - Opcional:</label>
             <input type="file" name="subtitulo" accept=".srt,.vtt">
-
             <button type="submit">Subir Capítulo</button>
         </form>
     </div>
@@ -172,31 +153,31 @@
         <form action="/api/admin/nuevo-video" onsubmit="enviarFormulario(event)">
             <label>Título:</label>
             <input type="text" name="titulo" required>
-
             <label>Autor:</label>
             <input type="text" name="autor" placeholder="Yo">
-
             <label>Descripción:</label>
             <textarea name="descripcion" rows="3"></textarea>
-
             <label>Archivo de Vídeo (Obligatorio):</label>
             <input type="file" name="archivo" required accept="video/*">
-
             <label>Subtítulos (.srt o .vtt) - Opcional:</label>
             <input type="file" name="subtitulo" accept=".srt,.vtt">
-
             <button type="submit">Subir Video</button>
         </form>
     </div>
 
     <div id="sec-editar" class="form-section" style="max-width: 900px;">
         <h1>Gestionar Contenido</h1>
-        <p style="color:#aaa;">Haz clic en una carátula para editar sus datos.</p>
+        <p style="color:#aaa;">Haz clic en una carátula para editar o eliminar.</p>
 
         <div id="grid-edicion" class="grid-content"></div>
 
         <div id="formulario-edicion" class="edit-form-container">
-            <h2 style="margin-top:0; font-family: 'Bebas Neue', sans-serif; letter-spacing: 1px;">Editando: <span id="edit-titulo-display" style="color:#e50914"></span></h2>
+            <h2 style="margin-top:0; font-family: 'Bebas Neue', sans-serif; letter-spacing: 1px; color: #ffb400;">
+                Editando: <span id="edit-titulo-display" style="color:white"></span>
+            </h2>
+
+            <div id="lista-capitulos-gestion" style="margin-bottom: 20px; border: 1px solid #444; border-radius: 5px; padding: 10px; background: #222; display: none;">
+            </div>
 
             <form action="/api/admin/editar-contenido" onsubmit="enviarFormulario(event)">
                 <input type="hidden" name="id" id="edit-id">
@@ -217,38 +198,39 @@
 
                 <div class="section-separator"></div>
                 <div class="section-title">📂 Archivos (Opcional)</div>
-                <p style="font-size:0.8em; color:#777;">Solo sube archivos si quieres cambiar/añadir algo.</p>
+                <p style="font-size:0.8em; color:#777;">Sube archivos solo si quieres reemplazarlos.</p>
 
                 <label>Cambiar Carátula:</label>
                 <input type="file" name="archivoCaratula" accept="image/*">
 
                 <div class="section-separator"></div>
-                <div class="section-title">🌍 Añadir Nuevo Subtítulo</div>
+                <div class="section-title">🌍 Añadir Subtítulo Extra</div>
 
                 <div class="row">
                     <div style="flex:1">
-                        <label>Idioma (código):</label>
+                        <label>Idioma:</label>
                         <select name="idiomaSub">
-                            <option value="es">Español (es)</option>
-                            <option value="en">Inglés (en)</option>
-                            <option value="fr">Francés (fr)</option>
-                            <option value="de">Alemán (de)</option>
-                            <option value="it">Italiano (it)</option>
-                            <option value="pt">Portugués (pt)</option>
+                            <option value="es">Español</option>
+                            <option value="en">Inglés</option>
+                            <option value="fr">Francés</option>
                         </select>
                     </div>
                     <div style="flex:1">
-                        <label>Etiqueta (Lo que se ve):</label>
-                        <input type="text" name="nombreSub" placeholder="Ej: Español, English (CC)">
+                        <label>Etiqueta:</label>
+                        <input type="text" name="nombreSub" placeholder="Ej: Español Latino">
                     </div>
                 </div>
                 <label>Archivo Subtítulo (.vtt / .srt):</label>
                 <input type="file" name="archivoSubtitulo" accept=".srt,.vtt">
 
-                <button type="submit">💾 Guardar Cambios</button>
-                <button type="button" class="btn-cancelar" onclick="cerrarEditor()">Cancelar</button>
+                <div style="margin-top: 30px; display: flex; gap: 10px;">
+                    <button type="submit" style="flex: 2;">💾 Guardar Cambios</button>
+                    <button type="button" class="btn-cancelar" onclick="cerrarEditor()" style="flex: 1;">Cancelar</button>
+                </div>
 
-                <button type="button" class="btn-eliminar" onclick="eliminarContenido()">🗑️ ELIMINAR CONTENIDO</button>
+                <button type="button" class="btn-eliminar" onclick="ejecutarBorradoTotal()" style="margin-top: 20px; width: 100%;">
+                    🗑️ ELIMINAR ESTE CONTENIDO (SERIE/PELI COMPLETA)
+                </button>
             </form>
         </div>
     </div>
@@ -257,7 +239,7 @@
 
 <div id="overlay-loading">
     <div class="spinner"></div>
-    <div class="loading-text">Subiendo contenido...</div>
+    <div class="loading-text">Procesando...</div>
     <div class="loading-subtext">Por favor, no cierres esta pestaña.</div>
 </div>
 

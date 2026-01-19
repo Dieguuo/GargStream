@@ -1,5 +1,6 @@
 package com.gargstream.controller;
 
+import com.gargstream.model.Capitulo;
 import com.gargstream.model.Contenido;
 import com.gargstream.model.Usuario;
 import com.gargstream.repository.ContenidoRepository;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/public")
@@ -27,8 +29,10 @@ public class ContenidoPublicoController {
     //http://localhost:8080/api/public/catalogo
     @GetMapping("/catalogo")
     public List<Contenido> verTodoElCatalogo(){
-        //devuelve una lusta con las películas y vídeos
-        return contenidoRepository.findAll();
+        //devuelve una lusta con las películas y vídeos (sin capítulos sueltos)
+        return contenidoRepository.findAll().stream()
+                .filter(c -> !(c instanceof Capitulo))
+                .collect(Collectors.toList());
     }
 
     //http://localhost:8080/api/public/contenido/{id}
@@ -41,11 +45,18 @@ public class ContenidoPublicoController {
     @GetMapping("/novedades")
     public ResponseEntity<List<Contenido>> obtenerListaNovedades() {
         try {
-            // pedir las 10 últimas
-            List<Contenido> listaNovedades = contenidoService.obtenerNovedades();
+            // pedir las 10 últimas (filtrando capítulos para que no salgan en el carrusel)
+            // usamos directamente el repo para asegurar el filtro
+            List<Contenido> todos = contenidoRepository.findAll();
 
-            // devolver la lista
-            return ResponseEntity.ok(listaNovedades);
+            // ordenamos por fecha descendente
+            List<Contenido> novedades = todos.stream()
+                    .filter(c -> !(c instanceof Capitulo))//solo peliculas y series
+                    .sorted(Comparator.comparing(Contenido::getId).reversed()) //ordenar descendeintemente
+                    .limit(10) // Solo los 10 últimos
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(novedades);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -67,5 +78,4 @@ public class ContenidoPublicoController {
 
         return ResponseEntity.ok(favoritos);
     }
-
 }

@@ -7,6 +7,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
 @Service
 public class TmdbService {
 
@@ -41,7 +44,7 @@ public class TmdbService {
                 for(JsonNode video : resultados){
                     String sitio = video.path("site").asText();
                     String tipo = video.path("type").asText();
-                    String idioma = video.path("iso_639_1").asText(); //Lee el idioma del vídeo
+                    String idioma = video.path("iso_639_1").asText(); //lee el idioma del vídeo
                     //buscar el trailer en youtube
                     if("YouTube".equalsIgnoreCase(sitio) && "Trailer".equalsIgnoreCase(tipo)){
                         //coger el trailer en español
@@ -68,4 +71,60 @@ public class TmdbService {
             return null;
         }
     }
+
+
+    //métodos para buscar los caps de las series
+    public Long buscarIdSerie(String nombreSerie){
+        try{
+            //codificar el nombre de la serie
+            String query = URLEncoder.encode(nombreSerie, StandardCharsets.UTF_8);
+            String url = "https://api.themoviedb.org/3/search/tv?api_key=" + apiKey + "&query=" + query + "&language=es-ES";
+
+            ResponseEntity<String> respuesta = restTemplate.getForEntity(url, String.class);
+            JsonNode root = mapper.readTree(respuesta.getBody());
+            JsonNode resultados = root.path("results");
+
+            if (resultados.isArray() && resultados.size() > 0){
+                //devolver el id de la primera coincidencia
+                return resultados.get(0).path("id").asLong();
+            }
+        } catch (Exception e) {
+            System.out.println("Error buscando el id de la serie en TMDB: " + e.getMessage());
+        }
+        return null;
+
+    }
+
+    //obtener los datos específicos de un cap
+    public JsonNode obtenerDatosCapitulo(Long idSerieTmdb, Integer temporada, Integer capitulo){
+        try {
+            // el endpoint especídfico para episodios
+            String url = "https://api.themoviedb.org/3/tv/" + idSerieTmdb + "/season/" + temporada + "/episode/" + capitulo + "?api_key=" + apiKey + "&language=es-ES";
+
+            ResponseEntity<String> respuesta = restTemplate.getForEntity(url, String.class);
+            return mapper.readTree(respuesta.getBody()); //devolver el json completo del cap
+        } catch (Exception e) {
+            System.out.println("Capítulo no encontrado en TMDB (" + temporada + "x" + capitulo + "): " + e.getMessage());
+            return null;
+        }
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

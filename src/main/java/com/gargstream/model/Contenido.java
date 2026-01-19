@@ -8,8 +8,7 @@ import java.util.List;
 
 @Entity
 @Data//los data hace que no haya que escribir los getter y setters manualmente
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "tipo_contenido") //esta columna verá si es una película, serie o vídeo cualqueira
+@Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "contenidos")
 public abstract class Contenido {
 

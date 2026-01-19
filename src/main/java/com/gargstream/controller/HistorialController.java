@@ -1,9 +1,7 @@
 package com.gargstream.controller;
 
 import com.gargstream.dto.HistorialDTO;
-import com.gargstream.model.Contenido;
-import com.gargstream.model.Historial;
-import com.gargstream.model.Usuario;
+import com.gargstream.model.*;
 import com.gargstream.repository.ContenidoRepository;
 import com.gargstream.repository.HistorialRepository;
 import com.gargstream.repository.UsuarioRepository;
@@ -14,8 +12,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/historial")
@@ -56,39 +53,73 @@ public class HistorialController {
         List<Historial> lista = historialRepository.findTop10ByUsuarioOrderByFechaUltimaVisualizacionDesc(usuario);
 
         //convertirlo al dto
-        List<HistorialDTO> dtos = lista.stream()
+        List<HistorialDTO> dtos = new ArrayList<>();
+
+        //para que no haya ducplicados
+        Set<Long> seriesYaProcesadas = new HashSet<>();
+
+        for(Historial h : lista){
+            Contenido c = h.getContenido();
+
+            //calcular el porcentaje visto
+            double porcentajeVal = (h.getDuracionTotal() != null && h.getDuracionTotal() > 0) ? h.getSegundosVistos() / h.getDuracionTotal() : 0;
+
+            //si es una película o video personal
+            if (!(c instanceof Capitulo)) {
                 //filtro para que si ya se ha visto un 90% de la película se quite de continuar viendo
-                .filter(h -> {
-                    if (h.getDuracionTotal() == null || h.getDuracionTotal() == 0) return true;
-                    double porcentaje = h.getSegundosVistos() / h.getDuracionTotal();
-                    return porcentaje < 0.90;
-                })
-                .map(h -> {
-                    HistorialDTO dto = new HistorialDTO();
+                if (porcentajeVal < 0.90) {
+                    dtos.add(crearDTO(h, null, null));
+                }
+                continue; //pasamos al siguiente
+            }
 
-                    //los datos básicos
-                    dto.setSegundosVistos(h.getSegundosVistos());
-                    dto.setDuracionTotal(h.getDuracionTotal());
+            //si es un capítulo de una serie
+            Capitulo capActual = (Capitulo) c;
+            Serie seriePadre = capActual.getTemporada().getSerie();
+            Long idSerie = seriePadre.getId();
 
-                    dto.setContenido(h.getContenido());
+            //si ya estaba la serie lo saltamos
+            if(seriesYaProcesadas.contains(idSerie)){
+                continue;
+            }
+            //marcar la serie como procesada
+            seriesYaProcesadas.add(idSerie);
 
-                    //calcular el % para ponerlo en la barra del progreso
-                    int porcentaje = 0;
-                    if(h.getDuracionTotal() != null && h.getDuracionTotal() > 0){
-                        porcentaje = (int) ((h.getSegundosVistos() / h.getDuracionTotal()) * 100);
-                    }
+            //poner los datos de la serie para que quede bien en el menú
+            c.setTitulo(seriePadre.getTitulo());
+            c.setRutaCaratula(seriePadre.getRutaCaratula());
+            c.setRutaFondo(seriePadre.getRutaFondo());
 
-                    if(porcentaje > 100){
-                        porcentaje = 100;
-                    }
+            //si no se ha terminado mostramos este capítulo
+            if (porcentajeVal < 0.90) {
+                String info = "T" + capActual.getTemporada().getNumeroTemporada() + ":E" + capActual.getNumeroCapitulo();
+                dtos.add(crearDTO(h, c, info));
+            }
+            //si se ha terminado buscamos el siguiente automáticamente
+            else {
+                Contenido siguiente = buscarSiguienteCapitulo(capActual);
 
-                    dto.setPorcentaje(porcentaje);
+                if (siguiente != null) {
+                    //creamos un historial falso con tiempo 0
+                    Historial hSiguiente = new Historial();
+                    hSiguiente.setContenido(siguiente);
+                    hSiguiente.setSegundosVistos(0.0);
+                    hSiguiente.setDuracionTotal(h.getDuracionTotal());
 
-                    return dto;
-                }).toList();
+                    //visualmente le ponemos la carátula de la serie
+                    siguiente.setTitulo(seriePadre.getTitulo());
+                    siguiente.setRutaCaratula(seriePadre.getRutaCaratula());
+
+                    Capitulo sigCap = (Capitulo) siguiente;
+                    String info = "T" + sigCap.getTemporada().getNumeroTemporada() + ":E" + sigCap.getNumeroCapitulo();
+
+                    dtos.add(crearDTO(hSiguiente, siguiente, info));
+                }
+                //si devuelve null es que acabó la serie y no añadimos nada
+            }
+        }
 
         return ResponseEntity.ok(dtos);
-
     }
 
 
@@ -120,7 +151,51 @@ public class HistorialController {
                     //si existe y no está acabado, devolvemos el segundo exacto
                     return ResponseEntity.ok(h.getSegundosVistos());
                 })
-                .orElse(ResponseEntity.ok(0.0)); //si no existe devolvemos 0
+                .orElse(ResponseEntity.ok(0.0)); //si no existe devuelve 0
+    }
+
+    //métodos auxiliares privados
+    private HistorialDTO crearDTO(Historial h, Contenido contenidoVisual, String infoExtra) {
+        HistorialDTO dto = new HistorialDTO();
+        dto.setSegundosVistos(h.getSegundosVistos());
+        dto.setDuracionTotal(h.getDuracionTotal());
+
+        dto.setContenido(contenidoVisual != null ? contenidoVisual : h.getContenido());
+        dto.setInformacionExtra(infoExtra);
+
+        int porcentaje = 0;
+        if(h.getDuracionTotal() != null && h.getDuracionTotal() > 0){
+            porcentaje = (int) ((h.getSegundosVistos() / h.getDuracionTotal()) * 100);
+        }
+        if(porcentaje > 100) porcentaje = 100;
+        dto.setPorcentaje(porcentaje);
+
+        return dto;
+    }
+
+    private Capitulo buscarSiguienteCapitulo(Capitulo actual) {
+        Temporada tempActual = actual.getTemporada();
+        Serie serie = tempActual.getSerie();
+
+        //buscamos en la misma temporada
+        Optional<Capitulo> siguienteEnTemp = tempActual.getCapitulos().stream()
+                .filter(c -> c.getNumeroCapitulo() > actual.getNumeroCapitulo())
+                .min(Comparator.comparingInt(Capitulo::getNumeroCapitulo));
+
+        if (siguienteEnTemp.isPresent()) return siguienteEnTemp.get();
+
+        //si no buscamos en la siguiente temporada
+        Optional<Temporada> siguienteTemp = serie.getTemporadas().stream()
+                .filter(t -> t.getNumeroTemporada() > tempActual.getNumeroTemporada())
+                .min(Comparator.comparingInt(Temporada::getNumeroTemporada));
+
+        if (siguienteTemp.isPresent()) {
+            return siguienteTemp.get().getCapitulos().stream()
+                    .min(Comparator.comparingInt(Capitulo::getNumeroCapitulo))
+                    .orElse(null);
+        }
+
+        return null;
     }
 
 }

@@ -1,5 +1,6 @@
 package com.gargstream.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.gargstream.dto.RespuestaTMDB;
 import com.gargstream.dto.DetallesTMDB;
 import com.gargstream.model.Capitulo;
@@ -144,9 +145,58 @@ public class SerieService {
         //crear el objeto cap
         Capitulo capitulo = new Capitulo();
         capitulo.setNumeroCapitulo(numCapitulo);
-        capitulo.setTitulo(tituloCapitulo);
         capitulo.setRutaVideo(urlvideo);
         capitulo.setTemporada(temporada);
+
+        // para los datos de los capítulos
+        boolean datosEncontrados = false;
+        try {
+            //buscamos el id de la serie en tmdb usando el nombre que tenemos guardado
+            Long idTmdb = tmdbService.buscarIdSerie(serie.getTitulo());
+
+            if (idTmdb != null) {
+                //pedimos los datos exactos del episodio
+                JsonNode datos = tmdbService.obtenerDatosCapitulo(idTmdb, numTemporada, numCapitulo);
+
+                if (datos != null) {
+                    String nombreReal = datos.path("name").asText();
+                    String sinopsis = datos.path("overview").asText();
+                    String imagenPath = datos.path("still_path").asText(); // imagen horizontal
+
+                    //usar nombre real o el manual si viene vacío
+                    capitulo.setTitulo((nombreReal != null && !nombreReal.isEmpty()) ? nombreReal : tituloCapitulo);
+
+                    //asignar sinopsis si existe
+                    if(sinopsis != null && !sinopsis.isEmpty()) {
+                        capitulo.setSipnosis(sinopsis);
+                    }
+
+                    //lógica de imagen
+                    if (imagenPath != null && !imagenPath.equals("null") && !imagenPath.isEmpty()) {
+                        String urlImagenTmdb = "https://image.tmdb.org/t/p/original" + imagenPath;
+                        capitulo.setRutaFondo(urlImagenTmdb);
+                        //usamos la misma imagen para la carátula del cap para que se distinga
+                        capitulo.setRutaCaratula(urlImagenTmdb);
+                    } else {
+                        //si tmdb no tiene foto del capítulo, usamos el fondo de la serie
+                        capitulo.setRutaFondo(serie.getRutaFondo());
+                        capitulo.setRutaCaratula(serie.getRutaCaratula());
+                    }
+
+                    datosEncontrados = true;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("No se pudieron cargar datos de TMDB: " + e.getMessage());
+        }
+
+        //si falló todoo, se ponen los datos manualmente y la imagen de la serie
+        if (!datosEncontrados) {
+            capitulo.setTitulo(tituloCapitulo);
+            capitulo.setRutaFondo(serie.getRutaFondo());
+            capitulo.setRutaCaratula(serie.getRutaCaratula());
+        }
+        // ----------------------------------------------
 
         //añadirlo a la lista de la temp
         temporada.getCapitulos().add(capitulo);
@@ -161,7 +211,7 @@ public class SerieService {
             sub.setRutaArchivo(urlSubtitulo);
             sub.setIdioma("es");
             sub.setEtiqueta("Español");
-            sub.setCapitulo(capitulo); //y se vincula a capitulo
+            sub.setContenido(capitulo); //y se vincula a capitulo
 
             // guardarlo
             capitulo.getSubtitulos().add(sub);

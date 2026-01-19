@@ -9,4 +9,6 @@ public class HistorialDTO {
     private Double segundosVistos;
     private Double duracionTotal;
     private Integer porcentaje;
+    //para las temporadas
+    private String informacionExtra;
 }

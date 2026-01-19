@@ -2,6 +2,7 @@ package com.gargstream.service;
 
 import com.gargstream.model.*;
 import com.gargstream.repository.ContenidoRepository;
+import com.gargstream.repository.HistorialRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,6 +16,7 @@ public class ContenidoService {
 
     private final ContenidoRepository contenidoRepository;
     private final AlmacenamientoService almacenamientoService;
+    private final HistorialRepository historialRepository;
 
     //guardar un vídeo personal en la db
     public VideoPersonal guardarVideoPersonal(String titulo, String sipnosis, String autor, MultipartFile archivo, MultipartFile archivoSubtitulo){
@@ -52,26 +54,41 @@ public class ContenidoService {
             }
         }
 
-        //según el tipo
+        // borrar archivos de video según el tipo
         if(contenido instanceof Serie serie){
-
-            //recorrer todas las temporadas y los caps
+            // Si es una serie recorre temps y caps
             if(serie.getTemporadas() != null){
                 for(Temporada temporada : serie.getTemporadas()){
                     if(temporada.getCapitulos() != null){
                         for(Capitulo capitulo : temporada.getCapitulos()){
                             borrarArchivoFisico(capitulo.getRutaVideo());
+                            //borrar los subtítulos también si los hay
+                            if(capitulo.getSubtitulos() != null) {
+                                for(Subtitulo subCap : capitulo.getSubtitulos()){
+                                    borrarArchivoFisico(subCap.getRutaArchivo());
+                                }
+                            }
+
+                            //borrar del historial del capítulo
+                            historialRepository.deleteByContenido(capitulo);
                         }
                     }
                 }
             }
         }else if(contenido instanceof Pelicula pelicula){
-
+            //borrar una pelicula
             borrarArchivoFisico(pelicula.getRutaVideo());
         }else if(contenido instanceof VideoPersonal videoPersonal){
+            //borrar un video personal
             borrarArchivoFisico(videoPersonal.getRutaVideo());
+        }else if( contenido instanceof Capitulo capitulo){
+            //borrar un cap individual
+            borrarArchivoFisico((capitulo.getRutaVideo()));
         }
 
+        //borrar el hisotrial del objeto
+        historialRepository.deleteByContenido(contenido);
+        //borrarlo de la base d datos
         contenidoRepository.delete(contenido);
     }
 

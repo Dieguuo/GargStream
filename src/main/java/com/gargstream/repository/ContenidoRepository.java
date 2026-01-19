@@ -2,6 +2,7 @@ package com.gargstream.repository;
 
 import com.gargstream.model.Contenido;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import java.util.*;
 
@@ -18,6 +19,10 @@ public interface ContenidoRepository extends JpaRepository<Contenido, Long>{
     //para las novedades
     //encuentra los top 10 ordenados por id descendiente.
     List<Contenido> findTop10ByOrderByIdDesc();
+
+    //para que no coja capítulos de series para el carrusel
+    @Query("SELECT c FROM Contenido c WHERE TYPE(c) <> Capitulo")
+    List<Contenido> findAllSinCapitulos();
 
     //poner en el fuutro más métodos para buscar
 
