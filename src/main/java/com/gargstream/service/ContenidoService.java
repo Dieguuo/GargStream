@@ -3,8 +3,10 @@ package com.gargstream.service;
 import com.gargstream.model.*;
 import com.gargstream.repository.ContenidoRepository;
 import com.gargstream.repository.HistorialRepository;
+import com.gargstream.repository.UsuarioRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -17,13 +19,24 @@ public class ContenidoService {
     private final ContenidoRepository contenidoRepository;
     private final AlmacenamientoService almacenamientoService;
     private final HistorialRepository historialRepository;
+    private final UsuarioRepository usuarioRepository;
+
+    //los nombres de las carpetas principales
+    private static final String CARPETA_PELICULAS = "Peliculas";
+    private static final String CARPETA_VIDEOS = "Videos_Personales";
+    private static final String CARPETA_SERIES = "Series";
 
     //guardar un vídeo personal en la db
     public VideoPersonal guardarVideoPersonal(String titulo, String sipnosis, String autor, MultipartFile archivo, MultipartFile archivoSubtitulo){
-        //guardar el archivo físico en el disco
-        String nombreArchivo = almacenamientoService.store(archivo);
+        //crear el nombre de la carpeta
+        String tituloSanitizado = almacenamientoService.sanitizarNombre(titulo);
+        //la ruta
+        String rutaCarpeta = CARPETA_VIDEOS + "/" + tituloSanitizado;
+        //guardar el archivo físico en esa carpeta
+        String nombreArchivo = almacenamientoService.store(archivo, rutaCarpeta);
         //url para verlo
         String urlVideo = "/api/archivos/" + nombreArchivo;
+
         //crear el objeto para la db
         VideoPersonal video = new VideoPersonal();
         video.setTitulo(titulo);
@@ -31,10 +44,10 @@ public class ContenidoService {
         video.setAutor(autor);
         video.setRutaVideo(urlVideo);
 
-        //si hay subts añadirlos
+        //si hay subts añadirlos en la misma carpeta
         if(archivoSubtitulo != null && !archivoSubtitulo.isEmpty()){
-            String nombreSubtitulo = almacenamientoService.store(archivoSubtitulo);
-            String urlSubtitulo = "/api/archivos/" + archivoSubtitulo;
+            String nombreSubtitulo = almacenamientoService.store(archivoSubtitulo, rutaCarpeta);
+            String urlSubtitulo = "/api/archivos/" + nombreSubtitulo;
             video.setRutaSubtitulo(urlSubtitulo);
         }
 
@@ -42,10 +55,19 @@ public class ContenidoService {
         return contenidoRepository.save(video);
     }
 
+
     //méetodo para borrar cualquier cosa
+    @Transactional
     public void eliminarContenido(Long id){
         //recuperar el contenido antes de borrarlo para saber qué archivos tiene
         Contenido contenido = contenidoRepository.findById(id).orElseThrow(() -> new RuntimeException("Contenido no encontrado"));
+
+        //quitar de la lista de favoritos
+        List<Usuario> usuariosConElContenido = usuarioRepository.findByMiListaContains(contenido);
+        for (Usuario u : usuariosConElContenido) {
+            u.getMiLista().remove(contenido);
+            usuarioRepository.save(u);
+        }
 
         //borrar subtitulso que haya
         if(contenido.getSubtitulos() != null){
@@ -61,29 +83,76 @@ public class ContenidoService {
                 for(Temporada temporada : serie.getTemporadas()){
                     if(temporada.getCapitulos() != null){
                         for(Capitulo capitulo : temporada.getCapitulos()){
+                            // 1. Limpiar historial del capítulo
+                            historialRepository.deleteByContenido(capitulo);
+
+                            // 2. Limpiar favoritos del capítulo (si hubiera)
+                            List<Usuario> usersCap = usuarioRepository.findByMiListaContains(capitulo);
+                            for(Usuario u : usersCap){
+                                u.getMiLista().remove(capitulo);
+                                usuarioRepository.save(u);
+                            }
+
+                            // 3. Borrar archivo físico
                             borrarArchivoFisico(capitulo.getRutaVideo());
+
                             //borrar los subtítulos también si los hay
                             if(capitulo.getSubtitulos() != null) {
                                 for(Subtitulo subCap : capitulo.getSubtitulos()){
                                     borrarArchivoFisico(subCap.getRutaArchivo());
                                 }
                             }
-
-                            //borrar del historial del capítulo
-                            historialRepository.deleteByContenido(capitulo);
                         }
                     }
                 }
             }
+            //borrar la carpeta enteraa
+            String nombreCarpeta = almacenamientoService.sanitizarNombre(serie.getTitulo());
+            almacenamientoService.eliminarCarpeta(CARPETA_SERIES + "/" + nombreCarpeta);
+
         }else if(contenido instanceof Pelicula pelicula){
             //borrar una pelicula
             borrarArchivoFisico(pelicula.getRutaVideo());
+            // Intento borrar carpeta padre si está vacía o es propia
+            borrarCarpetaPadreSiCorresponde(pelicula.getRutaVideo(), CARPETA_PELICULAS);
+
         }else if(contenido instanceof VideoPersonal videoPersonal){
             //borrar un video personal
             borrarArchivoFisico(videoPersonal.getRutaVideo());
+            // Intento borrar carpeta padre si está vacía o es propia
+            borrarCarpetaPadreSiCorresponde(videoPersonal.getRutaVideo(), CARPETA_VIDEOS);
+
         }else if( contenido instanceof Capitulo capitulo){
             //borrar un cap individual
+            historialRepository.deleteByContenido(capitulo); //limpiar el historial específico
+
+            // limpiar favoritos específico
+            List<Usuario> usersCap = usuarioRepository.findByMiListaContains(capitulo);
+            for(Usuario u : usersCap){
+                u.getMiLista().remove(capitulo);
+                usuarioRepository.save(u);
+            }
+            //borrar el archivo físico
             borrarArchivoFisico((capitulo.getRutaVideo()));
+
+            //borrar la carpeta física si está vacía
+            //recuperar la ruta del vídeo
+            String rutaCompleta = capitulo.getRutaVideo();
+            if(rutaCompleta != null && rutaCompleta.contains("/api/archivos")){
+                String rutaFisica = rutaCompleta.replace("/api/archivos/", "");
+
+                if(rutaFisica.contains("/")){
+                    //obtener la carpeta padre
+                    String carpetaTemporada = rutaFisica.substring(0, rutaFisica.lastIndexOf("/"));
+                    //intentar borrarlo
+                    try{
+                        almacenamientoService.eliminarDirectorioSiVacio(carpetaTemporada);
+                    }catch (Exception e){
+
+                    }
+                }
+
+            }
         }
 
         //borrar el hisotrial del objeto
@@ -96,14 +165,27 @@ public class ContenidoService {
     private void borrarArchivoFisico(String urlVideo){
         if(urlVideo != null && !urlVideo.isEmpty()){
             try {
-                //solo hay que coger lo último tras la última /
-                String nombreArchivo = urlVideo.substring(urlVideo.lastIndexOf("/") + 1);
+                String nombreArchivo = urlVideo.replace("/api/archivos/", "");
 
                 almacenamientoService.delete(nombreArchivo);
-                System.out.println("Archivo borrado físicamente" + nombreArchivo);
+                System.out.println("Archivo borrado físicamente: " + nombreArchivo);
 
             }catch (Exception e){
                 System.out.println("Error al borrar el archivo físicamente: " + urlVideo);
+            }
+        }
+    }
+
+    // metodo para borrar la carpeta para no dejarla ahí
+    private void borrarCarpetaPadreSiCorresponde(String urlVideo, String carpetaBase) {
+        if (urlVideo != null && urlVideo.contains("/api/archivos/")) {
+            String rutaFisica = urlVideo.replace("/api/archivos/", "");
+            if (rutaFisica.contains("/")) {
+                String carpetaPadre = rutaFisica.substring(0, rutaFisica.lastIndexOf("/"));
+                // Solo borramos si la carpeta está dentro de la categoría correcta
+                if (carpetaPadre.startsWith(carpetaBase)) {
+                    almacenamientoService.eliminarCarpeta(carpetaPadre);
+                }
             }
         }
     }
@@ -112,5 +194,4 @@ public class ContenidoService {
     public List<Contenido> obtenerNovedades(){
         return contenidoRepository.findTop10ByOrderByIdDesc();
     }
-
 }

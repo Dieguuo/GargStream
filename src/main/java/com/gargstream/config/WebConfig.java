@@ -13,26 +13,31 @@ import java.nio.file.Paths;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-    //la ruta que he puesto en application properties
+    //ruta de contenido
+    @Value("${storage.location}")
+    private String storageLocation;
+    //la ruta para los avatares que he puesto en application properties
     @Value("${gargstream.upload.path}")
     private String uploadPath;
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // permite acceder a la carpeta física mediafiles y desactiva el cache para que se noten los cambios al instante
-        //porque me daba problemas para los subtítulos de varios idiomas a la vez.
+
+        // para vídeos y subtitulos
+        Path rutaContenido = Paths.get(storageLocation);
+        String rutaContenidoAbsoluta = rutaContenido.toAbsolutePath().toUri().toString();
+
         registry.addResourceHandler("/api/archivos/**")
-                .addResourceLocations("file:mediafiles/")
+                .addResourceLocations(rutaContenidoAbsoluta)
                 .setCachePeriod(0);
 
 
-        // para los avatares no se guarden en img
-        // convierte la ruta relativa uploads/ a absoluta para evitar errores
+        //para avatares
         Path rutaUploads = Paths.get(uploadPath);
-        String rutaUri = rutaUploads.toAbsolutePath().toUri().toString();
+        String rutaUploadsAbsoluta = rutaUploads.toAbsolutePath().toUri().toString();
 
         registry.addResourceHandler("/uploads/**")
-                .addResourceLocations(rutaUri);
+                .addResourceLocations(rutaUploadsAbsoluta);
     }
 
     // decirle al server que es vtt para los subtitulos

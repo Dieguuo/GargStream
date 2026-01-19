@@ -29,6 +29,9 @@ public class SerieService {
     @Value("${tmdb.api.key}")
     private String apiKey;
 
+    //la carpeta donde se va a guardar
+    private static final String CARPETA_SERIES = "Series";
+
     //pedir solo el nombre para crear la carpeta de la serie
     public Serie crearSerie(String nombreBusqueda){
         Serie serie = new Serie();
@@ -138,8 +141,12 @@ public class SerieService {
             return nueva;
         });
 
-        //guardar el archivo
-        String nombreArchivo = almacenamientoService.store(archivo);
+        //guardar el archivo en carpetas organizado
+        String nombreSerieSanitizado = almacenamientoService.sanitizarNombre(serie.getTitulo());
+        // crear la ruta
+        String rutaDestino = CARPETA_SERIES + "/" + nombreSerieSanitizado + "/Temporada_" + numTemporada;
+        //guardarlo en la ruta específica
+        String nombreArchivo = almacenamientoService.store(archivo, rutaDestino);
         String urlvideo = "/api/archivos/" + nombreArchivo;
 
         //crear el objeto cap
@@ -196,14 +203,14 @@ public class SerieService {
             capitulo.setRutaFondo(serie.getRutaFondo());
             capitulo.setRutaCaratula(serie.getRutaCaratula());
         }
-        // ----------------------------------------------
+
 
         //añadirlo a la lista de la temp
         temporada.getCapitulos().add(capitulo);
 
         //añadir subtitulos si los hay
         if(archivoSubtitulo != null && !archivoSubtitulo.isEmpty()){
-            String nombreSubtitulo = almacenamientoService.store(archivoSubtitulo);
+            String nombreSubtitulo = almacenamientoService.store(archivoSubtitulo, rutaDestino);
             String urlSubtitulo = "/api/archivos/" + nombreSubtitulo;
 
             // crearel objeto subtitulo

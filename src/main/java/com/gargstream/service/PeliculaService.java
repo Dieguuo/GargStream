@@ -25,11 +25,19 @@ public class PeliculaService {
     //la clave de la api tmdb
     @Value("${tmdb.api.key}")
     private String apiKey;
+    //carpeta
+    private static final String CARPETA_PELICULAS = "Peliculas";
 
     //metodo que sube el archivo y descarga los datos
     public Pelicula guardarPelicula(String titulo, MultipartFile archivo, MultipartFile archivoSubtitulo){
-        //guardar el archivo físico
-        String nombreArchivo = almacenamientoService.store(archivo);
+
+        //sanitizar el nombre
+        String tituloSanitizado = almacenamientoService.sanitizarNombre(titulo);
+        //crear la ruta
+        String rutaCarpeta = CARPETA_PELICULAS + "/" + tituloSanitizado;
+
+        //guardar el archivo físico en la carpeta
+        String nombreArchivo = almacenamientoService.store(archivo, rutaCarpeta);
         String urlVideo = "/api/archivos/" + nombreArchivo;
 
         //crear el objeto película
@@ -39,7 +47,7 @@ public class PeliculaService {
 
         //si se ponen subtitulos guardalos también
         if(archivoSubtitulo != null && !archivoSubtitulo.isEmpty()){
-            String nombreSubtitulo = almacenamientoService.store(archivoSubtitulo);
+            String nombreSubtitulo = almacenamientoService.store(archivoSubtitulo, rutaCarpeta);
             String urlSubtitulo = "/api/archivos/" + nombreSubtitulo;
 
             //crear el objeto subtitulo
@@ -96,7 +104,7 @@ public class PeliculaService {
                         pelicula.setRutaCaratula(urlImagenCompleta);
                     }
 
-                    // --- NUEVO: guardar el fondo horizontal para el hero slider ---
+                    // guardar el fondo horizontal para mostrarlo en el carrusel de novedades.
                     if(datos.getRutaFondo() != null){
                         // usamos "original" para que se vea hd
                         String urlFondoCompleta = "https://image.tmdb.org/t/p/original" + datos.getRutaFondo();

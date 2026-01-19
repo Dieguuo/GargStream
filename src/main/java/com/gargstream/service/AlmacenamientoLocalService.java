@@ -7,10 +7,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.util.stream.Stream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -18,6 +17,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.text.Normalizer;
+import java.util.stream.Stream;
 
 
 @Service//con esto spring lo calga al iniciar
@@ -43,8 +44,32 @@ public class AlmacenamientoLocalService implements AlmacenamientoService{
         }
     }
 
+    //quitar simbolos de los nomrbes de las carpetas para evitar que haya errores con el sistema
     @Override
-    public String store(MultipartFile archivo){
+    public String sanitizarNombre(String original){
+        if (original == null){
+            return "Sin_Titulo";
+        }
+
+        //quitar las tildes
+        String nombre = Normalizer.normalize(original, Normalizer.Form.NFD);
+        nombre = nombre.replaceAll("[\\p{InCombiningDiacriticalMarks}]", "");
+
+        //cambiar los espacios por _
+        nombre = nombre.trim().replace(" ","_");
+        //dejar solo los números, letras, guiones y puntos
+        nombre = nombre.replaceAll("[^a-zA-Z0-9_\\-\\.]", "");
+
+        return nombre;
+    }
+
+    @Override
+    public String store(MultipartFile archivo) {
+        return store(archivo, "");//lo guarda en la raíz
+    }
+
+    @Override
+    public String store(MultipartFile archivo, String rutaDestino){
         try{
             if(archivo.isEmpty()){
                 throw new StorageException("Error. El archivo está vacío");
@@ -63,17 +88,38 @@ public class AlmacenamientoLocalService implements AlmacenamientoService{
                 throw new FormatoInvalidoException("Formato no válido: " + tipoContenido + ". Solo vídeo o subtítulos");
             }
 
+            //el directorio de destino
+            Path rutaDirectorioFinal = this.rootLocation.resolve(rutaDestino);
 
+            //crear las carpetas si no existen
+            if(!Files.exists(rutaDirectorioFinal)){
+                Files.createDirectories(rutaDirectorioFinal);
+            }
 
-            //obtener el nombre original
-            String nombreArchivo = archivo.getOriginalFilename();
-            //construir la ruta de destino
-            Path destino = this.rootLocation.resolve(Paths.get(nombreArchivo)).normalize().toAbsolutePath();
-            //copiar los bytes del archivo a la carpeta destino
+            //limpiar el nombre
+            String nombreOriginal = archivo.getOriginalFilename();
+            String nombreSanitizado = sanitizarNombre(nombreOriginal);
+
+            //copiarlo
+            Path destino = rutaDirectorioFinal.resolve(Paths.get(nombreSanitizado)).normalize().toAbsolutePath();
+
+            //comprobar que no se intneta guardar fuera del directorio
+            if (!destino.getParent().equals(rutaDirectorioFinal.toAbsolutePath())) {
+                throw new StorageException("No se puede guardar el archivo fuera del directorio actual.");
+            }
+
             try(InputStream is = archivo.getInputStream()){
                 Files.copy(is, destino, StandardCopyOption.REPLACE_EXISTING);
             }
-            return nombreArchivo;
+
+
+            // devuelve la ruta relativa completa
+            if (rutaDestino.isEmpty()) {
+                return nombreSanitizado;
+            } else {
+                return rutaDestino + "/" + nombreSanitizado;
+            }
+
         }catch (IOException e){
             throw new StorageException("Error. Fallo al guardar el archivo.");
         }
@@ -114,6 +160,34 @@ public class AlmacenamientoLocalService implements AlmacenamientoService{
             e.printStackTrace();
         }
 
+    }
+
+    //para borrar carpetas si no tiene contenido
+    @Override
+    public void eliminarDirectorioSiVacio(String nombreDirectorio) {
+        try {
+            Path dir = rootLocation.resolve(nombreDirectorio);
+            //solo borra si existe y está vacío
+            Files.deleteIfExists(dir);
+            System.out.println("Carpeta vacía eliminada: " + nombreDirectorio);
+        } catch (java.nio.file.DirectoryNotEmptyException e) {
+            //si hay algo no se borra
+        } catch (IOException e) {
+            System.err.println("Error al intentar limpiar carpeta: " + nombreDirectorio);
+        }
+    }
+
+    //borrar la carpeta entera
+    @Override
+    public void eliminarCarpeta(String nombreCarpeta){
+        try{
+            Path dir = rootLocation.resolve(nombreCarpeta);
+            FileSystemUtils.deleteRecursively(dir);
+            System.out.println("Carpeta borrada: " + nombreCarpeta);
+
+        }catch (IOException e) {
+            System.err.println("Error borrando la carpeta: " + nombreCarpeta);
+        }
     }
 
     //borrar
