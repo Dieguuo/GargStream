@@ -232,7 +232,7 @@ function renderHeroSlider(lista) {
                 <div class="hero-desc">${item.sipnosis || 'Sin sinopsis disponible.'}</div>
                 <div class="hero-actions">
                     <a href="/ver_detalle.html?id=${item.id}" class="hero-btn btn-primary">▶ Reproducir</a>
-                    <a href="/ver_detalle.html?id=${item.id}" class="hero-btn btn-secondary">ℹ Más Información</a>
+                    <a href="/ver_detalle.html?id=${item.id}" class="hero-btn btn-secondary">Más Información</a>
                 </div>
             </div>
         `;

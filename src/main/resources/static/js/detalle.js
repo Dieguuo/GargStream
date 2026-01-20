@@ -141,7 +141,7 @@ function renderizarDetalle(c) {
             html += `<button onclick="reproducirPeli(${c.id})" class="btn-play-big">▶ Reproducir</button>`;
         } else {
             // Botón bloqueado que manda al login
-            html += `<button onclick="window.location.href='/login'" class="btn-play-big" style="background-color:#444; color:#aaa; cursor:pointer;">🔒 Inicia sesión para ver</button>`;
+            html += `<button onclick="window.location.href='/login'" class="btn-play-big" style="background-color:#444; color:#aaa; cursor:pointer;">Inicia sesión para ver</button>`;
         }
     }
 
@@ -157,7 +157,7 @@ function renderizarDetalle(c) {
         if (estaLogueado) {
             html += `<button onclick="verTrailer('${youtubeId}')" class="btn-trailer">🎬 Ver Tráiler</button>`;
         } else {
-            html += `<button onclick="window.location.href='/login'" class="btn-trailer" style="background-color:#333; color:#888;">🔒 Tráiler</button>`;
+            html += `<button onclick="window.location.href='/login'" class="btn-trailer" style="background-color:#333; color:#888;">Tráiler</button>`;
         }
     }
 
@@ -190,7 +190,7 @@ function renderizarDetalle(c) {
                     if (estaLogueado) {
                         botonCapitulo = `<button class="btn-cap" onclick="reproducirCapitulo('${urlVideoCap}', ${cap.id})">▶ Reproducir</button>`;
                     } else {
-                        botonCapitulo = `<button class="btn-cap" onclick="window.location.href='/login'" style="background:#333; color:#777;">🔒 Bloqueado</button>`;
+                        botonCapitulo = `<button class="btn-cap" onclick="window.location.href='/login'" style="background:#333; color:#777;">Bloqueado</button>`;
                     }
 
                     html += `

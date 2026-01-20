@@ -3,96 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <title>Mi Perfil - GargStream</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-
     <link rel="stylesheet" th:href="@{/css/perfil.css}">
 </head>
 <body>
 
-<div class="navbar">
-    <a href="/index" class="brand">GargStream</a>
-    <a href="/index" class="btn-back">⬅ Volver al Inicio</a>
-</div>
+<div class="page-container">
+    <a href="/index" class="btn-back">
+        <span>←</span> Volver al Inicio
+    </a>
 
-<div class="profile-container">
-
-    <div class="identity-card">
-        <div class="avatar-wrapper">
-            <img th:src="${usuario.avatarUrl != null ? usuario.avatarUrl : '/img/default-avatar.png'}"
-                 onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png'"
-                 alt="Avatar">
-        </div>
-
-        <div class="user-name" th:text="${usuario.nombre}">Usuario</div>
-        <span class="user-role" th:text="${usuario.rol}">USER</span>
-
-        <form action="/api/perfil/avatar" method="post" enctype="multipart/form-data" style="margin-top:20px;">
-            <div class="upload-btn-wrapper">
-                <button class="btn-upload">📷 Cambiar Foto</button>
-                <input type="file" name="archivo" accept="image/*" onchange="this.form.submit()">
+    <div class="profile-content">
+        <section class="profile-header">
+            <div class="profile-image-wrapper">
+                <img th:src="${usuario.avatarUrl != null ? usuario.avatarUrl : '/img/default-avatar.png'}"
+                     onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png'"
+                     alt="Avatar de Usuario" class="profile-image">
+                <button class="btn-change-image" onclick="document.getElementById('avatar-upload').click()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                </button>
+                <form action="/api/perfil/avatar" method="post" enctype="multipart/form-data" style="display: none;">
+                    <input type="file" id="avatar-upload" name="archivo" accept="image/*" onchange="this.form.submit()">
+                </form>
             </div>
-        </form>
-    </div>
+            <div class="profile-summary">
+                <h1 class="user-name" th:text="${usuario.nombre}">Nombre de Usuario</h1>
+                <span class="user-role" th:text="${usuario.rol}">ROL</span>
+                <p class="member-since">Miembro de GargStream</p>
+            </div>
+        </section>
 
-    <div class="settings-section">
-
-        <div class="section-box">
-            <h2>Mis Datos</h2>
-            <form action="/api/perfil/actualizar-nombre" method="post">
-                <div class="form-group">
-                    <label>Nombre de Usuario</label>
-                    <input type="text" name="nombre" th:value="${usuario.nombre}" required>
+        <div class="settings-grid">
+            <div class="settings-card">
+                <div class="card-header">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <h2>Información Personal</h2>
                 </div>
-                <button type="submit" class="btn-save">Guardar Nombre</button>
-            </form>
-        </div>
-
-        <div class="section-box">
-            <h2>Correo Electrónico</h2>
-            <p style="font-size: 0.9em; color: #888;">Correo actual: <span style="color:white; font-weight:bold" th:text="${usuario.email}"></span></p>
-
-            <form th:if="${param.verify == null}" action="/api/perfil/solicitar-email" method="post">
-                <div class="form-group">
-                    <label>Nuevo Correo Electrónico</label>
-                    <input type="email" name="nuevoEmail" placeholder="ejemplo@nuevo.com" required>
-                </div>
-                <button type="submit" class="btn-save" style="background-color: var(--primary);">Solicitar Cambio</button>
-                <p style="font-size:0.8em; color:#666; margin-top:5px;">Te enviaremos un código de seguridad al nuevo correo.</p>
-            </form>
-
-            <div th:if="${param.verify != null}" class="verification-box">
-                <h3 style="margin-top:0; color:var(--primary)">✉️ Introduce el Código</h3>
-                <p style="font-size:0.9em;">Hemos enviado un código de 6 dígitos a tu nuevo correo.</p>
-
-                <form action="/api/perfil/validar-email" method="post">
-                    <input type="text" name="codigo" placeholder="CÓDIGO (Ej: A1B2C3)" required style="text-align:center; letter-spacing: 5px; font-weight:bold; font-size:1.2em;">
-                    <button type="submit" class="btn-save" style="width:100%; margin-top:10px;">Verificar y Cerrar Sesión</button>
+                <form action="/api/perfil/actualizar-nombre" method="post" class="settings-form">
+                    <div class="form-group">
+                        <label for="nombre">Nombre de Usuario</label>
+                        <input type="text" id="nombre" name="nombre" th:value="${usuario.nombre}" required>
+                    </div>
+                    <button type="submit" class="btn-save">Actualizar Nombre</button>
                 </form>
             </div>
 
-            <div th:if="${param.error == 'wrongCode'}" style="color:red; margin-top:10px;">⚠ Código incorrecto.</div>
-            <div th:if="${param.error == 'emailExists'}" style="color:red; margin-top:10px;">⚠ Ese correo ya está en uso.</div>
-            <div th:if="${param.error == 'codeExpired'}" style="color:red; margin-top:10px;">⚠ El código ha caducado.</div>
-        </div>
-
-        <div class="section-box">
-            <h2>Contraseña</h2>
-            <form action="/api/perfil/password" method="post">
-                <div class="form-group">
-                    <label>Nueva Contraseña</label>
-                    <input type="password" name="newPassword" required>
+            <div class="settings-card">
+                <div class="card-header">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0 1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                    <h2>Correo Electrónico</h2>
                 </div>
-                <div class="form-group">
-                    <label>Confirmar</label>
-                    <input type="password" name="confirmPassword" required>
+                <div class="current-email">
+                    <p>Correo actual:</p>
+                    <span th:text="${usuario.email}">usuario@ejemplo.com</span>
                 </div>
-                <button type="submit" class="btn-save" style="background-color: #333; color:white; border:1px solid #555;">Actualizar Clave</button>
-            </form>
 
-            <div th:if="${param.error == 'passMismatch'}" style="color:red; margin-top:10px;">⚠ Las contraseñas no coinciden.</div>
+                <form th:if="${param.verify == null}" action="/api/perfil/solicitar-email" method="post" class="settings-form">
+                    <div class="form-group">
+                        <label for="nuevoEmail">Nuevo Correo</label>
+                        <input type="email" id="nuevoEmail" name="nuevoEmail" placeholder="ejemplo@nuevo.com" required>
+                    </div>
+                    <button type="submit" class="btn-save btn-accent">Solicitar Cambio</button>
+                </form>
+
+                <div th:if="${param.verify != null}" class="verification-box">
+                    <h3>Verificar Nuevo Correo</h3>
+                    <p>Introduce el código que hemos enviado a tu nuevo correo.</p>
+                    <form action="/api/perfil/validar-email" method="post" class="verification-form">
+                        <input type="text" name="codigo" placeholder="CÓDIGO" required maxlength="6">
+                        <button type="submit" class="btn-save">Verificar</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="settings-card">
+                <div class="card-header">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    <h2>Seguridad</h2>
+                </div>
+                <form action="/api/perfil/password" method="post" class="settings-form">
+                    <div class="form-group">
+                        <label for="newPassword">Nueva Contraseña</label>
+                        <input type="password" id="newPassword" name="newPassword" required placeholder="••••••">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirmar Contraseña</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="••••••">
+                    </div>
+                    <button type="submit" class="btn-save">Cambiar Contraseña</button>
+                </form>
+            </div>
         </div>
-
     </div>
 </div>
 

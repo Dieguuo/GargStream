@@ -1,90 +1,226 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro | GargStream</title>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@300;700&display=swap" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
     <style>
-        :root { --primary-color: #ffb400; --bg-color: #141414; }
-        body {
-            background-color: var(--bg-color); color: white;
-            font-family: 'Roboto', sans-serif;
-            display: flex; justify-content: center; align-items: center;
-            height: 100vh; margin: 0;
-            background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('/img/fondo_cine.jpeg');
-            background-size: cover; background-position: center;
-            position: relative; /* Para posicionar el botón de volver */
+        :root {
+            --primary-color: #ffb400;
+            --bg-color: #141414;
+            --card-bg: rgba(20, 20, 20, 0.75);
         }
 
-        /* --- BOTÓN VOLVER (NUEVO) --- */
-        .back-home {
-            position: absolute;
-            top: 25px;
+        body {
+            background-color: var(--bg-color);
+            color: white;
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.9)), url('/img/fondo_cine.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        /* --- BOTÓN REGRESAR (ESTILO CÁPSULA) --- */
+        .btn-regresar {
+            position: fixed;
+            top: 30px;
             left: 30px;
+            z-index: 100;
             color: white;
             text-decoration: none;
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 1.5em;
-            letter-spacing: 1px;
+            font-size: 1.1rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 10px 20px;
+            border-radius: 50px;
             display: flex;
             align-items: center;
             gap: 10px;
-            transition: 0.3s;
-            z-index: 10;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
         }
-        .back-home:hover {
-            color: var(--primary-color);
+        .btn-regresar:hover {
+            background: var(--primary-color);
+            color: #000;
             transform: translateX(-5px);
         }
 
+        /* --- TARJETA DE REGISTRO --- */
         .register-card {
-            background: rgba(0, 0, 0, 0.85); padding: 40px 60px;
-            border-radius: 10px; width: 100%; max-width: 450px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.8);
-            position: relative;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            padding: 50px 60px;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin: 40px 20px;
         }
-        h1 { font-family: 'Bebas Neue', sans-serif; font-size: 3em; margin: 0 0 20px 0; color: white; letter-spacing: 2px; text-align: center;}
-        .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 5px; color: #aaa; font-size: 0.9em; }
+
+        .brand-logo {
+            text-align: center;
+            font-family: 'Bebas Neue', sans-serif;
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2.2rem;
+            margin: 0 0 30px 0;
+            color: white;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+
+        /* --- FORMULARIO --- */
+        .form-group { margin-bottom: 22px; }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ccc;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
         input {
-            width: 100%; padding: 15px; background: #333; border: 1px solid #333;
-            color: white; border-radius: 4px; font-size: 1em; box-sizing: border-box;
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 6px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
         }
-        input:focus { outline: none; border-color: var(--primary-color); background: #444; }
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: rgba(0, 0, 0, 0.6);
+            box-shadow: 0 0 0 4px rgba(255, 180, 0, 0.1);
+        }
 
+        /* --- SELECCIÓN DE AVATARES --- */
+        .avatar-section-title {
+            text-align: center;
+            color: white;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .avatar-selection {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .avatar-option {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            opacity: 0.5;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            object-fit: cover;
+            background: #333;
+        }
+        .avatar-option:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+        .avatar-option.selected {
+            border-color: var(--primary-color);
+            opacity: 1;
+            transform: scale(1.2);
+            box-shadow: 0 0 20px rgba(255, 180, 0, 0.4);
+        }
+
+        /* --- BOTÓN REGISTRO --- */
         .btn-register {
-            width: 100%; padding: 15px; background-color: var(--primary-color);
-            color: black; border: none; font-weight: bold; font-size: 1.2em;
-            cursor: pointer; border-radius: 4px; margin-top: 10px; font-family: 'Bebas Neue', sans-serif; letter-spacing: 1px;
-            transition: 0.3s;
+            width: 100%;
+            padding: 16px;
+            background-color: var(--primary-color);
+            color: black;
+            border: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-family: 'Roboto', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
         }
-        .btn-register:hover { background-color: #e5a100; transform: scale(1.02); }
+        .btn-register:hover {
+            background-color: #e5a100;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
 
-        .login-link { text-align: center; margin-top: 20px; color: #aaa; }
-        .login-link a { color: var(--primary-color); text-decoration: none; font-weight: bold; }
+        .login-link {
+            text-align: center;
+            margin-top: 25px;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+        .login-link a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: bold;
+            margin-left: 5px;
+        }
         .login-link a:hover { text-decoration: underline; }
 
-        .error-msg { background: #e50914; color: white; padding: 10px; border-radius: 4px; margin-bottom: 20px; text-align: center; font-weight: bold; }
-
-        /* ESTILOS AVATARES */
-        .avatar-selection { display: flex; justify-content: center; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; }
-        .avatar-option {
-            width: 60px; height: 60px; border-radius: 50%; cursor: pointer;
-            border: 3px solid transparent; opacity: 0.6; transition: all 0.2s ease; object-fit: cover;
+        .error-msg {
+            background: rgba(229, 9, 20, 0.8);
+            color: white;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+            border: 1px solid #e50914;
         }
-        .avatar-option:hover { opacity: 1; transform: scale(1.1); }
-        .avatar-option.selected {
-            border-color: var(--primary-color); opacity: 1; transform: scale(1.15);
-            box-shadow: 0 0 15px rgba(255, 180, 0, 0.4);
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .register-card { padding: 40px 30px; }
+            .btn-regresar { top: 15px; left: 15px; padding: 8px 15px; font-size: 1rem; }
         }
     </style>
 </head>
 <body>
 
-<a href="/index.html" class="back-home">← Volver al Catálogo</a>
+<a href="/index.html" class="btn-regresar">
+    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="3" fill="none"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+    Catálogo
+</a>
 
 <div class="register-card">
+    <div class="brand-logo">GargStream</div>
     <h1>Crear Cuenta</h1>
 
     <div th:if="${error}" class="error-msg">
@@ -93,25 +229,25 @@
 
     <form action="/register" method="POST">
 
-        <div class="form-group" style="text-align: center;">
-            <label style="margin-bottom: 10px; color: #fff;">Elige tu Personaje</label>
+        <div class="form-group">
+            <div class="avatar-section-title">Elige tu Avatar</div>
             <input type="hidden" id="avatarUrl" name="avatarUrl" value="">
             <div class="avatar-selection">
-                <img src="/img/avatars/1.png" class="avatar-option" onclick="seleccionarAvatar(this, '/img/avatars/1.png')">
-                <img src="/img/avatars/2.png" class="avatar-option" onclick="seleccionarAvatar(this, '/img/avatars/2.png')">
-                <img src="/img/avatars/3.png" class="avatar-option" onclick="seleccionarAvatar(this, '/img/avatars/3.png')">
-                <img src="/img/avatars/4.png" class="avatar-option" onclick="seleccionarAvatar(this, '/img/avatars/4.png')">
-                <img src="/img/avatars/5.png" class="avatar-option" onclick="seleccionarAvatar(this, '/img/avatars/5.png')">
+                <img src="/img/avatars/1.png" class="avatar-option" onclick="seleccionarAvatar(this, '/img/avatars/1.png')" alt="Avatar 1">
+                <img src="/img/avatars/2.png" class="avatar-option" onclick="seleccionarAvatar(this, '/img/avatars/2.png')" alt="Avatar 2">
+                <img src="/img/avatars/3.png" class="avatar-option" onclick="seleccionarAvatar(this, '/img/avatars/3.png')" alt="Avatar 3">
+                <img src="/img/avatars/4.png" class="avatar-option" onclick="seleccionarAvatar(this, '/img/avatars/4.png')" alt="Avatar 4">
+                <img src="/img/avatars/5.png" class="avatar-option" onclick="seleccionarAvatar(this, '/img/avatars/5.png')" alt="Avatar 5">
             </div>
         </div>
 
         <div class="form-group">
-            <label>Nombre</label>
-            <input type="text" name="nombre" placeholder="Tu nombre" required>
+            <label>Nombre Completo</label>
+            <input type="text" name="nombre" placeholder="Ej: Juan Pérez" required>
         </div>
 
         <div class="form-group">
-            <label>Email</label>
+            <label>Correo Electrónico</label>
             <input type="email" name="email" placeholder="ejemplo@correo.com" required>
         </div>
 
@@ -120,18 +256,21 @@
             <input type="password" name="password" placeholder="Mínimo 4 caracteres" required>
         </div>
 
-        <button type="submit" class="btn-register">Registrarse</button>
+        <button type="submit" class="btn-register">Registrarse ahora</button>
     </form>
 
     <div class="login-link">
-        ¿Ya tienes cuenta? <a href="/login">Inicia Sesión</a>
+        ¿Ya eres miembro? <a href="/login">Inicia Sesión</a>
     </div>
 </div>
 
 <script>
     function seleccionarAvatar(elementoImg, ruta) {
+        // Quitar selección previa
         document.querySelectorAll('.avatar-option').forEach(img => img.classList.remove('selected'));
+        // Marcar la nueva
         elementoImg.classList.add('selected');
+        // Actualizar el valor del input para el servidor
         document.getElementById('avatarUrl').value = ruta;
     }
 </script>

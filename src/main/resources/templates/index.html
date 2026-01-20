@@ -7,7 +7,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
 
 </head>
@@ -15,17 +15,19 @@
 
 <div id="main-loader">
   <div class="loader-spinner"></div>
-  <p style="margin-top:15px; color:#666; font-family:'Bebas Neue'; letter-spacing:1px;">Cargando catálogo...</p>
+  <p class="loader-text">Cargando catálogo...</p>
 </div>
 
 <div class="header-container">
   <div class="brand-section">
-    <h1 onclick="resetearVista()" style="cursor: pointer;">GargStream</h1>
+    <h1 onclick="resetearVista()" title="Volver al inicio">GargStream</h1>
   </div>
 
   <div class="search-box">
-    <span class="search-icon">🔍</span>
-    <input type="text" id="buscador" class="search-input" placeholder="Títulos, géneros...">
+    <span class="search-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+    </span>
+    <input type="text" id="buscador" class="search-input" placeholder="Buscar títulos...">
   </div>
 
   <div class="header-actions">
@@ -36,9 +38,10 @@
            class="avatar-circle" alt="Perfil">
 
       <div class="dropdown-content">
-        <a href="/perfil" class="dropdown-item">👤 Mi Perfil</a>
+        <div class="dropdown-header">Hola, <span th:text="${usuario.nombre}">Usuario</span></div>
+        <a href="/perfil" class="dropdown-item">Mi Perfil</a>
 
-        <a href="admin.html" class="dropdown-item" sec:authorize="hasAuthority('ADMIN')" style="color: #ffb400;">⚙️ Panel Admin</a>
+        <a href="admin.html" class="dropdown-item admin-link" sec:authorize="hasAuthority('ADMIN')">Panel Admin</a>
 
         <form th:action="@{/logout}" method="post" style="margin: 0;">
           <button type="submit" class="btn-logout-menu">Cerrar Sesión</button>
@@ -46,8 +49,8 @@
       </div>
     </div>
 
-    <div sec:authorize="isAnonymous()" style="display: flex; align-items: center;">
-      <a href="/login" class="btn-login">Iniciar Sesión</a>
+    <div sec:authorize="isAnonymous()" class="auth-buttons">
+      <a href="/login" class="btn-login">Entrar</a>
       <a href="/register" class="btn-register">Registrarse</a>
     </div>
 
@@ -61,16 +64,25 @@
 <div class="hero-wrapper" id="hero-section">
   <div id="hero-slider-container"></div>
 
-  <button class="hero-arrow left" id="hero-prev" onclick="cambiarHero(-1)">❮</button>
-  <button class="hero-arrow right" id="hero-next" onclick="cambiarHero(1)">❯</button>
+  <button class="hero-arrow left" id="hero-prev" onclick="cambiarHero(-1)">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+  </button>
+  <button class="hero-arrow right" id="hero-next" onclick="cambiarHero(1)">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+  </button>
 
   <div class="hero-indicators" id="hero-indicators"></div>
+
+  <div class="hero-top-gradient"></div>
+  <div class="hero-bottom-gradient"></div>
 </div>
 
-<div class="main-content" style="padding-bottom: 50px;">
+<div class="main-content">
 
   <div class="category-row" id="cat-historial" style="display: none;">
-    <div class="category-title" style="color: #ddd;">↻ Continuar viendo</div>
+    <div class="category-header">
+      <div class="category-title">Continuar viendo</div>
+    </div>
     <div class="row-wrapper">
       <button class="row-btn left" onclick="deslizarFila('row-historial', -1)">❮</button>
       <div class="scroller" id="row-historial"></div>
@@ -79,7 +91,9 @@
   </div>
 
   <div class="category-row" id="cat-milista" style="display: none;">
-    <div class="category-title" style="color: #ffb400;">❤️ Mi Lista <span>Tus favoritos</span></div>
+    <div class="category-header">
+      <div class="category-title" style="color: #ffb400;">Mi Lista</div>
+    </div>
     <div class="row-wrapper">
       <button class="row-btn left" onclick="deslizarFila('row-milista', -1)">❮</button>
       <div class="scroller" id="row-milista"></div>
@@ -88,7 +102,9 @@
   </div>
 
   <div class="category-row" id="cat-peliculas">
-    <div class="category-title">Películas <span>Blockbusters y Cine</span></div>
+    <div class="category-header">
+      <div class="category-title">Películas</div>
+    </div>
     <div class="row-wrapper">
       <button class="row-btn left" onclick="deslizarFila('row-peliculas', -1)">❮</button>
       <div class="scroller" id="row-peliculas"></div>
@@ -97,7 +113,9 @@
   </div>
 
   <div class="category-row" id="cat-series">
-    <div class="category-title">Series de TV <span>Maratones épicas</span></div>
+    <div class="category-header">
+      <div class="category-title">Series</div>
+    </div>
     <div class="row-wrapper">
       <button class="row-btn left" onclick="deslizarFila('row-series', -1)">❮</button>
       <div class="scroller" id="row-series"></div>
@@ -106,7 +124,9 @@
   </div>
 
   <div class="category-row" id="cat-videos">
-    <div class="category-title">Vídeos Personales <span>Tus recuerdos</span></div>
+    <div class="category-header">
+      <div class="category-title">Vídeos Personales</div>
+    </div>
     <div class="row-wrapper">
       <button class="row-btn left" onclick="deslizarFila('row-videos', -1)">❮</button>
       <div class="scroller" id="row-videos"></div>

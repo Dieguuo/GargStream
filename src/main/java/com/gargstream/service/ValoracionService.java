@@ -53,7 +53,6 @@ public class ValoracionService {
         media = Math.round(media * 10.0) / 10.0;
 
         // actualizar la película
-        contenido.setPuntuacionMedia(media);
         contenido.setNotaPromedioLocal(media);
         contenido.setContadorVotos(votos.size());
 

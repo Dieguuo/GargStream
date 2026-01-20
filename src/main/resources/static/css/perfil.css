@@ -1,211 +1,259 @@
 :root {
-    --primary: #ffb400;
-    --bg: #141414;
+    --primary-color: #ffb400;
+    --bg-color: #141414;
     --card-bg: #1f1f1f;
     --text-muted: #aaa;
+    --border-color: #333;
 }
 
 body {
-    background-color: var(--bg);
+    background-color: var(--bg-color);
     color: white;
     font-family: 'Roboto', sans-serif;
     margin: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     min-height: 100vh;
 }
 
-/* --- CABECERA SIMPLE --- */
-.navbar {
-    width: 100%;
-    padding: 20px 4%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
-    box-sizing: border-box;
-}
-.brand {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 2em;
-    color: var(--primary);
-    text-decoration: none;
-    letter-spacing: 2px;
-}
-.btn-back {
-    color: white;
-    text-decoration: none;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    transition: 0.3s;
-}
-.btn-back:hover { color: var(--primary); }
-
-/* --- CONTENEDOR PRINCIPAL --- */
-.profile-container {
-    width: 100%;
+.page-container {
     max-width: 900px;
-    margin-top: 40px;
-    padding: 20px;
-    display: grid;
-    grid-template-columns: 300px 1fr; /* Columna Izq (Avatar) y Der (Formularios) */
-    gap: 40px;
-    box-sizing: border-box;
+    margin: 0 auto;
+    padding: 40px 20px;
 }
 
-/* --- TARJETA IZQUIERDA (AVATAR) --- */
-.identity-card {
-    background-color: var(--card-bg);
-    padding: 30px;
-    border-radius: 8px;
-    text-align: center;
-    height: fit-content;
-    border: 1px solid #333;
-}
-
-.avatar-wrapper {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    overflow: hidden;
-    margin: 0 auto 20px auto;
-    border: 4px solid var(--primary);
-    background-color: #000;
-    position: relative;
-}
-.avatar-wrapper img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.user-name { font-size: 1.5em; font-weight: bold; margin: 10px 0 5px 0; }
-.user-role {
-    background-color: var(--primary);
-    color: black;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: 0.8em;
+/* --- BOTÓN VOLVER --- */
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    color: var(--text-muted);
+    text-decoration: none;
     font-weight: bold;
-    text-transform: uppercase;
+    margin-bottom: 30px;
+    transition: color 0.2s;
 }
 
-.upload-btn-wrapper {
-    margin-top: 15px;
-    position: relative;
-    overflow: hidden;
-    display: inline-block;
+.btn-back span {
+    margin-right: 8px;
+    font-size: 1.2em;
 }
 
-.btn-upload {
-    border: 1px solid #555;
-    color: white;
-    background-color: transparent;
-    padding: 8px 20px;
-    border-radius: 4px;
-    font-size: 0.9em;
-    cursor: pointer;
-    transition: 0.3s;
-}
-.btn-upload:hover { border-color: var(--primary); color: var(--primary); }
-.upload-btn-wrapper input[type=file] {
-    font-size: 100px;
-    position: absolute;
-    left: 0; top: 0; opacity: 0;
-    cursor: pointer;
-    height: 100%; width: 100%;
+.btn-back:hover {
+    color: var(--primary-color);
 }
 
-/* --- SECCIÓN DERECHA (DATOS) --- */
-.settings-section {
+/* --- ENCABEZADO DEL PERFIL --- */
+.profile-header {
     display: flex;
     flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.profile-image-wrapper {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    margin-bottom: 20px;
+}
+
+.profile-image {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--card-bg);
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+.btn-change-image {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background-color: var(--primary-color);
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    color: var(--bg-color);
+    transition: transform 0.2s;
+}
+
+.btn-change-image:hover {
+    transform: scale(1.1);
+}
+
+.user-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3em;
+    margin: 0 0 5px 0;
+    letter-spacing: 1px;
+}
+
+.user-role {
+    display: inline-block;
+    background-color: var(--primary-color);
+    color: var(--bg-color);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 0.9em;
+    margin-bottom: 10px;
+}
+
+.member-since {
+    color: var(--text-muted);
+    font-size: 0.9em;
+    margin: 0;
+}
+
+/* --- CUADRÍCULA DE CONFIGURACIONES --- */
+.settings-grid {
+    display: grid;
     gap: 30px;
 }
 
-.section-box {
+.settings-card {
     background-color: var(--card-bg);
+    border-radius: 12px;
     padding: 30px;
-    border-radius: 8px;
-    border: 1px solid #333;
-    position: relative;
+    border: 1px solid var(--border-color);
 }
 
-h2 { margin-top: 0; color: var(--primary); font-family: 'Bebas Neue'; letter-spacing: 1px; }
+.card-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 25px;
+    color: var(--primary-color);
+}
 
-.form-group { margin-bottom: 20px; }
-label { display: block; color: var(--text-muted); margin-bottom: 8px; font-size: 0.9em; }
+.card-header svg {
+    margin-right: 15px;
+}
 
-input {
-    width: 100%;
-    padding: 12px;
-    background-color: #333;
-    border: 1px solid #444;
-    border-radius: 4px;
+.card-header h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8em;
+    margin: 0;
+    letter-spacing: 1px;
     color: white;
-    box-sizing: border-box;
-    transition: 0.3s;
 }
-input:focus { outline: none; border-color: var(--primary); background-color: #444; }
-input:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* --- FORMULARIOS --- */
+.settings-form {
+    display: grid;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-weight: bold;
+    margin-bottom: 8px;
+    font-size: 0.9em;
+}
+
+.form-group input {
+    padding: 12px 15px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background-color: rgba(0,0,0,0.2);
+    color: white;
+    font-size: 1em;
+    transition: border-color 0.2s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
 
 .btn-save {
-    background-color: white;
-    color: black;
+    padding: 12px 20px;
+    border-radius: 6px;
     border: none;
-    padding: 10px 25px;
-    border-radius: 4px;
+    background-color: white;
+    color: var(--bg-color);
     font-weight: bold;
+    font-size: 1em;
     cursor: pointer;
-    transition: 0.3s;
-    margin-top: 10px;
+    transition: background-color 0.2s, transform 0.1s;
+    justify-self: start;
 }
-.btn-save:hover { background-color: var(--primary); transform: scale(1.02); }
 
-/* --- ESTILOS VERIFICACIÓN EMAIL (NUEVO) --- */
+.btn-save:hover {
+    background-color: #eee;
+    transform: translateY(-1px);
+}
+
+.btn-save.btn-accent {
+    background-color: var(--primary-color);
+}
+
+.btn-save.btn-accent:hover {
+    background-color: #e6a300;
+}
+
+/* --- ESTILOS ESPECÍFICOS --- */
+.current-email {
+    margin-bottom: 25px;
+    font-size: 1em;
+}
+
+.current-email span {
+    display: block;
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-top: 5px;
+}
+
 .verification-box {
-    background: rgba(255, 180, 0, 0.1);
-    padding: 15px;
-    border: 1px solid var(--primary);
-    border-radius: 4px;
-    margin-top: 10px;
+    margin-top: 25px;
+    padding: 20px;
+    background-color: rgba(255, 180, 0, 0.1);
+    border-radius: 8px;
+    border: 1px solid var(--primary-color);
 }
 
-/* Responsive */
+.verification-box h3 {
+    margin: 0 0 10px 0;
+    color: var(--primary-color);
+}
+
+.verification-form {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.verification-form input {
+    flex: 1;
+    text-align: center;
+    letter-spacing: 3px;
+    font-weight: bold;
+}
+
+/* RESPONSIVE */
 @media (max-width: 768px) {
-    .profile-container { grid-template-columns: 1fr; }
-}
-
-
-/* --- ESTRELLAS --- */
-.star {
-    font-size: 32px; /* Un poco más grandes */
-    color: #ccc;     /* GRIS CLARO para que se vea sobre fondo negro */
-    cursor: pointer;
-    transition: color 0.2s, transform 0.1s;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.5); /* Sombra para que resalten */
-}
-
-/* Estrella rellena (Dorada) */
-.star.filled {
-    color: #ffcc00; /* Un dorado más brillante */
-}
-
-/* Efecto hover */
-.star:hover {
-    color: #ffe066;
-    transform: scale(1.2);
-}
-
-/* Animación al votar */
-@keyframes pop {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.4); }
-    100% { transform: scale(1); }
-}
-.star.animate {
-    animation: pop 0.3s ease;
+    .page-container {
+        padding: 30px 15px;
+    }
+    .user-name {
+        font-size: 2.5em;
+    }
+    .settings-card {
+        padding: 20px;
+    }
+    .verification-form {
+        flex-direction: column;
+    }
+    .btn-save {
+        width: 100%;
+    }
 }
