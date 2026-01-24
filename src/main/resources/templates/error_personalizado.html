@@ -1,51 +1,187 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
+  <meta charset="UTF-8">
   <title>Error - GargStream</title>
+
+  <!-- Fuente estilo cine -->
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
   <style>
+    /* ======================= RESET BASE ======================= */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
-        background-color: #141414;
-        color: white;
-        font-family: Arial, sans-serif;
-        text-align: center;
-        padding-top: 50px;
+      min-height: 100vh;
+      font-family: 'Inter', sans-serif;
+      background:
+        radial-gradient(circle at top, rgba(255, 180, 0, 0.08), transparent 40%),
+        linear-gradient(180deg, #0b0b0b, #141414);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
     }
-    .error-box {
-        background-color: #333;
-        margin: 0 auto;
-        padding: 40px;
-        width: 80%;
-        max-width: 500px;
-        border-radius: 10px;
-        border: 2px solid #e50914;
-        box-shadow: 0 0 20px rgba(229, 9, 20, 0.5);
+
+    /* ======================= CONTENEDOR ERROR ======================= */
+    .error-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 520px;
+      padding: 40px 45px;
+
+      background: linear-gradient(
+        145deg,
+        rgba(25, 25, 25, 0.85),
+        rgba(10, 10, 10, 0.85)
+      );
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+
+      box-shadow:
+        0 30px 70px rgba(0, 0, 0, 0.7),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+
+      text-align: center;
+      animation: fadeUp 0.35s ease;
     }
-    h1 { color: #e50914; margin-top: 0; }
-    p { font-size: 1.2em; color: #ccc; line-height: 1.5; }
-    .btn {
-        background-color: white;
-        color: black;
-        padding: 12px 25px;
-        text-decoration: none;
-        border-radius: 5px;
-        font-weight: bold;
-        margin-top: 25px;
-        display: inline-block;
-        transition: background 0.3s;
+
+    /* Halo decorativo */
+    .error-wrapper::before {
+      content: "";
+      position: absolute;
+      inset: -40px;
+      background: radial-gradient(circle, rgba(255, 180, 0, 0.12), transparent 60%);
+      filter: blur(50px);
+      z-index: -1;
     }
-    .btn:hover { background-color: #ccc; }
+
+    /* ======================= ICONO ======================= */
+    .error-icon {
+      font-size: 3.5rem;
+      margin-bottom: 15px;
+      color: #ff4d4d;
+      text-shadow: 0 0 20px rgba(255, 77, 77, 0.6);
+    }
+
+    /* ======================= TITULOS ======================= */
+    h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.2rem;
+      letter-spacing: 1.5px;
+      margin-bottom: 10px;
+      color: #ff4d4d;
+    }
+
+    h2 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 14px;
+      color: #fff;
+    }
+
+    p {
+      font-size: 0.95rem;
+      color: #bbb;
+      line-height: 1.5;
+      margin-bottom: 30px;
+    }
+
+    /* ======================= BOTONES ======================= */
+    .actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #ffb400, #ff9c00);
+      color: #000;
+      text-decoration: none;
+      padding: 12px 18px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      color: #aaa;
+      font-size: 0.85rem;
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .btn-secondary:hover {
+      color: #fff;
+    }
+
+    /* ======================= FOOTER ======================= */
+    .error-footer {
+      margin-top: 25px;
+      font-size: 0.75rem;
+      color: #666;
+      letter-spacing: 0.5px;
+    }
+
+    /* ======================= ANIMACIONES ======================= */
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.97);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    /* ======================= RESPONSIVE ======================= */
+    @media (max-width: 500px) {
+      .error-wrapper {
+        padding: 30px 25px;
+      }
+    }
   </style>
 </head>
+
 <body>
-<div class="error-box">
-  <h1>⚠️ Ups! Algo salió mal</h1>
 
-  <h2 th:text="${tituloError}">Error Desconocido</h2>
-  <p th:text="${mensajeError}">Ha ocurrido un error.</p>
+<div class="error-wrapper">
+  <div class="error-icon">⚠️</div>
 
-  <a href="/index.html" class="btn">Volver al Inicio</a>
-  <br><br>
-  <a href="javascript:history.back()" style="color:#aaa; text-decoration: none; font-size: 0.9em;">Intentarlo de nuevo</a>
+  <h1>Algo salió mal</h1>
+
+  <h2 th:text="${tituloError}">
+    Error inesperado
+  </h2>
+
+  <p th:text="${mensajeError}">
+    Se ha producido un error que no esperábamos. Puedes volver atrás o regresar al inicio.
+  </p>
+
+  <div class="actions">
+    <a href="/index.html" class="btn-primary">Volver al inicio</a>
+    <a href="javascript:history.back()" class="btn-secondary">Intentarlo de nuevo</a>
+  </div>
+
+  <div class="error-footer">
+    GargStream • Sistema de errores
+  </div>
 </div>
+
 </body>
 </html>

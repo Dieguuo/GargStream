@@ -291,9 +291,21 @@ function renderRow(lista, containerId) {
     if(!container) return;
 
     container.innerHTML = "";
+
+    // >>> CORRECCIÓN AQUÍ <<<
+    // Detectamos si el scroll es horizontal o si debe ser vertical
     container.addEventListener('wheel', (evt) => {
-        evt.preventDefault(); container.scrollLeft += evt.deltaY;
+        // ¿Hay contenido desbordado? (El contenido es más ancho que la ventana visible)
+        const hayDesbordamiento = container.scrollWidth > container.clientWidth;
+
+        if (hayDesbordamiento) {
+            // Si hay desbordamiento, bloqueamos el scroll vertical y movemos la fila
+            evt.preventDefault();
+            container.scrollLeft += evt.deltaY;
+        }
+        // Si NO hay desbordamiento, no hacemos nada y el navegador hace scroll vertical normal
     });
+    // >>> FIN CORRECCIÓN <<<
 
     lista.forEach(item => {
         const img = item.rutaCaratula || 'https://via.placeholder.com/160x240?text=No+Img';

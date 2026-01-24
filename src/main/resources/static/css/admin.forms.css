@@ -1,0 +1,319 @@
+/* =====================================================
+   ADMIN FORMS
+   Formularios, inputs, botones, overlays y feedback
+   ===================================================== */
+
+/* -----------------------------------------------------
+   CONTENEDOR DE SECCIÓN (CENTRADO EN PANTALLA)
+----------------------------------------------------- */
+.form-section {
+  max-width: 900px;
+  margin: 0 auto;
+  min-height: calc(100vh - 60px);
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+}
+/* SOLO LA SECCIÓN ACTIVA SE MUESTRA */
+.form-section.active {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: calc(100vh - 60px);
+}
+
+/* TÍTULO */
+.form-section h1 {
+  margin-bottom: 30px;
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 2px;
+  text-align: center;
+  color: #fff;
+}
+
+/* -----------------------------------------------------
+   FORM BASE (CRISTALBLUR FUERTE)
+----------------------------------------------------- */
+form {
+  background: rgba(25, 25, 25, 0.45);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 18px;
+  padding: 35px;
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.6),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  transition:
+    box-shadow 0.3s ease,
+    transform 0.3s ease;
+}
+
+form:hover {
+  box-shadow:
+    0 30px 70px rgba(0, 0, 0, 0.7),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+/* -----------------------------------------------------
+   LABELS
+----------------------------------------------------- */
+form label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.8rem;
+  color: #bbb;
+  letter-spacing: 0.4px;
+}
+
+/* -----------------------------------------------------
+   INPUTS BASE
+----------------------------------------------------- */
+form input[type="text"],
+form input[type="number"],
+form input[type="file"],
+form textarea,
+form select {
+  width: 100%;
+  padding: 12px 14px;
+  background: rgba(15, 15, 15, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 10px;
+  color: #fff;
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+form textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* -----------------------------------------------------
+   PLACEHOLDER
+----------------------------------------------------- */
+form ::placeholder {
+  color: #666;
+}
+
+/* -----------------------------------------------------
+   FOCUS STATES
+----------------------------------------------------- */
+form input:focus,
+form textarea:focus,
+form select:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  background: rgba(20, 20, 20, 0.95);
+  box-shadow:
+    0 0 0 2px rgba(255, 180, 0, 0.25),
+    0 0 18px rgba(255, 180, 0, 0.15);
+}
+
+/* -----------------------------------------------------
+   FILE INPUT MEJORADO
+----------------------------------------------------- */
+form input[type="file"] {
+  cursor: pointer;
+}
+
+form input[type="file"]::-webkit-file-upload-button {
+  background: rgba(255, 180, 0, 0.18);
+  border: 1px solid rgba(255, 180, 0, 0.55);
+  border-radius: 8px;
+  padding: 6px 14px;
+  color: #ffb400;
+  font-weight: bold;
+  cursor: pointer;
+  margin-right: 10px;
+  transition: all 0.2s ease;
+}
+
+form input[type="file"]::-webkit-file-upload-button:hover {
+  background: rgba(255, 180, 0, 0.3);
+}
+
+/* -----------------------------------------------------
+   ROW FLEX
+----------------------------------------------------- */
+form .row {
+  display: flex;
+  gap: 20px;
+}
+
+form .row > div {
+  flex: 1;
+}
+
+/* -----------------------------------------------------
+   BOTONES
+----------------------------------------------------- */
+form button,
+button {
+  background: linear-gradient(135deg, #ffb400, #ff9c00);
+  border: none;
+  color: #000;
+  padding: 14px 18px;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    filter 0.15s ease;
+}
+
+form button:hover,
+button:hover {
+  filter: brightness(1.1);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(255, 180, 0, 0.45);
+}
+
+form button:active,
+button:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+/* -----------------------------------------------------
+   BOTÓN CANCELAR
+----------------------------------------------------- */
+.btn-cancelar {
+  background: transparent;
+  border: 1px solid #777;
+  color: #aaa;
+}
+
+.btn-cancelar:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  border-color: #aaa;
+  box-shadow: none;
+}
+
+/* -----------------------------------------------------
+   BOTÓN ELIMINAR
+----------------------------------------------------- */
+.btn-eliminar {
+  background: transparent;
+  border: 1px solid #ff4d4d;
+  color: #ff4d4d;
+}
+
+.btn-eliminar:hover {
+  background: rgba(255, 77, 77, 0.18);
+  color: #fff;
+  box-shadow: 0 0 0 2px rgba(255, 77, 77, 0.25);
+}
+
+/* -----------------------------------------------------
+   SEPARADORES
+----------------------------------------------------- */
+.section-separator {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.15),
+    transparent
+  );
+  margin: 30px 0;
+}
+
+.section-title {
+  font-size: 0.85rem;
+  color: var(--accent-color);
+  margin-bottom: 12px;
+  letter-spacing: 0.6px;
+}
+
+/* -----------------------------------------------------
+   FORMULARIO EDICIÓN
+----------------------------------------------------- */
+.edit-form-container {
+  background: rgba(18, 18, 18, 0.85);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 18px;
+  padding: 35px;
+  margin-top: 30px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65);
+}
+
+/* -----------------------------------------------------
+   OVERLAY LOADING
+----------------------------------------------------- */
+#overlay-loading {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(6px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  z-index: 9999;
+}
+
+/* -----------------------------------------------------
+   SPINNER
+----------------------------------------------------- */
+.spinner {
+  width: 60px;
+  height: 60px;
+  border: 5px solid rgba(255, 255, 255, 0.15);
+  border-top-color: var(--accent-color);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* -----------------------------------------------------
+   TEXTO LOADING
+----------------------------------------------------- */
+.loading-text {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #fff;
+}
+
+.loading-subtext {
+  font-size: 0.8rem;
+  color: #aaa;
+  margin-top: 5px;
+}
+
+/* -----------------------------------------------------
+   RESPONSIVE
+----------------------------------------------------- */
+@media (max-width: 700px) {
+  .form-section {
+    min-height: auto;
+    padding-top: 30px;
+  }
+
+  form {
+    padding: 24px;
+  }
+
+  form .row {
+    flex-direction: column;
+  }
+
+  form button,
+  .btn-cancelar,
+  .btn-eliminar {
+    width: 100%;
+  }
+}

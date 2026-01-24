@@ -1,0 +1,93 @@
+/* =====================================================
+   ADMIN SIDEBAR
+   Estilos exclusivos del menú lateral
+   ===================================================== */
+
+/* -------------------------
+   TÍTULO / LOGO
+-------------------------- */
+.sidebar h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.8em;
+  letter-spacing: 1px;
+  text-align: center;
+  color: var(--primary-color);
+  margin-bottom: 20px;
+}
+
+/* -------------------------
+   BOTONES DE MENÚ
+-------------------------- */
+.menu-btn {
+  width: 100%;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-color);
+  padding: 12px 14px;
+  text-align: left;
+  font-size: 0.95em;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Hover */
+.menu-btn:hover {
+  background: rgba(255, 180, 0, 0.08);
+  color: var(--primary-color);
+}
+
+/* Activo */
+.menu-btn.active {
+  background: rgba(255, 180, 0, 0.15);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  font-weight: bold;
+}
+
+/* -------------------------
+   SEPARACIÓN VISUAL
+-------------------------- */
+.sidebar::after {
+  content: "";
+  display: block;
+  margin-top: auto;
+}
+
+/* -------------------------
+   LINK VOLVER AL CATÁLOGO
+-------------------------- */
+.back-link {
+  margin-top: 20px;
+  display: block;
+  padding: 10px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 0.85em;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border-color);
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.back-link:hover {
+  color: var(--primary-color);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* -------------------------
+   RESPONSIVE BÁSICO
+-------------------------- */
+@media (max-width: 900px) {
+  .sidebar {
+    width: 220px;
+    min-width: 220px;
+  }
+
+  .menu-btn {
+    font-size: 0.9em;
+    padding: 10px 12px;
+  }
+}

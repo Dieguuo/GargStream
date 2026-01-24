@@ -6,7 +6,36 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/admin.css">
+    <!-- 1. BASE (variables, reset, tipografía) -->
+    <link rel="stylesheet" href="css/admin.base.css">
+
+    <!-- 2. LAYOUT GENERAL -->
+    <link rel="stylesheet" href="css/admin.layout.css">
+
+    <!-- 3. ESTRUCTURA DE NAVEGACIÓN -->
+    <link rel="stylesheet" href="css/admin.sidebar.css">
+
+    <!-- 4. SECCIONES PRINCIPALES -->
+    <link rel="stylesheet" href="css/admin.dashboard.css">
+
+    <!-- 5. TABLAS -->
+    <link rel="stylesheet" href="css/admin.tables.css">
+
+    <!-- 6. FORMULARIOS -->
+    <link rel="stylesheet" href="css/admin.forms.css">
+
+    <!-- 7. EDITOR DE CONTENIDO -->
+    <link rel="stylesheet" href="css/admin.editor.css">
+
+    <!-- 8. COMPONENTES REUTILIZABLES -->
+    <link rel="stylesheet" href="css/admin.components.css">
+
+    <!-- 9. OVERLAYS / LOADING / CONSOLA -->
+    <link rel="stylesheet" href="css/admin.overlay.css">
+
+    <!-- 10. RESPONSIVE (SIEMPRE EL ÚLTIMO) -->
+    <link rel="stylesheet" href="css/admin.responsive.css">
+
 </head>
 <body>
 
@@ -131,11 +160,11 @@
             <div class="row">
                 <div style="flex:1">
                     <label>Temporada:</label>
-                    <input type="number" name="numTemporada" required value="1">
+                    <input type="number" name="numTemporada" required value="1" min="1">
                 </div>
                 <div style="flex:1">
                     <label>Capítulo:</label>
-                    <input type="number" name="numCapitulo" required value="1">
+                    <input type="number" name="numCapitulo" required value="1" min="1">
                 </div>
             </div>
             <label>Título del Capítulo (Opcional - TMDB):</label>
@@ -243,6 +272,12 @@
     <div class="loading-subtext">Por favor, no cierres esta pestaña.</div>
 </div>
 
+<script src="js/navigation.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/users.js"></script>
+<script src="js/forms.js"></script>
+<script src="js/content.js"></script>
 <script src="js/admin.js"></script>
+
 </body>
 </html>

@@ -1,0 +1,164 @@
+/* =====================================================
+   ADMIN EDITOR
+   Grid de edición y panel de edición de contenido
+   ===================================================== */
+
+/* ======================= GRID DE CONTENIDO ======================= */
+
+.grid-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 26px;
+  margin-top: 30px;
+  justify-items: center;
+}
+
+/* ======================= TARJETA DE CONTENIDO ======================= */
+
+.card-edit {
+  width: 100%;
+  max-width: 240px;
+  background: rgba(25, 25, 25, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45);
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.card-edit:hover {
+  transform: scale(1.06);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.65);
+  border-color: var(--accent-color);
+}
+
+/* ======================= IMAGEN / CARÁTULA ======================= */
+
+.card-edit img {
+  width: 100%;
+  height: 320px;
+  object-fit: cover;
+  display: block;
+  background: #111;
+}
+
+/* ======================= TÍTULO SOBRE CARÁTULA ======================= */
+
+.card-edit p {
+  margin: 0;
+  padding: 14px 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #fff;
+  text-align: center;
+  background:
+    linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.85),
+      rgba(0, 0, 0, 0.25),
+      transparent
+    );
+}
+
+/* ======================= EFECTO DE SELECCIÓN / FOCUS ======================= */
+
+.card-edit:active {
+  transform: scale(1.02);
+}
+
+/* ======================= FORMULARIO DE EDICIÓN ======================= */
+
+.edit-form-container {
+  background: rgba(18, 18, 18, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 30px;
+  margin-top: 30px;
+  animation: fadeIn 0.25s ease;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+}
+
+.edit-form-container h2 {
+  margin-bottom: 18px;
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 1px;
+}
+
+/* ======================= LISTA DE CAPÍTULOS ======================= */
+
+#lista-capitulos-gestion {
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 10px;
+}
+
+#lista-capitulos-gestion h3 {
+  font-size: 0.9rem;
+  margin-bottom: 12px;
+  color: var(--accent-color);
+}
+
+#lista-capitulos-gestion > div {
+  border-radius: 8px;
+  padding: 8px 10px;
+  transition: background 0.2s ease;
+}
+
+#lista-capitulos-gestion > div:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ======================= BOTÓN ELIMINAR TOTAL ======================= */
+
+.btn-eliminar {
+  background: transparent;
+  border: 1px solid #ff4d4d;
+  color: #ff4d4d;
+  padding: 12px;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.1s ease;
+}
+
+.btn-eliminar:hover {
+  background: rgba(255, 77, 77, 0.18);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+/* ======================= ANIMACIÓN ======================= */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ======================= RESPONSIVE ======================= */
+
+@media (max-width: 600px) {
+  .grid-content {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 18px;
+  }
+
+  .card-edit img {
+    height: 240px;
+  }
+}

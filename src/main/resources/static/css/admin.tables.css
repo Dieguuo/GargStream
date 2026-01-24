@@ -1,0 +1,228 @@
+/* =====================================================
+   ADMIN TABLES
+   Tablas, badges, avatares y acciones
+===================================================== */
+
+/* -----------------------------------------------------
+   CONTENEDOR GENERAL DE TABLAS
+----------------------------------------------------- */
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  background: rgba(25, 25, 25, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+}
+
+/* -----------------------------------------------------
+   TABLA BASE
+----------------------------------------------------- */
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 900px;
+  font-size: 0.95rem;
+}
+
+/* -----------------------------------------------------
+   CABECERA
+----------------------------------------------------- */
+.user-table thead {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 180, 0, 0.18),
+    rgba(255, 180, 0, 0.06)
+  );
+}
+
+.user-table th {
+  text-align: left;
+  padding: 14px 12px;
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 1px;
+  color: var(--accent-color);
+  border-bottom: 1px solid var(--border-color);
+  white-space: nowrap;
+}
+
+/* -----------------------------------------------------
+   FILAS
+----------------------------------------------------- */
+.user-table td {
+  padding: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  vertical-align: middle;
+}
+
+.user-table tr {
+  transition: background 0.2s ease;
+}
+
+.user-table tr:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* -----------------------------------------------------
+   FILA BLOQUEADA
+----------------------------------------------------- */
+.user-table tr[style*="rgba(255, 0, 0"] {
+  box-shadow: inset 4px 0 0 #ff4d4d;
+}
+
+/* -----------------------------------------------------
+   AVATAR
+----------------------------------------------------- */
+.table-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.18);
+  background: #111;
+}
+
+/* -----------------------------------------------------
+   IDENTIDAD USUARIO
+----------------------------------------------------- */
+.user-identity {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.user-identity .name {
+  font-weight: 600;
+  color: #fff;
+}
+
+.user-identity .email {
+  font-size: 0.8rem;
+  color: #aaa;
+  word-break: break-all;
+}
+
+/* -----------------------------------------------------
+   BADGES
+----------------------------------------------------- */
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.badge-user {
+  background: rgba(70, 211, 105, 0.15);
+  color: #46d369;
+  border: 1px solid rgba(70, 211, 105, 0.4);
+}
+
+.badge-admin {
+  background: rgba(255, 180, 0, 0.2);
+  color: #ffb400;
+  border: 1px solid rgba(255, 180, 0, 0.5);
+}
+
+/* -----------------------------------------------------
+   BOTONES DE ACCIÓN
+----------------------------------------------------- */
+.action-btn {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff;
+  padding: 6px 8px;
+  margin-left: 5px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.85rem;
+}
+
+.action-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+}
+
+/* BOTÓN ELIMINAR */
+.action-btn[style*="#f44"],
+.action-btn.delete {
+  border-color: rgba(255, 70, 70, 0.6);
+  color: #ff4d4d;
+}
+
+.action-btn[style*="#f44"]:hover,
+.action-btn.delete:hover {
+  background: rgba(255, 70, 70, 0.15);
+  color: #fff;
+}
+
+/* -----------------------------------------------------
+   ESTADOS TEXTO
+----------------------------------------------------- */
+.user-table span {
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+/* =====================================================
+   PANEL DE CONTROL DE USUARIO (MODAL)
+   + ANIMACIÓN SUAVE
+===================================================== */
+
+#modal-usuario {
+  background: rgba(25, 25, 25, 0.72);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 16px;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.65);
+
+  animation: userPanelIn 0.35s ease forwards;
+  transform-origin: top center;
+}
+
+#modal-usuario h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 1px;
+}
+
+#modal-usuario .row > div {
+  background: rgba(255,255,255,0.035);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 14px;
+}
+
+/* -----------------------------------------------------
+   ANIMACIÓN APERTURA
+----------------------------------------------------- */
+@keyframes userPanelIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* -----------------------------------------------------
+   RESPONSIVE
+----------------------------------------------------- */
+@media (max-width: 900px) {
+  .user-table {
+    font-size: 0.85rem;
+  }
+
+  .action-btn {
+    padding: 5px 6px;
+  }
+}
