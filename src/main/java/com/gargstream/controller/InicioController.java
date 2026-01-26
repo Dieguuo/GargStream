@@ -29,7 +29,17 @@ public class InicioController {
     }
     //lo mismo pero con ver detalle
     @GetMapping("/ver_detalle.html")
-    public String verDetalle() {
-        return "ver_detalle"; // Carga templates/ver_detalle.html
+    public String verDetalle(@AuthenticationPrincipal UserDetails userDetails, Model model) {
+
+        // 1. Si hay usuario logueado, lo buscamos y lo pasamos al modelo
+        if (userDetails != null) {
+            Usuario usuario = usuarioRepository.findByEmail(userDetails.getUsername()).orElse(null);
+            model.addAttribute("usuario", usuario);
+        }
+
+        // 2. Si NO hay usuario (userDetails es null), simplemente no añadimos nada.
+        // Thymeleaf entenderá que 'usuario' es null y tratará al visitante como invitado.
+
+        return "ver_detalle";
     }
 }

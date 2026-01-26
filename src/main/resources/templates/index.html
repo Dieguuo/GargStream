@@ -136,6 +136,12 @@
 
 </div>
 
+<script th:inline="javascript">
+  /*<![CDATA[*/
+  const isUserAuthenticated = [[${#authorization.expression('isAuthenticated()')}]];
+  /*]]>*/
+</script>
+
 <script src="js/main.js"></script>
 
 </body>

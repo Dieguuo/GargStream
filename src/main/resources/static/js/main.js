@@ -30,7 +30,33 @@ document.addEventListener('DOMContentLoaded', () => {
     ])
     .then(([dataNovedades, dataCatalogo, dataMiLista, dataHistorial]) => {
         // 1. Renderizar Novedades
-        renderHeroSlider(dataNovedades);
+        //renderHeroSlider(dataNovedades); quitar si no hace falta
+
+        //invitado vs logueado
+        const usuarioLogueado = (typeof isUserAuthenticated !== 'undefined' && isUserAuthenticated);
+
+                if (!usuarioLogueado) {
+                    // --- MODO INVITADO: Solo tarjeta estática ---
+                    const staticSlide = [{
+                        id: 'intro-guest',
+                        titulo: "Bienvenido a GargStream",
+                        // Texto exacto solicitado por el profesor:
+                        sipnosis: "Esta aplicación permite consultar, buscar y gestionar información sobre películas, series y vídeos personales. Los usuarios pueden visualizar listados, acceder al detalle de cada elemento y realizar acciones según su rol. Para comenzar a visualizar contenido, regístrese o inicie sesión.",
+                        rutaFondo: "/img/fondo_cine.jpeg", // Asegúrate de tener esta imagen en tu carpeta static/img
+                        esStatic: true // Bandera importante para cambiar los botones luego
+                    }];
+
+                    // Renderizamos solo esta tarjeta.
+                    renderHeroSlider(staticSlide);
+
+                } else {
+                    // --- MODO USUARIO: Carrusel normal de novedades ---
+                    // Renderizamos las novedades tal cual vienen de la API
+                    renderHeroSlider(dataNovedades || []);
+                }
+
+
+
 
         // 2. Guardar datos globales
         catalogoCompleto = dataCatalogo || []; // Protección contra nulos
@@ -213,17 +239,51 @@ function renderHeroSlider(lista) {
         return;
     }
 
-    heroSlidesData = lista.slice(0, 5);
+    heroSlidesData = lista.slice(0, 10); // 10 novedades
     if(heroWrapper) heroWrapper.style.display = 'block';
 
     heroSlidesData.forEach((item, index) => {
         const slide = document.createElement('div');
-        slide.className = index === 0 ? 'hero-slide active' : 'hero-slide';
+
+        // =======================================================
+        // 1. CLASE ESPECIAL PARA CAMBIAR EL FORMATO (INVITADO)
+        // =======================================================
+        // Si es static, añadimos la clase 'guest-mode' para que el CSS
+        // sepa que debe centrar el texto y poner la caja de cristal.
+        let clasesSlide = index === 0 ? 'hero-slide active' : 'hero-slide';
+
+        if (item.esStatic) {
+            clasesSlide += ' guest-mode';
+        }
+
+        slide.className = clasesSlide;
+        // =======================================================
 
         let bgImage = item.rutaFondo ? item.rutaFondo : item.rutaCaratula;
         if(!bgImage) bgImage = 'https://via.placeholder.com/1920x800?text=GargStream'; // Fallback
 
         slide.style.backgroundImage = `url('${bgImage}')`;
+
+        // =======================================================
+        // 2. LÓGICA DE BOTONES (ESTÁTICA vs PELÍCULA NORMAL)
+        // =======================================================
+        let botonesHtml = '';
+        if (item.esStatic) {
+            // BOTONES PARA INVITADO (Login y Registro)
+            // Añadimos un div contenedor 'guest-buttons' para ayudar al CSS
+            botonesHtml = `
+                <div class="guest-buttons">
+                    <a href="/login" class="hero-btn btn-primary">Iniciar Sesión</a>
+                    <a href="/register" class="hero-btn btn-secondary">Registrarse</a>
+                </div>
+            `;
+        } else {
+            // BOTONES PARA USUARIO LOGUEADO (Reproducir)
+            botonesHtml = `
+                <a href="/ver_detalle.html?id=${item.id}" class="hero-btn btn-primary">▶ Reproducir</a>
+                <a href="/ver_detalle.html?id=${item.id}" class="hero-btn btn-secondary">Más Información</a>
+            `;
+        }
 
         slide.innerHTML = `
             <div class="hero-overlay"></div>
@@ -231,14 +291,14 @@ function renderHeroSlider(lista) {
                 <div class="hero-logo-title">${item.titulo}</div>
                 <div class="hero-desc">${item.sipnosis || 'Sin sinopsis disponible.'}</div>
                 <div class="hero-actions">
-                    <a href="/ver_detalle.html?id=${item.id}" class="hero-btn btn-primary">▶ Reproducir</a>
-                    <a href="/ver_detalle.html?id=${item.id}" class="hero-btn btn-secondary">Más Información</a>
+                    ${botonesHtml}
                 </div>
             </div>
         `;
         container.appendChild(slide);
 
-        if(indicators) {
+        // Indicadores (Puntos abajo) - Solo si hay más de 1 slide
+        if(indicators && heroSlidesData.length > 1) {
             const dot = document.createElement('div');
             dot.className = index === 0 ? 'indicator active' : 'indicator';
             dot.onclick = () => irASlide(index);
@@ -246,11 +306,13 @@ function renderHeroSlider(lista) {
         }
     });
 
+    // Flechas y Autoplay - Solo si hay más de 1 slide
     if (heroSlidesData.length > 1) {
         if(prevBtn) prevBtn.style.display = 'block';
         if(nextBtn) nextBtn.style.display = 'block';
         iniciarAutoPlay();
     } else {
+        // Si es estático (invitado), ocultamos flechas
         if(prevBtn) prevBtn.style.display = 'none';
         if(nextBtn) nextBtn.style.display = 'none';
     }

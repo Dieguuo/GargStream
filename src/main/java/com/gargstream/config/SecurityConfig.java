@@ -21,8 +21,7 @@ import java.io.IOException;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    // 1. ENCRIPTADOR DE CONTRASEÑAS
-    // Spring lo detecta y lo usa automáticamente.
+    // encriptador de contraseñas
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
@@ -49,45 +48,42 @@ public class SecurityConfig {
         };
     }
 
-    // 2. FILTRO DE SEGURIDAD
+    // filtros de segurididad
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         http
                 .authorizeHttpRequests(requests -> requests
-                        // Recursos estáticos (CSS, JS, Imágenes) y Uploads (Carátulas)
+                        // recursos estáticos y uploads
                         .requestMatchers("/css/**", "/js/**", "/img/**", "/logo.svg", "/error/**", "/uploads/**").permitAll()
 
-                        // Rutas Públicas: Inicio, Login, Registro, Detalles y H2 Console
+                        // rutas públicas
                         .requestMatchers("/", "/index", "/index.html", "/api/public/**", "/api/archivos/**", "/ver_detalle.html", "/register", "/login", "/recuperar", "/h2-console/**").permitAll()
 
-                        // Rutas Privadas (Admin)
+                        // rutas provadas admin
                         .requestMatchers("/admin.html", "/api/admin/**").hasAuthority("ADMIN")
 
-                        // Rutas Privadas (Funcionalidades de Usuario: Historial y Favoritos)
                         .requestMatchers("/api/historial/**", "/api/lista/**").authenticated()
 
-                        // Resto protegido (Todo lo demás requiere login)
+                        // todo lo demás requiere el logueo
                         .anyRequest().authenticated()
                 )
-                // Formulario de login
+                // formulario de login
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .defaultSuccessUrl("/index.html", true) // Al entrar, te manda al inicio
+                        .defaultSuccessUrl("/index.html", true) // al entrar, te manda al inicio
                         .failureHandler(falloPersonalizadoHandler())
                         .permitAll() // Todos pueden ver el login
                 )
-                // Cerrar sesión
+                // cerrar sesión
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/index.html") // Al salir, te manda al inicio (modo invitado)
+                        .logoutSuccessUrl("/index.html") // al salir, te manda al inicio en modo invitado
                         .permitAll()
                 );
 
         // Desactivar CSRF para que funcionen las peticiones POST de Javascript (Latido y Favoritos)
         http.csrf(csrf -> csrf.disable());
 
-        // Permitir Frames (Necesario para que la consola H2 funcione)
-        // CORRECCIÓN AQUÍ: Se usa una lambda dentro de frameOptions
         http.headers(headers -> headers.frameOptions(frame -> frame.disable()));
 
         return http.build();

@@ -154,11 +154,7 @@ function renderizarDetalle(c) {
 
     // --- CORRECCIÓN 2: PROTECCIÓN BOTÓN TRÁILER ---
     if(youtubeId) {
-        if (estaLogueado) {
-            html += `<button onclick="verTrailer('${youtubeId}')" class="btn-trailer">🎬 Ver Tráiler</button>`;
-        } else {
-            html += `<button onclick="window.location.href='/login'" class="btn-trailer" style="background-color:#333; color:#888;">Tráiler</button>`;
-        }
+        html += `<button onclick="verTrailer('${youtubeId}')" class="btn-trailer">🎬 Ver Tráiler</button>`;
     }
 
     html += `</div></div></div>`;

@@ -31,7 +31,7 @@
             background-attachment: fixed;
         }
 
-        /* --- BOTÓN REGRESAR (ESTILO CÁPSULA) --- */
+        /* --- BOTÓN REGRESAR --- */
         .btn-regresar {
             position: fixed;
             top: 30px;
@@ -130,7 +130,7 @@
             display: flex;
             justify-content: center;
             gap: 12px;
-            margin-bottom: 30px;
+            margin-bottom: 10px; /* Reducido para dejar espacio al error */
             flex-wrap: wrap;
         }
 
@@ -154,6 +154,24 @@
             opacity: 1;
             transform: scale(1.2);
             box-shadow: 0 0 20px rgba(255, 180, 0, 0.4);
+        }
+
+        /* ERROR VISUAL AVATAR */
+        #avatar-error {
+            color: #ff555e;
+            font-size: 0.9em;
+            text-align: center;
+            display: none; /* Se activa con JS */
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
         }
 
         /* --- BOTÓN REGISTRO --- */
@@ -227,11 +245,12 @@
         <span th:text="${error}"></span>
     </div>
 
-    <form action="/register" method="POST">
+    <form action="/register" method="POST" onsubmit="return validarFormulario(event)">
 
         <div class="form-group">
             <div class="avatar-section-title">Elige tu Avatar</div>
             <input type="hidden" id="avatarUrl" name="avatarUrl" value="">
+
             <div class="avatar-selection">
                 <img src="/img/avatars/1.png" class="avatar-option" onclick="seleccionarAvatar(this, '/img/avatars/1.png')" alt="Avatar 1">
                 <img src="/img/avatars/2.png" class="avatar-option" onclick="seleccionarAvatar(this, '/img/avatars/2.png')" alt="Avatar 2">
@@ -239,6 +258,8 @@
                 <img src="/img/avatars/4.png" class="avatar-option" onclick="seleccionarAvatar(this, '/img/avatars/4.png')" alt="Avatar 4">
                 <img src="/img/avatars/5.png" class="avatar-option" onclick="seleccionarAvatar(this, '/img/avatars/5.png')" alt="Avatar 5">
             </div>
+
+            <div id="avatar-error"></div>
         </div>
 
         <div class="form-group">
@@ -265,13 +286,50 @@
 </div>
 
 <script>
-    function seleccionarAvatar(elementoImg, ruta) {
-        // Quitar selección previa
-        document.querySelectorAll('.avatar-option').forEach(img => img.classList.remove('selected'));
-        // Marcar la nueva
-        elementoImg.classList.add('selected');
-        // Actualizar el valor del input para el servidor
-        document.getElementById('avatarUrl').value = ruta;
+    // 1. Función para seleccionar visualmente y guardar el valor
+    function seleccionarAvatar(imgElemento, urlAvatar) {
+        // a) Quitar la clase 'selected' de todos los avatares
+        document.querySelectorAll('.avatar-option').forEach(img => {
+            img.classList.remove('selected');
+        });
+
+        // b) Poner la clase 'selected' al que hemos clicado
+        imgElemento.classList.add('selected');
+
+        // c) Guardar la URL en el input oculto
+        const inputOculto = document.getElementById('avatarUrl');
+        inputOculto.value = urlAvatar;
+
+        // d) Si había error visible, lo quitamos porque ya ha elegido
+        const errorMsg = document.getElementById('avatar-error');
+        if(errorMsg) errorMsg.style.display = 'none';
+    }
+
+    // 2. Función para validar antes de enviar
+    function validarFormulario(event) {
+        const avatarValue = document.getElementById('avatarUrl').value;
+
+        if (!avatarValue || avatarValue.trim() === "") {
+            // DETENER EL ENVÍO
+            event.preventDefault();
+
+            // Mostrar mensaje de error
+            const errorMsg = document.getElementById('avatar-error');
+            if(errorMsg) {
+                errorMsg.style.display = 'block';
+                errorMsg.innerText = "⚠️ Por favor, elige un avatar para continuar.";
+            }
+
+            // Efecto visual de "temblor"
+            const contenedor = document.querySelector('.avatar-selection');
+            if(contenedor) {
+                contenedor.style.animation = "shake 0.5s";
+                setTimeout(() => contenedor.style.animation = "", 500);
+            }
+
+            return false;
+        }
+        return true;
     }
 </script>
 
