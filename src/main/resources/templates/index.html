@@ -41,7 +41,8 @@
         <div class="dropdown-header">Hola, <span th:text="${usuario.nombre}">Usuario</span></div>
         <a href="/perfil" class="dropdown-item">Mi Perfil</a>
 
-        <a href="admin.html" class="dropdown-item admin-link" sec:authorize="hasAuthority('ADMIN')">Panel Admin</a>
+        <!--<a href="admin" class="dropdown-item admin-link" sec:authorize="hasAuthority('ADMIN')">Panel Admin</a>-->
+        <a th:href="@{/admin}" class="dropdown-item">Panel Admin</a>
 
         <form th:action="@{/logout}" method="post" style="margin: 0;">
           <button type="submit" class="btn-logout-menu">Cerrar Sesión</button>

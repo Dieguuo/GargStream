@@ -8,9 +8,7 @@
  * - Borrado de contenido
  */
 
-// ================================
-// 4. CARGAR SERIES EN SELECTOR
-// ================================
+// cargar las series en el selector
 async function cargarSeriesEnSelector() {
   const sel = document.getElementById('selector-series');
   sel.innerHTML = '<option>Cargando...</option>';
@@ -19,7 +17,7 @@ async function cargarSeriesEnSelector() {
     const r = await fetch('/api/public/catalogo');
     const data = await r.json();
 
-    // Filtro: solo series (sin vídeo y sin ser capítulo)
+    // filtro: solo las series, que no se metan los caps
     const series = data.filter(i => !i.rutaVideo && i.numeroCapitulo == null);
 
     sel.innerHTML = '<option value="" disabled selected>-- Elige Serie --</option>';
@@ -41,9 +39,7 @@ async function cargarSeriesEnSelector() {
   }
 }
 
-// ================================
-// 5. GRID DE CONTENIDO PARA EDICIÓN
-// ================================
+// grid de contneido
 async function cargarContenidoParaEditar() {
   cerrarEditor();
 
@@ -54,7 +50,7 @@ async function cargarContenidoParaEditar() {
     const r = await fetch('/api/public/catalogo');
     const data = await r.json();
 
-    // Filtro: ocultar capítulos sueltos
+    // filtro: ocultar lso caps sueltos
     const items = data.filter(i => i.numeroCapitulo == null);
 
     grid.innerHTML = '';
@@ -79,9 +75,7 @@ async function cargarContenidoParaEditar() {
   }
 }
 
-// ================================
-// 6. EDITOR DE CONTENIDO
-// ================================
+// editar contenido
 async function abrirEditor(id) {
   document.getElementById('grid-edicion').style.display = 'none';
 
@@ -89,7 +83,7 @@ async function abrirEditor(id) {
   form.style.display = 'block';
   form.scrollIntoView({ behavior: 'smooth' });
 
-  // Limpiar lista de capítulos
+  // quitar los caps de la lista
   const divCaps = document.getElementById('lista-capitulos-gestion');
   if (divCaps) {
     divCaps.style.display = 'none';
@@ -108,13 +102,11 @@ async function abrirEditor(id) {
     document.getElementById('edit-trailer').value =
       data.youtubeTrailerId || '';
 
-    // ================================
-    // SI ES SERIE → LISTAR CAPÍTULOS
-    // ================================
+    //si es serie listar caps
     if (data.temporadas && data.temporadas.length > 0 && divCaps) {
       divCaps.style.display = 'block';
 
-      let html = '<h3 style="color:#aaa; margin-top:0;">📺 Capítulos</h3>';
+      let html = '<h3 style="color:#aaa; margin-top:0;">Capítulos</h3>';
 
       data.temporadas.forEach(temp => {
         if (temp.capitulos) {
@@ -141,7 +133,7 @@ async function abrirEditor(id) {
                     padding:3px 8px;
                     cursor:pointer;
                   ">
-                  🗑️
+                  Borrar
                 </button>
               </div>
             `;
@@ -169,13 +161,8 @@ function cerrarEditor() {
   if (divCaps) divCaps.innerHTML = '';
 }
 
-// ================================
-// 8. FUNCIONES DE BORRADO
-// ================================
 
-// --------------------------------
-// A) BORRAR SERIE / PELÍCULA ENTERA
-// --------------------------------
+// borrar serie/peli entera
 async function ejecutarBorradoTotal() {
   console.log("Intentando borrar contenido...");
 
@@ -187,48 +174,46 @@ async function ejecutarBorradoTotal() {
     return;
   }
 
-  if (!confirm(
-    `⚠️ ¿ELIMINAR DEFINITIVAMENTE "${titulo}"?\n` +
-    `Se borrará todo: archivos, historial, favoritos y capítulos.`
-  )) return;
+  if (!confirm(`¿ELIMINAR DEFINITIVAMENTE "${titulo}"?\nSe borrará todo: archivos, historial, favoritos y capítulos.`)) return;
 
   try {
+    // 🟢 AÑADIR CABECERAS CSRF
     const r = await fetch(`/api/admin/eliminar-contenido/${id}`, {
-      method: 'DELETE'
-    });
+      method: 'DELETE',
+      headers: getAuthHeaders()
 
     if (r.ok) {
-      alert("✅ Contenido eliminado correctamente.");
+      alert("Contenido eliminado correctamente.");
       cerrarEditor();
       cargarContenidoParaEditar();
-      cargarMetricas();
+      if(typeof cargarMetricas === 'function') cargarMetricas();
     } else {
-      alert("❌ Error al eliminar: " + await r.text());
+      alert("Error al eliminar: " + await r.text());
     }
 
   } catch (e) {
-    alert("❌ Error de conexión al borrar.");
+    console.error(e);
+    alert("Error de conexión al borrar.");
   }
 }
 
-// --------------------------------
-// B) BORRAR CAPÍTULO SUELTO
-// --------------------------------
+// borrar un cap suelto
 async function ejecutarBorradoCapitulo(idCap, titulo) {
-  if (!confirm(`⚠️ ¿Borrar capítulo "${titulo}"?`)) return;
+  if (!confirm(`¿Borrar capítulo "${titulo}"?`)) return;
 
   try {
+    // 🟢 AÑADIR CABECERAS CSRF
     const r = await fetch(`/api/admin/eliminar-contenido/${idCap}`, {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: getAuthHeaders()
     });
 
     if (r.ok) {
       alert("Capítulo eliminado.");
-
-      // Recargar editor del padre
+      // recargar editor del padre
       const idPadre = document.getElementById('edit-id').value;
       abrirEditor(idPadre);
-      cargarMetricas();
+      if(typeof cargarMetricas === 'function') cargarMetricas();
     } else {
       alert("Error: " + await r.text());
     }
@@ -236,4 +221,33 @@ async function ejecutarBorradoCapitulo(idCap, titulo) {
   } catch (e) {
     alert("Error conexión");
   }
+}
+
+
+//filtrar en editor /gestion de contenido
+function filtrarContenidoAdmin() {
+    // obtener lo que ha escrito el usuario
+    const input = document.getElementById('buscadorAdmin');
+    const filtro = input.value.toLowerCase(); // convertir a minúsculas para comparar mejor
+
+    // obtener el contenedor y las tarjetas
+    const grid = document.getElementById('gridAdmin');
+    const tarjetas = document.querySelectorAll('.card-edit');
+
+    // recorrer todas las tarjetas
+    tarjetas.forEach(tarjeta => {
+        // buscar el título
+        const titulo = tarjeta.querySelector('p');
+
+        if (titulo) {
+            const textoTitulo = titulo.textContent || titulo.innerText;
+
+            // comparar
+            if (textoTitulo.toLowerCase().indexOf(filtro) > -1) {
+                tarjeta.style.display = "";
+            } else {
+                tarjeta.style.display = "none"; // ocultar
+            }
+        }
+    });
 }

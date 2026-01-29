@@ -1,19 +1,19 @@
-// --- VARIABLES GLOBALES ---
+// variable globales
 let catalogoCompleto = [];
 let miListaCompleta = [];
 let historialCompleto = [];
 
-// Variables Hero Slider
+//variables del carrusel de novedades
 let currentHeroIndex = 0;
 let heroSlidesData = [];
 let heroInterval = null;
 
-// --- 1. CARGA INICIAL (CON LOADER) ---
+// carga inicial
 document.addEventListener('DOMContentLoaded', () => {
 
     const loader = document.getElementById('main-loader');
 
-    // FUNCIÓN SEGURA
+    // función segura
     const fetchSafe = (url) =>
         fetch(url)
             .then(res => {
@@ -29,54 +29,52 @@ document.addEventListener('DOMContentLoaded', () => {
         fetchSafe('/api/historial/continuar-viendo')
     ])
     .then(([dataNovedades, dataCatalogo, dataMiLista, dataHistorial]) => {
-        // 1. Renderizar Novedades
-        //renderHeroSlider(dataNovedades); quitar si no hace falta
+        // renderizar novedades
 
         //invitado vs logueado
         const usuarioLogueado = (typeof isUserAuthenticated !== 'undefined' && isUserAuthenticated);
 
                 if (!usuarioLogueado) {
-                    // --- MODO INVITADO: Solo tarjeta estática ---
+                    // modo invitado tarjeta estática
                     const staticSlide = [{
                         id: 'intro-guest',
                         titulo: "Bienvenido a GargStream",
-                        // Texto exacto solicitado por el profesor:
                         sipnosis: "Esta aplicación permite consultar, buscar y gestionar información sobre películas, series y vídeos personales. Los usuarios pueden visualizar listados, acceder al detalle de cada elemento y realizar acciones según su rol. Para comenzar a visualizar contenido, regístrese o inicie sesión.",
-                        rutaFondo: "/img/fondo_cine.jpeg", // Asegúrate de tener esta imagen en tu carpeta static/img
-                        esStatic: true // Bandera importante para cambiar los botones luego
+                        rutaFondo: "/img/fondo_cine.jpeg",
+                        esStatic: true
                     }];
 
-                    // Renderizamos solo esta tarjeta.
+                    // renderizar solo la tarjeta estática
                     renderHeroSlider(staticSlide);
 
                 } else {
-                    // --- MODO USUARIO: Carrusel normal de novedades ---
-                    // Renderizamos las novedades tal cual vienen de la API
+                    // modo logueado
+                    // renderizar las novedades
                     renderHeroSlider(dataNovedades || []);
                 }
 
 
 
 
-        // 2. Guardar datos globales
-        catalogoCompleto = dataCatalogo || []; // Protección contra nulos
+        // guardar datos globales
+        catalogoCompleto = dataCatalogo || [];
         miListaCompleta = dataMiLista || [];
 
-        // Aplanar el historial
+        // aplanar el historial
         historialCompleto = (dataHistorial || []).map(h => {
             if(!h.contenido) return null;
             return {
                 ...h.contenido,
                 porcentajeVisto: h.porcentaje,
-                informacionExtra: h.informacionExtra // Añadido para que se vea T1:E1
+                informacionExtra: h.informacionExtra
             };
         }).filter(h => h !== null);
 
-        // 3. Generar filtros y distribuir contenido
+        // generar filtros y distribuir el contneido
         generarFiltros(catalogoCompleto);
         distribuirCatalogo(catalogoCompleto);
 
-        // 4. Renderizar Mi Lista y Historial
+        // renderizar mi lista e historial
         actualizarFilaMiLista(miListaCompleta);
         actualizarFilaHistorial(historialCompleto);
     })
@@ -84,7 +82,6 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error("Error cargando la web:", err);
     })
     .finally(() => {
-        // --- ESTO ES LO NUEVO: QUITA EL LOADER SIEMPRE ---
         if(loader) {
             loader.style.opacity = '0';
             setTimeout(() => {
@@ -93,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- LISTENER DEL BUSCADOR ---
+    // listener del buscador
     const buscador = document.getElementById('buscador');
     if(buscador){
         buscador.addEventListener('keyup', (e) => {
@@ -106,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// --- FUNCIÓN CENTRAL DE FILTRADO ---
+// función central de filtrado
 function aplicarFiltrosGlobales(textoBusqueda, generoSeleccionado) {
     const hero = document.getElementById('hero-section');
     const esBusquedaTexto = textoBusqueda.length > 0;
@@ -157,12 +154,11 @@ function actualizarFilaHistorial(lista) {
     }
 }
 
-// --- 2. GENERADOR DE FILTROS ---
+// generador de filtros
 function generarFiltros(lista) {
     const contenedor = document.getElementById('filter-bar');
     if(!contenedor) return;
 
-    // Limpiar manteniendo el "Todos" si quieres, o rehacerlo
     contenedor.innerHTML = '<div class="filter-chip active" onclick="filtrarPorGenero(\'Todos\', this)">Todos</div>';
 
     const generos = new Set();
@@ -193,10 +189,8 @@ function filtrarPorGenero(genero, elementoChip) {
     aplicarFiltrosGlobales("", genero);
 }
 
-// --- 3. DISTRIBUCIÓN FILAS ---
+// distribución de filas
 function distribuirCatalogo(lista) {
-    // MODIFICADO: Añadido filtro 'item.numeroCapitulo == null' para que los capítulos
-    // no aparezcan sueltos en videos personales.
 
     const pelis = lista.filter(item =>
         item.rutaVideo && item.director && item.numeroCapitulo == null
@@ -220,7 +214,7 @@ function toggleFila(idSeccion, items) {
     if(seccion) seccion.style.display = items.length === 0 ? 'none' : 'block';
 }
 
-// --- 4. HERO SLIDER ---
+// carrusel de novedades
 function renderHeroSlider(lista) {
     const heroWrapper = document.getElementById('hero-section');
     const container = document.getElementById('hero-slider-container');
@@ -228,7 +222,7 @@ function renderHeroSlider(lista) {
     const prevBtn = document.getElementById('hero-prev');
     const nextBtn = document.getElementById('hero-next');
 
-    if(!container) return; // Protección
+    if(!container) return;
 
     container.innerHTML = "";
     if(indicators) indicators.innerHTML = "";
@@ -239,17 +233,14 @@ function renderHeroSlider(lista) {
         return;
     }
 
-    heroSlidesData = lista.slice(0, 10); // 10 novedades
+    heroSlidesData = lista.slice(0, 10);//10 novedades
     if(heroWrapper) heroWrapper.style.display = 'block';
 
     heroSlidesData.forEach((item, index) => {
         const slide = document.createElement('div');
 
-        // =======================================================
-        // 1. CLASE ESPECIAL PARA CAMBIAR EL FORMATO (INVITADO)
-        // =======================================================
-        // Si es static, añadimos la clase 'guest-mode' para que el CSS
-        // sepa que debe centrar el texto y poner la caja de cristal.
+        // clase para cambiar al modo invitado
+        // si es staic se añade el guest mode para que el css lo sepa
         let clasesSlide = index === 0 ? 'hero-slide active' : 'hero-slide';
 
         if (item.esStatic) {
@@ -257,20 +248,16 @@ function renderHeroSlider(lista) {
         }
 
         slide.className = clasesSlide;
-        // =======================================================
 
         let bgImage = item.rutaFondo ? item.rutaFondo : item.rutaCaratula;
-        if(!bgImage) bgImage = 'https://via.placeholder.com/1920x800?text=GargStream'; // Fallback
+        if(!bgImage) bgImage = 'https://via.placeholder.com/1920x800?text=GargStream';
 
         slide.style.backgroundImage = `url('${bgImage}')`;
 
-        // =======================================================
-        // 2. LÓGICA DE BOTONES (ESTÁTICA vs PELÍCULA NORMAL)
-        // =======================================================
+        // lógica de botones invitado y logueado
         let botonesHtml = '';
         if (item.esStatic) {
-            // BOTONES PARA INVITADO (Login y Registro)
-            // Añadimos un div contenedor 'guest-buttons' para ayudar al CSS
+            // botones para invitado
             botonesHtml = `
                 <div class="guest-buttons">
                     <a href="/login" class="hero-btn btn-primary">Iniciar Sesión</a>
@@ -278,7 +265,7 @@ function renderHeroSlider(lista) {
                 </div>
             `;
         } else {
-            // BOTONES PARA USUARIO LOGUEADO (Reproducir)
+            // botones para logueado
             botonesHtml = `
                 <a href="/ver_detalle.html?id=${item.id}" class="hero-btn btn-primary">▶ Reproducir</a>
                 <a href="/ver_detalle.html?id=${item.id}" class="hero-btn btn-secondary">Más Información</a>
@@ -297,7 +284,7 @@ function renderHeroSlider(lista) {
         `;
         container.appendChild(slide);
 
-        // Indicadores (Puntos abajo) - Solo si hay más de 1 slide
+        // indicadores sis hay más de una ficha
         if(indicators && heroSlidesData.length > 1) {
             const dot = document.createElement('div');
             dot.className = index === 0 ? 'indicator active' : 'indicator';
@@ -306,13 +293,13 @@ function renderHeroSlider(lista) {
         }
     });
 
-    // Flechas y Autoplay - Solo si hay más de 1 slide
+    //flechas
     if (heroSlidesData.length > 1) {
         if(prevBtn) prevBtn.style.display = 'block';
         if(nextBtn) nextBtn.style.display = 'block';
         iniciarAutoPlay();
     } else {
-        // Si es estático (invitado), ocultamos flechas
+        // si es static que no haya flechas
         if(prevBtn) prevBtn.style.display = 'none';
         if(nextBtn) nextBtn.style.display = 'none';
     }
@@ -347,34 +334,48 @@ function reiniciarAutoPlay() {
     if (heroSlidesData.length > 1) iniciarAutoPlay();
 }
 
-// --- 5. RENDERIZADO FILAS ESTÁNDAR ---
+// Renderizado de filas estándar
 function renderRow(lista, containerId) {
     const container = document.getElementById(containerId);
-    if(!container) return;
+    if (!container) return;
 
     container.innerHTML = "";
 
-    // >>> CORRECCIÓN AQUÍ <<<
-    // Detectamos si el scroll es horizontal o si debe ser vertical
+    // detectar si el scroll es vertical u horizontal
     container.addEventListener('wheel', (evt) => {
-        // ¿Hay contenido desbordado? (El contenido es más ancho que la ventana visible)
         const hayDesbordamiento = container.scrollWidth > container.clientWidth;
 
         if (hayDesbordamiento) {
-            // Si hay desbordamiento, bloqueamos el scroll vertical y movemos la fila
+            // si se pasa de ancho se pone scroll horizontal
             evt.preventDefault();
             container.scrollLeft += evt.deltaY;
         }
-        // Si NO hay desbordamiento, no hacemos nada y el navegador hace scroll vertical normal
+        // si no, vertical
     });
-    // >>> FIN CORRECCIÓN <<<
 
     lista.forEach(item => {
+        // aseguramos que item.id sea correcto (a veces viene en item.contenido.id dependiendo del DTO)
+        const idContenido = item.contenido ? item.contenido.id : item.id;
+        const titulo = item.contenido ? item.contenido.titulo : item.titulo;
+
         const img = item.rutaCaratula || 'https://via.placeholder.com/160x240?text=No+Img';
-        const link = `/ver_detalle.html?id=${item.id}`;
+        const link = `/ver_detalle.html?id=${idContenido}`;
         const rating = item.puntuacionMedia ? `⭐ ${item.puntuacionMedia}` : '';
 
-        // Barra de progreso y Etiqueta de episodio (T1:E1)
+        //boton para borrar el continuar viendo
+        let botonEliminarHTML = '';
+
+        if (containerId === 'row-historial') {
+            botonEliminarHTML = `
+                <div class="btn-remove-history"
+                     onclick="eliminarDeContinuarViendo(${idContenido}, this, event)"
+                     title="Quitar de seguir viendo">
+                     ✕
+                </div>
+            `;
+        }
+
+        // barra de progreso y etiqueta
         let barraHtml = '';
         let infoExtraHtml = '';
 
@@ -382,31 +383,61 @@ function renderRow(lista, containerId) {
             infoExtraHtml = `<div class="episode-tag" style="position:absolute; top:5px; right:5px; background:rgba(0,0,0,0.7); color:white; padding:2px 5px; font-size:0.8em; border-radius:3px;">${item.informacionExtra}</div>`;
         }
 
-        if (item.porcentajeVisto !== undefined && item.porcentajeVisto > 0) {
+        const porcentaje = item.porcentaje || item.porcentajeVisto;
+
+        if (porcentaje !== undefined && porcentaje > 0) {
             barraHtml = `
                 <div class="progress-container">
-                    <div class="progress-bar" style="width: ${item.porcentajeVisto}%"></div>
+                    <div class="progress-bar" style="width: ${porcentaje}%"></div>
                 </div>
             `;
         }
 
         const div = document.createElement('div');
         div.className = 'standard-card';
+
         div.innerHTML = `
             <div onclick="window.location.href='${link}'">
                 <div class="img-wrapper" style="position:relative;">
-                    <img src="${img}" loading="lazy" alt="${item.titulo}">
-                    ${infoExtraHtml}
+                    <img src="${img}" loading="lazy" alt="${titulo}">
+
+                    ${botonEliminarHTML} ${infoExtraHtml}
                     ${barraHtml}
+
                 </div>
                 <div class="standard-info">
-                      <div class="st-title">${item.titulo}</div>
+                      <div class="st-title">${titulo}</div>
                       <div class="st-rating">${rating}</div>
                   </div>
               </div>
           `;
           container.appendChild(div);
       });
+}
+
+function eliminarDeContinuarViendo(idContenido, elementoBoton, event) {
+    event.stopPropagation();
+    event.preventDefault();
+
+    if (!confirm("¿Quieres quitar este título de 'Continuar viendo'?")) return;
+
+    fetch(`/api/historial/eliminar?idContenido=${idContenido}`, {
+        method: 'DELETE'
+    })
+    .then(res => {
+        if (res.ok) {
+            const tarjeta = elementoBoton.closest('.standard-card');
+            if (tarjeta) {
+                tarjeta.style.transition = '0.3s';
+                tarjeta.style.opacity = '0';
+                tarjeta.style.transform = 'scale(0.8)';
+                setTimeout(() => tarjeta.remove(), 300);
+            }
+        } else {
+            console.error("Error al eliminar");
+        }
+    })
+    .catch(err => console.error(err));
 }
 
 function deslizarFila(idContainer, direccion) {
@@ -418,3 +449,35 @@ function deslizarFila(idContainer, direccion) {
 }
 
 function resetearVista() { window.location.reload(); }
+
+
+
+// lógica del menú de usuario
+document.addEventListener('DOMContentLoaded', () => {
+
+    // localizar el avatar
+    const avatar = document.querySelector('.user-menu-container .avatar-circle');
+    const dropdown = document.querySelector('.dropdown-content');
+
+    if (avatar && dropdown) {
+
+        //al hacer click en el avatar
+        avatar.addEventListener('click', (e) => {
+            // para que no se cierre si se sale el mouse del menú
+            e.stopPropagation();
+            dropdown.classList.toggle('show');
+        });
+
+        // al hacer click en cualquier otro sitio
+        window.addEventListener('click', (e) => {
+            // si el menú está abierto
+            if (dropdown.classList.contains('show')) {
+                // y el click no ha sido dentro del menú
+                if (!dropdown.contains(e.target) && e.target !== avatar) {
+                    //se cierra
+                    dropdown.classList.remove('show');
+                }
+            }
+        });
+    }
+});

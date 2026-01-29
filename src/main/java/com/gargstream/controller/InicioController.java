@@ -17,7 +17,7 @@ public class InicioController {
         this.usuarioRepository = usuarioRepository;
     }
 
-    // Gestiona todas las formas de llamar al inicio
+    // gestiona todas las formas de llamar al inicio
     @GetMapping({"/", "/index", "/index.html"})
     public String inicio(@AuthenticationPrincipal UserDetails userDetails, Model model) {
         //si hay alguien logueado se ponga su perfil
@@ -25,20 +25,17 @@ public class InicioController {
             Usuario usuario = usuarioRepository.findByEmail(userDetails.getUsername()).orElse(null);
             model.addAttribute("usuario", usuario);
         }
-        return "index"; // Esto carga templates/index.html procesando Thymeleaf
+        return "index";
     }
     //lo mismo pero con ver detalle
     @GetMapping("/ver_detalle.html")
     public String verDetalle(@AuthenticationPrincipal UserDetails userDetails, Model model) {
 
-        // 1. Si hay usuario logueado, lo buscamos y lo pasamos al modelo
+        // si hay un usuario logueado se busca y se le pasa al modelo
         if (userDetails != null) {
             Usuario usuario = usuarioRepository.findByEmail(userDetails.getUsername()).orElse(null);
             model.addAttribute("usuario", usuario);
         }
-
-        // 2. Si NO hay usuario (userDetails es null), simplemente no añadimos nada.
-        // Thymeleaf entenderá que 'usuario' es null y tratará al visitante como invitado.
 
         return "ver_detalle";
     }

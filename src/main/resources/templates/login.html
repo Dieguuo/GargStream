@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar sesión | GargStream</title>
+    <title>Iniciar sesión - GargStream</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -211,7 +211,7 @@
 
     <div th:if="${param.error}" class="error-msg">
         <span th:if="${param.error[0] == 'blocked'}">
-            ⛔ <strong>ACCESO DENEGADO</strong><br>
+            <strong>ACCESO DENEGADO</strong><br>
             Tu cuenta ha sido bloqueada.
         </span>
         <span th:if="${param.error[0] != 'blocked'}">

@@ -1,9 +1,9 @@
-/* =====================================================
-   ADMIN EDITOR
-   Grid de edición y panel de edición de contenido
-   ===================================================== */
+/*
+   admin editor
+   grid de edición y panel de edición de contenido
+*/
 
-/* ======================= GRID DE CONTENIDO ======================= */
+/* grid de contenido*/
 
 .grid-content {
   display: grid;
@@ -13,7 +13,7 @@
   justify-items: center;
 }
 
-/* ======================= TARJETA DE CONTENIDO ======================= */
+/* tarjeta de contenido*/
 
 .card-edit {
   width: 100%;
@@ -26,6 +26,13 @@
   cursor: pointer;
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45);
+
+  /*para que se amplie */
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    min-height: 100%;
+
   transition:
     transform 0.25s ease,
     box-shadow 0.25s ease,
@@ -38,7 +45,7 @@
   border-color: var(--accent-color);
 }
 
-/* ======================= IMAGEN / CARÁTULA ======================= */
+/* carátula*/
 
 .card-edit img {
   width: 100%;
@@ -46,9 +53,11 @@
   object-fit: cover;
   display: block;
   background: #111;
+
+  flex-shrink: 0;
 }
 
-/* ======================= TÍTULO SOBRE CARÁTULA ======================= */
+/*título sobre la carátula*/
 
 .card-edit p {
   margin: 0;
@@ -57,22 +66,23 @@
   font-weight: 600;
   color: #fff;
   text-align: center;
-  background:
-    linear-gradient(
-      to top,
-      rgba(0, 0, 0, 0.85),
-      rgba(0, 0, 0, 0.25),
-      transparent
-    );
+
+  /* fondo sólido para tapar el gris de la tarjeta */
+  background: #1a1a1a;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* ======================= EFECTO DE SELECCIÓN / FOCUS ======================= */
+/*efecto de selección*/
 
 .card-edit:active {
   transform: scale(1.02);
 }
 
-/* ======================= FORMULARIO DE EDICIÓN ======================= */
+/* formulario de edicción*/
 
 .edit-form-container {
   background: rgba(18, 18, 18, 0.85);
@@ -92,7 +102,7 @@
   letter-spacing: 1px;
 }
 
-/* ======================= LISTA DE CAPÍTULOS ======================= */
+/* lista de caps*/
 
 #lista-capitulos-gestion {
   background: rgba(0, 0, 0, 0.25);
@@ -115,7 +125,7 @@
   background: rgba(255, 255, 255, 0.08);
 }
 
-/* ======================= BOTÓN ELIMINAR TOTAL ======================= */
+/* btn de eliminar */
 
 .btn-eliminar {
   background: transparent;
@@ -137,7 +147,7 @@
   transform: translateY(-1px);
 }
 
-/* ======================= ANIMACIÓN ======================= */
+/* animación */
 
 @keyframes fadeIn {
   from {
@@ -150,7 +160,7 @@
   }
 }
 
-/* ======================= RESPONSIVE ======================= */
+/* responsive */
 
 @media (max-width: 600px) {
   .grid-content {
@@ -161,4 +171,38 @@
   .card-edit img {
     height: 240px;
   }
+}
+
+
+
+/*buscador del admin */
+
+.admin-search-wrapper {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto 30px auto;
+  position: relative;
+}
+
+#buscadorAdmin {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 50px;
+  font-size: 1rem;
+  outline: none;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(5px);
+}
+
+#buscadorAdmin:focus {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: #ffb400;
+  box-shadow: 0 0 15px rgba(255, 180, 0, 0.2);
+}
+
+#buscadorAdmin::placeholder {
+  color: #aaa;
 }

@@ -141,14 +141,14 @@ public class PerfilController {
 
     }
 
-    // Método auxiliar para limpiar los campos temporales
+    // método auxiliar para limpiar los campos temporales
     private void limpiarDatosVerificacion(Usuario usuario) {
         usuario.setCodigoVerificacion(null);
         usuario.setExpiracionCodigo(null);
         usuario.setNuevoEmailPendiente(null);
         usuarioRepository.save(usuario);
     }
-    // Generador de código simple
+    // generador de código simple
     private String generarCodigoAleatorio() {
         String caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         StringBuilder sb = new StringBuilder();
@@ -195,10 +195,8 @@ public class PerfilController {
                     Files.createDirectories(rutaDirectorio);
                 }
 
-                // Guardar en la carpeta original (src)
                 Files.copy(archivo.getInputStream(), rutaCompleta, StandardCopyOption.REPLACE_EXISTING);
 
-                // Definimos la variable rutaTarget que faltaba
                 Path rutaTarget = Paths.get("target/classes/static/img").resolve(nombreArchivo);
 
                 if (Files.exists(rutaTarget.getParent())) Files.copy(archivo.getInputStream(), rutaTarget, StandardCopyOption.REPLACE_EXISTING);

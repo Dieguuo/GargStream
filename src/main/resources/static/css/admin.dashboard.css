@@ -1,11 +1,9 @@
-/* =====================================================
-   ADMIN DASHBOARD
-   Métricas / Tarjetas / Disco
-   ===================================================== */
+/*
+   admin dashboard
+   métricas / tarjetas / disco
+*/
 
-/* -------------------------
-   TÍTULO
-   ------------------------- */
+/* título*/
 #sec-dashboard h1 {
   text-align: center;
   margin-bottom: 40px;
@@ -14,9 +12,7 @@
   letter-spacing: 2px;
 }
 
-/* -------------------------
-   GRID DE TARJETAS
-   ------------------------- */
+/* grid de las tarjetas*/
 .dash-grid {
   display: grid;
   grid-template-columns: repeat(2, 260px);
@@ -26,7 +22,7 @@
   align-content: center;
   padding: 40px;
 
-  /* Fondo glass */
+  /* fondo cristal */
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
@@ -34,9 +30,7 @@
   border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
-/* -------------------------
-   TARJETA
-   ------------------------- */
+/* tarjetas */
 .dash-card {
   width: 260px;
   height: 180px;
@@ -57,16 +51,14 @@
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-/* Hover sin solaparse */
+/* hover sin que se solapase */
 .dash-card:hover {
   transform: scale(1.05);
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
   z-index: 2;
 }
 
-/* -------------------------
-   TEXTO
-   ------------------------- */
+/* texto*/
 .dash-label {
   font-size: 0.9em;
   text-transform: uppercase;
@@ -81,9 +73,7 @@
   line-height: 1;
 }
 
-/* -------------------------
-   DISCO
-   ------------------------- */
+/* disco */
 .progress-container {
   width: 80%;
   height: 10px;
@@ -108,9 +98,7 @@
   color: #ccc;
 }
 
-/* -------------------------
-   RESPONSIVE
-   ------------------------- */
+/* responsive */
 @media (max-width: 700px) {
   .dash-grid {
     grid-template-columns: 1fr;

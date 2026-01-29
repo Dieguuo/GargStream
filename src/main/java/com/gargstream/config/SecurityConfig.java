@@ -60,7 +60,7 @@ public class SecurityConfig {
                         .requestMatchers("/", "/index", "/index.html", "/api/public/**", "/api/archivos/**", "/ver_detalle.html", "/register", "/login", "/recuperar", "/h2-console/**").permitAll()
 
                         // rutas provadas admin
-                        .requestMatchers("/admin.html", "/api/admin/**").hasAuthority("ADMIN")
+                        .requestMatchers("/admin", "/api/admin/**").hasAuthority("ADMIN")
 
                         .requestMatchers("/api/historial/**", "/api/lista/**").authenticated()
 
@@ -82,9 +82,14 @@ public class SecurityConfig {
                 );
 
         // Desactivar CSRF para que funcionen las peticiones POST de Javascript (Latido y Favoritos)
-        http.csrf(csrf -> csrf.disable());
+        //http.csrf(csrf -> csrf.disable());
+        http.csrf(csrf -> csrf
+                .ignoringRequestMatchers("/h2-console/**") // Ignoramos H2 porque da problemas
+        );
 
-        http.headers(headers -> headers.frameOptions(frame -> frame.disable()));
+        http.headers(headers -> headers.frameOptions(frame -> frame.sameOrigin())); // Cambia disable() por sameOrigin() para H2
+
+        //http.headers(headers -> headers.frameOptions(frame -> frame.disable()));
 
         return http.build();
     }

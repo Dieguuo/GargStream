@@ -3,12 +3,12 @@ package com.gargstream.controller;
 import com.gargstream.model.Rol;
 import com.gargstream.model.Usuario;
 import com.gargstream.repository.UsuarioRepository;
-import com.gargstream.service.EmailService; // <--- Importar
-import org.springframework.http.ResponseEntity; // <--- Importar
+import com.gargstream.service.EmailService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*; // <--- Importar
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -28,13 +28,13 @@ public class AuthController {
         this.emailService = emailService;
     }
 
-    //mostrar el formulario de registro (Solo muestra la pantalla)
+    //mostrar el formulario de registro
     @GetMapping("/register")
     public String mostrarFormulario() {
         return "register";
     }
 
-    //procesar el registro (Recibe los datos cuando pulsas el botón)
+    //procesar el registro
     @PostMapping("/register")
     public String resgistrarUsuario(
             @RequestParam String nombre,
@@ -88,23 +88,23 @@ public class AuthController {
         if (usuarioOpt.isPresent()) {
             Usuario usuario = usuarioOpt.get();
 
-            // Generar código de 6 caracteres (Reutilizando lógica simple)
+            //generar el código de 6 digitos/caracteres
             String codigo = generarCodigoAleatorio();
 
-            // Guardar en BD con fecha de expiración (15 minutos)
+            //guardarlo en la bd y que expire a los 15 mins
             usuario.setCodigoRecuperacion(codigo);
             usuario.setExpiracionRecuperacion(LocalDateTime.now().plusMinutes(15));
             usuarioRepository.save(usuario);
 
-            // Enviar email
+            // enviar el email
             try {
                 emailService.enviarCodigoRecuperacion(email, codigo);
             } catch (Exception e) {
-                return ResponseEntity.status(500).body("Error al enviar el correo. Inténtalo más tarde.");
+                return ResponseEntity.status(500).body("Error al enviar el correo.");
             }
         }
 
-        // Por seguridad, siempre decimos OK, aunque el correo no exista (para no dar pistas)
+        // aunque no exista el correo pongo que si existe se ha mandado, por seguridad
         return ResponseEntity.ok(Map.of("mensaje", "Si el correo existe, se ha enviado un código."));
     }
 
@@ -174,7 +174,7 @@ public class AuthController {
 
     @GetMapping("/recuperar")
     public String mostrarPaginaRecuperacion() {
-        return "recuperar"; // Esto buscará recuperar.html en templates
+        return "recuperar";
     }
 
 

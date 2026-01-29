@@ -1,11 +1,8 @@
 /* =====================================================
-   ADMIN COMPONENTS
-   Componentes reutilizables y micro-UI
-   ===================================================== */
+   admin components
+*/
 
-/* =======================
-   BADGES (ROLES / ESTADOS)
-   ======================= */
+/* roles y estados*/
 
 .badge {
     display: inline-block;
@@ -26,9 +23,7 @@
     color: var(--accent-color);
 }
 
-/* =======================
-   AVATARES
-   ======================= */
+/* avatares */
 
 .table-avatar {
     width: 40px;
@@ -39,9 +34,7 @@
     background: #111;
 }
 
-/* =======================
-   BOTONES ACCIÓN (TABLAS)
-   ======================= */
+/* botones */
 
 .action-btn {
     background: transparent;
@@ -64,9 +57,7 @@
     transform: scale(0.95);
 }
 
-/* =======================
-   IDENTIDAD USUARIO
-   ======================= */
+/* identidad del usuario */
 
 .user-identity .name {
     font-weight: bold;
@@ -79,9 +70,7 @@
     color: #888;
 }
 
-/* =======================
-   MODAL / PANEL EDICIÓN
-   ======================= */
+/* panel edicción */
 
 .edit-form-container h2 {
     font-size: 1.3rem;
@@ -92,9 +81,7 @@
     color: #bbb;
 }
 
-/* =======================
-   LISTA CAPÍTULOS (GESTIÓN)
-   ======================= */
+/* lista de caps*/
 
 #lista-capitulos-gestion h3 {
     font-size: 0.9rem;
@@ -105,9 +92,7 @@
     border-radius: 6px;
 }
 
-/* =======================
-   MENSAJES ESTADO INLINE
-   ======================= */
+/* mensajes estado inline */
 
 .status-ok {
     color: #46d369;
@@ -121,9 +106,7 @@
     color: #ffa500;
 }
 
-/* =======================
-   INPUT BUSCADOR
-   ======================= */
+/* input buscador */
 
 #buscador-usuarios {
     background: #111;
@@ -138,9 +121,7 @@
     border-color: var(--accent-color);
 }
 
-/* =======================
-   LINKS
-   ======================= */
+/*links*/
 
 a {
     color: var(--accent-color);
@@ -150,9 +131,7 @@ a:hover {
     color: #ffd36a;
 }
 
-/* =======================
-   SCROLLBAR (WEBKIT)
-   ======================= */
+/* scrollbar */
 
 ::-webkit-scrollbar {
     width: 8px;

@@ -1,11 +1,9 @@
-/* =====================================================
-   ADMIN TABLES
-   Tablas, badges, avatares y acciones
-===================================================== */
+/*
+   admin tables
+   tablas, roles, avatares y acciones
+*/
 
-/* -----------------------------------------------------
-   CONTENEDOR GENERAL DE TABLAS
------------------------------------------------------ */
+/* contenedor de la tabla*/
 .table-container {
   width: 100%;
   overflow-x: auto;
@@ -17,9 +15,7 @@
   box-shadow: 0 10px 30px rgba(0,0,0,0.35);
 }
 
-/* -----------------------------------------------------
-   TABLA BASE
------------------------------------------------------ */
+/* tabla base */
 .user-table {
   width: 100%;
   border-collapse: collapse;
@@ -27,9 +23,7 @@
   font-size: 0.95rem;
 }
 
-/* -----------------------------------------------------
-   CABECERA
------------------------------------------------------ */
+/* cabecera */
 .user-table thead {
   background: linear-gradient(
     90deg,
@@ -48,9 +42,7 @@
   white-space: nowrap;
 }
 
-/* -----------------------------------------------------
-   FILAS
------------------------------------------------------ */
+/* filas*/
 .user-table td {
   padding: 12px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -65,16 +57,12 @@
   background: rgba(255, 255, 255, 0.04);
 }
 
-/* -----------------------------------------------------
-   FILA BLOQUEADA
------------------------------------------------------ */
+/* fila bloqueada */
 .user-table tr[style*="rgba(255, 0, 0"] {
   box-shadow: inset 4px 0 0 #ff4d4d;
 }
 
-/* -----------------------------------------------------
-   AVATAR
------------------------------------------------------ */
+/* avatar */
 .table-avatar {
   width: 42px;
   height: 42px;
@@ -84,9 +72,7 @@
   background: #111;
 }
 
-/* -----------------------------------------------------
-   IDENTIDAD USUARIO
------------------------------------------------------ */
+/* identidad del user */
 .user-identity {
   display: flex;
   flex-direction: column;
@@ -104,9 +90,7 @@
   word-break: break-all;
 }
 
-/* -----------------------------------------------------
-   BADGES
------------------------------------------------------ */
+/* roles */
 .badge {
   display: inline-block;
   padding: 4px 10px;
@@ -130,9 +114,7 @@
   border: 1px solid rgba(255, 180, 0, 0.5);
 }
 
-/* -----------------------------------------------------
-   BOTONES DE ACCIÓN
------------------------------------------------------ */
+/* botón de acción */
 .action-btn {
   background: rgba(255,255,255,0.03);
   border: 1px solid rgba(255, 255, 255, 0.25);
@@ -151,7 +133,7 @@
   color: var(--accent-color);
 }
 
-/* BOTÓN ELIMINAR */
+/* botón eliminar */
 .action-btn[style*="#f44"],
 .action-btn.delete {
   border-color: rgba(255, 70, 70, 0.6);
@@ -164,18 +146,13 @@
   color: #fff;
 }
 
-/* -----------------------------------------------------
-   ESTADOS TEXTO
------------------------------------------------------ */
+/* estados texto*/
 .user-table span {
   font-weight: 600;
   font-size: 0.8rem;
 }
 
-/* =====================================================
-   PANEL DE CONTROL DE USUARIO (MODAL)
-   + ANIMACIÓN SUAVE
-===================================================== */
+/* panel de control del usuario*/
 
 #modal-usuario {
   background: rgba(25, 25, 25, 0.72);
@@ -200,9 +177,7 @@
   padding: 14px;
 }
 
-/* -----------------------------------------------------
-   ANIMACIÓN APERTURA
------------------------------------------------------ */
+/* animación de apertura */
 @keyframes userPanelIn {
   from {
     opacity: 0;
@@ -214,9 +189,7 @@
   }
 }
 
-/* -----------------------------------------------------
-   RESPONSIVE
------------------------------------------------------ */
+/* responsive */
 @media (max-width: 900px) {
   .user-table {
     font-size: 0.85rem;

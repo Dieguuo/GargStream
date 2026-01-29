@@ -1,15 +1,15 @@
-/* =====================================================
-   ADMIN LAYOUT
-   Sidebar, estructura principal, grids y responsive
-===================================================== */
+/*
+   admin layout
+   didebar, estructura principal, grids y responsive
+*/
 
-/* ======================= CONTENEDOR GENERAL ======================= */
+/* general*/
 body {
     display: flex;
     min-height: 100vh;
 }
 
-/* ======================= SIDEBAR ======================= */
+/* sidebar */
 .sidebar {
     width: 240px;
     background: linear-gradient(180deg, #0f0f0f, #141414);
@@ -30,7 +30,7 @@ body {
     text-align: center;
 }
 
-/* ======================= BOTONES MENÚ ======================= */
+/* botones menu */
 .menu-btn {
     width: 100%;
     background: transparent;
@@ -55,7 +55,7 @@ body {
     color: var(--accent-color);
 }
 
-/* ======================= LINK VOLVER ======================= */
+/* volver*/
 .back-link {
     margin-top: auto;
     padding: 12px;
@@ -70,14 +70,14 @@ body {
     color: #fff;
 }
 
-/* ======================= CONTENIDO PRINCIPAL ======================= */
+/* contenido principal */
 .content {
     margin-left: 240px;
     padding: 30px;
     width: calc(100% - 240px);
 }
 
-/* ======================= SECCIONES ======================= */
+/* secciones*/
 .form-section {
     display: none;
     animation: fadeIn 0.25s ease;
@@ -87,14 +87,14 @@ body {
     display: block;
 }
 
-/* Dashboard necesita flex SOLO cuando está activo */
+/* dashboard necesita flex solo cuando está activo */
 #sec-dashboard.active {
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-/* ======================= ANIMACIÓN ======================= */
+/* animación */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -106,7 +106,7 @@ body {
     }
 }
 
-/* ======================= DASHBOARD ======================= */
+/* dashboard */
 .dash-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -133,7 +133,7 @@ body {
     color: #fff;
 }
 
-/* ======================= BARRA DISCO ======================= */
+/* barra del disco */
 .progress-container {
     width: 100%;
     height: 8px;
@@ -158,7 +158,7 @@ body {
     margin-top: 8px;
 }
 
-/* ======================= GRID EDICIÓN CONTENIDO ======================= */
+/* grid ediccón contenido */
 .grid-content {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -193,7 +193,7 @@ body {
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
 }
 
-/* ======================= CONSOLA ESTADO ======================= */
+/* consola estado */
 #console-box {
     background: #0f0f0f;
     border: 1px solid var(--border-color);
@@ -215,7 +215,7 @@ body {
     white-space: pre-wrap;
 }
 
-/* ======================= RESPONSIVE ======================= */
+/* responsive */
 @media (max-width: 900px) {
     .sidebar {
         width: 200px;

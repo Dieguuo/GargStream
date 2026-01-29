@@ -78,22 +78,22 @@ public class ContenidoService {
 
         // borrar archivos de video según el tipo
         if(contenido instanceof Serie serie){
-            // Si es una serie recorre temps y caps
+            // si es una serie recorre temps y caps
             if(serie.getTemporadas() != null){
                 for(Temporada temporada : serie.getTemporadas()){
                     if(temporada.getCapitulos() != null){
                         for(Capitulo capitulo : temporada.getCapitulos()){
-                            // 1. Limpiar historial del capítulo
+                            // limpiar historial del capítulo
                             historialRepository.deleteByContenido(capitulo);
 
-                            // 2. Limpiar favoritos del capítulo (si hubiera)
+                            // limpiar favoritos del capítulo si los hay
                             List<Usuario> usersCap = usuarioRepository.findByMiListaContains(capitulo);
                             for(Usuario u : usersCap){
                                 u.getMiLista().remove(capitulo);
                                 usuarioRepository.save(u);
                             }
 
-                            // 3. Borrar archivo físico
+                            //borrar el archivo físico
                             borrarArchivoFisico(capitulo.getRutaVideo());
 
                             //borrar los subtítulos también si los hay
@@ -106,6 +106,7 @@ public class ContenidoService {
                     }
                 }
             }
+
             //borrar la carpeta enteraa
             String nombreCarpeta = almacenamientoService.sanitizarNombre(serie.getTitulo());
             almacenamientoService.eliminarCarpeta(CARPETA_SERIES + "/" + nombreCarpeta);
@@ -113,13 +114,13 @@ public class ContenidoService {
         }else if(contenido instanceof Pelicula pelicula){
             //borrar una pelicula
             borrarArchivoFisico(pelicula.getRutaVideo());
-            // Intento borrar carpeta padre si está vacía o es propia
+            // intento borrar carpeta padre si está vacía o es propia
             borrarCarpetaPadreSiCorresponde(pelicula.getRutaVideo(), CARPETA_PELICULAS);
 
         }else if(contenido instanceof VideoPersonal videoPersonal){
             //borrar un video personal
             borrarArchivoFisico(videoPersonal.getRutaVideo());
-            // Intento borrar carpeta padre si está vacía o es propia
+            // intento borrar carpeta padre si está vacía o es propia
             borrarCarpetaPadreSiCorresponde(videoPersonal.getRutaVideo(), CARPETA_VIDEOS);
 
         }else if( contenido instanceof Capitulo capitulo){

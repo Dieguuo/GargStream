@@ -1,6 +1,6 @@
 /**
  * navigation.js
- * Gestión de navegación entre secciones del panel
+ * gestión de navegación entre secciones del panel
  */
 
 function mostrar(idSeccion) {

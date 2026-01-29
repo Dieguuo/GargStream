@@ -45,15 +45,15 @@ public class ContenidoPublicoController {
     @GetMapping("/novedades")
     public ResponseEntity<List<Contenido>> obtenerListaNovedades() {
         try {
-            // pedir las 10 últimas (filtrando capítulos para que no salgan en el carrusel)
-            // usamos directamente el repo para asegurar el filtro
+            // pedir las 10 últimas y quitando los capítulos para que no salgan en el carrusel
+            // uso directamente el repo para asegurar el filtro
             List<Contenido> todos = contenidoRepository.findAll();
 
-            // ordenamos por fecha descendente
+            // ordeno por fecha descendente
             List<Contenido> novedades = todos.stream()
                     .filter(c -> !(c instanceof Capitulo))//solo peliculas y series
                     .sorted(Comparator.comparing(Contenido::getId).reversed()) //ordenar descendeintemente
-                    .limit(10) // Solo los 10 últimos
+                    .limit(10) // solo los 10 últimos
                     .collect(Collectors.toList());
 
             return ResponseEntity.ok(novedades);

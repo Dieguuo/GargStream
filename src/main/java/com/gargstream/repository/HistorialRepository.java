@@ -18,7 +18,9 @@ public interface HistorialRepository extends JpaRepository<Historial, Long> {
     //para dar las últimas 10 cosas para ponerlas en la fila de seguir viendo
     List<Historial> findTop10ByUsuarioOrderByFechaUltimaVisualizacionDesc(Usuario usuario);
 
-    @Transactional // Necesario para operaciones de borrado
+    @Transactional // necesario para operaciones de borrado
     void deleteByContenido(Contenido contenido);
+
+    void deleteByUsuarioAndContenidoId(Usuario usuario, Long contenidoId);
 
 }

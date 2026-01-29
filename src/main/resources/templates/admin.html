@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="fragments :: admin-head"></head>
+
+<body>
+
+<div style="display: flex; width: 100%;">
+
+    <div th:replace="fragments :: admin-sidebar"></div>
+
+    <div class="content">
+
+        <div id="console-box">
+            <div class="console-title">Estado del Servidor:</div>
+            <div id="console-content">Esperando acción...</div>
+        </div>
+
+        <div id="sec-dashboard" class="form-section active" style="max-width: 100%;">
+            <h1>Estado del Servidor</h1>
+            <div class="dash-grid">
+                <div class="dash-card">
+                    <div class="dash-label">Películas</div>
+                    <div class="dash-number" id="metric-pelis">-</div>
+                </div>
+                <div class="dash-card">
+                    <div class="dash-label">Series</div>
+                    <div class="dash-number" id="metric-series">-</div>
+                </div>
+                <div class="dash-card">
+                    <div class="dash-label">Vídeos</div>
+                    <div class="dash-number" id="metric-videos">-</div>
+                </div>
+                <div class="dash-card">
+                    <div class="dash-label">Disco Usado</div>
+                    <div class="dash-number" id="metric-espacio" style="font-size: 3em; color: #fff;">-</div>
+                    <div class="progress-container">
+                        <div class="progress-bar" id="disk-bar"></div>
+                    </div>
+                    <div class="disk-info">
+                        <span id="disk-used">0 GB</span>
+                        <span id="disk-total">Total: 0 GB</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="sec-usuarios" class="form-section" style="max-width: 100%;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h1>Directorio de Usuarios</h1>
+                <input type="text" id="buscador-usuarios" placeholder="🔍 Buscar por nombre o email..." onkeyup="filtrarUsuarios()" style="width: 300px; margin-top: 0;">
+            </div>
+
+            <div class="table-container">
+                <table class="user-table">
+                    <thead>
+                    <tr>
+                        <th style="width: 60px;">Avatar</th>
+                        <th>Identidad</th>
+                        <th>Estado</th>
+                        <th>Rol</th>
+                        <th>Fecha Registro</th>
+                        <th style="text-align: right;">Gestión</th>
+                    </tr>
+                    </thead>
+                    <tbody id="tabla-usuarios-body">
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="modal-usuario" class="edit-form-container" style="display: none; margin-top: 20px; border: 1px solid #ffb400;">
+                <h2 style="margin-top:0; color: #ffb400;">Panel de Control de Usuario</h2>
+                <div style="background: #222; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+                    <p>ID: <span id="user-info-id" style="color:white; font-family:monospace;"></span></p>
+                    <p>Usuario: <span id="user-info-nombre" style="font-weight:bold;"></span></p>
+                    <p>Email: <span id="user-info-email"></span></p>
+                    <p>Estado: <span id="user-info-estado"></span></p>
+                </div>
+                <div class="row" style="margin-top: 15px;">
+                    <div id="action-bloqueo" style="flex: 1;"></div>
+                    <div id="action-rol" style="flex: 1;"></div>
+                </div>
+                <button type="button" class="btn-cancelar" onclick="cerrarEditorUsuario()" style="margin-top: 20px; width: 100%;">Cerrar Panel</button>
+            </div>
+        </div>
+
+        <div id="sec-cine" class="form-section">
+            <h1>Subir Película</h1>
+            <form th:action="@{/api/admin/nueva-pelicula}" onsubmit="enviarFormulario(event)">
+                <label>*Título:</label>
+                <input type="text" name="titulo" required placeholder="Ej: El Padrino">
+                <label>*Archivo de Vídeo:</label>
+                <input type="file" name="archivo" required accept="video/*">
+                <label>Subtítulos (.srt o .vtt):</label>
+                <input type="file" name="subtitulo" accept=".srt,.vtt">
+                <button type="submit">Subir Película</button>
+            </form>
+        </div>
+
+        <div id="sec-serie" class="form-section">
+            <h1>Crear Ficha de Serie</h1>
+            <form th:action="@{/api/admin/nueva-serie}" onsubmit="enviarFormulario(event)">
+                <label>*Título de la Serie:</label>
+                <input type="text" name="titulo" required placeholder="Ej: Breaking Bad">
+                <button type="submit">Crear Ficha</button>
+            </form>
+        </div>
+
+        <div id="sec-capitulo" class="form-section">
+            <h1>Subir Capítulo</h1>
+            <form th:action="@{/api/admin/nuevo-capitulo}" onsubmit="enviarFormulario(event)">
+                <label>*Selecciona la Serie:</label>
+                <select name="idSerie" id="selector-series" required>
+                    <option value="" disabled selected>Cargando series...</option>
+                </select>
+                <div class="row">
+                    <div style="flex:1">
+                        <label>*Temporada:</label>
+                        <input type="number" name="numTemporada" required value="1" min="1">
+                    </div>
+                    <div style="flex:1">
+                        <label>*Capítulo:</label>
+                        <input type="number" name="numCapitulo" required value="1" min="1">
+                    </div>
+                </div>
+                <label>Título del Capítulo (Opcional - TMDB):</label>
+                <input type="text" name="titulo" placeholder="Ej: Piloto">
+                <label>*Archivo de Vídeo (Obligatorio):</label>
+                <input type="file" name="archivo" required accept="video/*">
+                <label>Subtítulos (.srt o .vtt) - Opcional:</label>
+                <input type="file" name="subtitulo" accept=".srt,.vtt">
+                <button type="submit">Subir Capítulo</button>
+            </form>
+        </div>
+
+        <div id="sec-video" class="form-section">
+            <h1>Subir Video Personal</h1>
+            <form th:action="@{/api/admin/nuevo-video}" onsubmit="enviarFormulario(event)">
+                <label>*Título:</label>
+                <input type="text" name="titulo" required>
+                <label>Autor:</label>
+                <input type="text" name="autor" placeholder="Yo">
+                <label>Descripción:</label>
+                <textarea name="descripcion" rows="3"></textarea>
+                <label>*Archivo de Vídeo:</label>
+                <input type="file" name="archivo" required accept="video/*">
+                <label>Subtítulos (.srt o .vtt):</label>
+                <input type="file" name="subtitulo" accept=".srt,.vtt">
+                <button type="submit">Subir Video</button>
+            </form>
+        </div>
+
+        <div id="sec-editar" class="form-section" style="max-width: 900px;">
+            <h1>Gestionar Contenido</h1>
+            <center><p style="color:#aaa;">Haz clic en una carátula para editar o eliminar.</p></center>
+
+            <div class="admin-search-wrapper">
+                <input type="text" id="buscadorAdmin" placeholder="Buscar por título..." onkeyup="filtrarContenidoAdmin()">
+            </div>
+
+            <div class="grid-content" id="gridAdmin">
+            </div>
+
+            <div id="grid-edicion" class="grid-content"></div>
+
+            <div id="formulario-edicion" class="edit-form-container">
+                <h2 style="margin-top:0; font-family: 'Bebas Neue', sans-serif; letter-spacing: 1px; color: #ffb400;">
+                    Editando: <span id="edit-titulo-display" style="color:white"></span>
+                </h2>
+
+                <div id="lista-capitulos-gestion" style="margin-bottom: 20px; border: 1px solid #444; border-radius: 5px; padding: 10px; background: #222; display: none;">
+                </div>
+
+                <form th:action="@{/api/admin/editar-contenido}" onsubmit="enviarFormulario(event)">
+                    <input type="hidden" name="id" id="edit-id">
+
+                    <div class="row">
+                        <div style="flex:1">
+                            <label>Título:</label>
+                            <input type="text" name="titulo" id="edit-titulo">
+                        </div>
+                        <div style="flex:1">
+                            <label>ID Trailer Youtube:</label>
+                            <input type="text" name="youtubeTrailerId" id="edit-trailer" placeholder="Ej: dQw4w9WgXcQ">
+                        </div>
+                    </div>
+
+                    <label>Sinopsis:</label>
+                    <textarea name="sipnosis" id="edit-sinopsis" rows="4"></textarea>
+
+                    <div class="section-separator"></div>
+                    <div class="section-title">📂 Archivos</div>
+                    <p style="font-size:0.8em; color:#777;">Sube archivos solo si quieres reemplazarlos.</p>
+
+                    <label>Cambiar Carátula:</label>
+                    <input type="file" name="archivoCaratula" accept="image/*">
+
+                    <div class="section-separator"></div>
+                    <div class="section-title">Añadir Subtítulo Extra</div>
+
+                    <div class="row">
+                        <div style="flex:1">
+                            <label>Idioma:</label>
+                            <select name="idiomaSub">
+                                <option value="es">Español</option>
+                                <option value="en">Inglés</option>
+                                <option value="fr">Francés</option>
+                            </select>
+                        </div>
+                        <div style="flex:1">
+                            <label>Etiqueta:</label>
+                            <input type="text" name="nombreSub" placeholder="Ej: Inglés">
+                        </div>
+                    </div>
+                    <label>Archivo Subtítulo (.vtt / .srt):</label>
+                    <input type="file" name="archivoSubtitulo" accept=".srt,.vtt">
+
+                    <div style="margin-top: 30px; display: flex; gap: 10px;">
+                        <button type="submit" style="flex: 2;">Guardar Cambios</button>
+                        <button type="button" class="btn-cancelar" onclick="cerrarEditor()" style="flex: 1;">Cancelar</button>
+                    </div>
+
+                    <button type="button" class="btn-eliminar" onclick="ejecutarBorradoTotal()" style="margin-top: 20px; width: 100%;">
+                        ELIMINAR CONTENIDO
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </div> </div> <div id="overlay-loading">
+    <div class="spinner"></div>
+    <div class="loading-text">Procesando...</div>
+    <div class="loading-subtext">Por favor, no cierres esta pestaña.</div>
+</div>
+
+<script th:src="@{/js/navigation.js}"></script>
+<script th:src="@{/js/dashboard.js}"></script>
+<script th:src="@{/js/users.js}"></script>
+<script th:src="@{/js/forms.js}"></script>
+<script th:src="@{/js/content.js}"></script>
+<script th:src="@{/js/admin.js}"></script>
+
+</body>
+</html>

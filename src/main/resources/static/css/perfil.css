@@ -20,7 +20,7 @@ body {
     padding: 40px 20px;
 }
 
-/* --- BOTÓN VOLVER --- */
+/* botón volver */
 .btn-back {
     display: inline-flex;
     align-items: center;
@@ -40,7 +40,7 @@ body {
     color: var(--primary-color);
 }
 
-/* --- ENCABEZADO DEL PERFIL --- */
+/* encabezado del perfil */
 .profile-header {
     display: flex;
     flex-direction: column;
@@ -110,7 +110,7 @@ body {
     margin: 0;
 }
 
-/* --- CUADRÍCULA DE CONFIGURACIONES --- */
+/* cuadrícula de configuraciones*/
 .settings-grid {
     display: grid;
     gap: 30px;
@@ -142,7 +142,7 @@ body {
     color: white;
 }
 
-/* --- FORMULARIOS --- */
+/* formularios */
 .settings-form {
     display: grid;
     gap: 20px;
@@ -200,7 +200,7 @@ body {
     background-color: #e6a300;
 }
 
-/* --- ESTILOS ESPECÍFICOS --- */
+/* estilos específicos */
 .current-email {
     margin-bottom: 25px;
     font-size: 1em;
@@ -239,7 +239,7 @@ body {
     font-weight: bold;
 }
 
-/* RESPONSIVE */
+/* responsive */
 @media (max-width: 768px) {
     .page-container {
         padding: 30px 15px;

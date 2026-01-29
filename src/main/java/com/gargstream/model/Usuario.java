@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -49,7 +50,7 @@ public class Usuario implements UserDetails {
     private String codigoRecuperacion;
     private LocalDateTime expiracionRecuperacion;
 
-    // metodos de seguridad ---
+    // metodos de seguridad
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -61,25 +62,25 @@ public class Usuario implements UserDetails {
         return this.email;
     }
 
-    // 1. CONTROL DE BLOQUEO (Correcto, usas tu variable)
+    // control de bloqueo
     @Override
     public boolean isAccountNonLocked() {
         return !this.bloqueado;
     }
 
-    // 2. ¿CUENTA CADUCADA? (Faltaba: devolver true)
+    // cuanta caducada
     @Override
     public boolean isAccountNonExpired() {
         return true;
     }
 
-    // 3. ¿CONTRASEÑA CADUCADA? (Faltaba: devolver true)
+    // contraseña caducada
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
-    // 4. ¿USUARIO HABILITADO?
+    // usuario inhabilitado
     @Override
     public boolean isEnabled() {
         return true;
@@ -92,6 +93,14 @@ public class Usuario implements UserDetails {
             this.fechaRegistro = LocalDate.now();
         }
     }
+
+    //relación con historial para borrado en cascada
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Historial> historial = new ArrayList<>();
+
+    //relación con valoraciones para borrado en cascada
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Valoracion> valoraciones = new ArrayList<>();
 
     //la relación de la lista de favoritos
     //una tabla intermedia usuario_favoritos

@@ -1,6 +1,6 @@
 /**
  * dashboard.js
- * Métricas y estado del servidor
+ * métricas y estado del servidor
  */
 
 async function cargarMetricas() {

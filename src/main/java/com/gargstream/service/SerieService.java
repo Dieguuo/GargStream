@@ -158,7 +158,7 @@ public class SerieService {
         // para los datos de los capítulos
         boolean datosEncontrados = false;
         try {
-            //buscamos el id de la serie en tmdb usando el nombre que tenemos guardado
+            //buscar el id de la serie en tmdb usando el nombre que hay guardado
             Long idTmdb = tmdbService.buscarIdSerie(serie.getTitulo());
 
             if (idTmdb != null) {
@@ -182,10 +182,10 @@ public class SerieService {
                     if (imagenPath != null && !imagenPath.equals("null") && !imagenPath.isEmpty()) {
                         String urlImagenTmdb = "https://image.tmdb.org/t/p/original" + imagenPath;
                         capitulo.setRutaFondo(urlImagenTmdb);
-                        //usamos la misma imagen para la carátula del cap para que se distinga
+                        //uso la misma imagen para la carátula del cap para que se distinga
                         capitulo.setRutaCaratula(urlImagenTmdb);
                     } else {
-                        //si tmdb no tiene foto del capítulo, usamos el fondo de la serie
+                        //si tmdb no tiene foto del capítulo, uso el fondo de la serie
                         capitulo.setRutaFondo(serie.getRutaFondo());
                         capitulo.setRutaCaratula(serie.getRutaCaratula());
                     }

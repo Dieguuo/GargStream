@@ -61,7 +61,7 @@ function renderizarDetalle(c) {
     const director = c.director || c.creador || c.autor || 'Desconocido';
     const genero = c.genero || '';
 
-    // NOTAS
+    // notas
     const notaTMDB = c.puntuacionMedia ? c.puntuacionMedia.toFixed(1) : '-';
     const mediaLocal = c.notaPromedioLocal || 0;
     const votosLocal = c.contadorVotos || 0;
@@ -79,18 +79,17 @@ function renderizarDetalle(c) {
     const iconoCorazon = enMiLista ? '/img/corazon_lleno.svg' : '/img/corazon_vacio.svg';
     const textoLista = enMiLista ? 'En mi lista' : 'Mi lista';
 
-    // Generar Estrellas HTML
+    // generar las estrellas
     let estrellasHtml = '';
-    // Comprobamos si el usuario está autenticado
+    // comprobar que el usuario esté autentificado
     const estaLogueado = (typeof isUserAuthenticated !== 'undefined' && isUserAuthenticated);
 
     for(let i=1; i<=5; i++) {
         const claseRellena = i <= miVotoActual ? 'filled' : '';
-        // Eventos solo si está logueado
+        // solo si se está logueado
         const eventos = estaLogueado ?
             `onclick="enviarVoto(${i}, ${c.id})" onmouseover="iluminar(${i})" onmouseout="restaurar()"` : '';
 
-        // Estilo inline cursor
         const estiloCursor = estaLogueado ? 'cursor:pointer;' : 'cursor:default;';
 
         estrellasHtml += `<span class="star ${claseRellena}" data-value="${i}" ${eventos} style="${estiloCursor}">★</span>`;
@@ -135,7 +134,7 @@ function renderizarDetalle(c) {
                 <div class="actions">
     `;
 
-    // --- CORRECCIÓN 1: PROTECCIÓN BOTÓN REPRODUCIR (PELÍCULAS) ---
+    // reproducir la peli/cap
     if (!esSerie) {
         if (estaLogueado) {
             html += `<button onclick="reproducirPeli(${c.id})" class="btn-play-big">▶ Reproducir</button>`;
@@ -145,21 +144,21 @@ function renderizarDetalle(c) {
         }
     }
 
-    // Botón Lista (Ya estaba protegido por el backend, pero visualmente lo dejamos)
+    // botón de la lista
     html += `
         <button onclick="toggleMiLista(${c.id})" class="btn-lista" title="${textoLista}">
             <img id="icono-fav" src="${iconoCorazon}" alt="Favorito" style="width:28px; height:28px;">
         </button>
     `;
 
-    // --- CORRECCIÓN 2: PROTECCIÓN BOTÓN TRÁILER ---
+    // botón del trailer
     if(youtubeId) {
-        html += `<button onclick="verTrailer('${youtubeId}')" class="btn-trailer">🎬 Ver Tráiler</button>`;
+        html += `<button onclick="verTrailer('${youtubeId}')" class="btn-trailer">Ver Tráiler</button>`;
     }
 
     html += `</div></div></div>`;
 
-    // Renderizado de Temporadas
+    // renderizar temps
     if (esSerie) {
         html += `
             <h2 style="padding-left:20px; margin-bottom:20px;">Temporadas y Episodios</h2>
@@ -181,7 +180,7 @@ function renderizarDetalle(c) {
                     const urlVideoCap = cap.rutaVideo;
                     episodiosData[cap.id] = cap.subtitulos || [];
 
-                    // --- CORRECCIÓN 3: PROTECCIÓN BOTONES EPISODIOS ---
+                    // botones cpas
                     let botonCapitulo = '';
                     if (estaLogueado) {
                         botonCapitulo = `<button class="btn-cap" onclick="reproducirCapitulo('${urlVideoCap}', ${cap.id})">▶ Reproducir</button>`;
@@ -206,7 +205,7 @@ function renderizarDetalle(c) {
     div.innerHTML = html;
 }
 
-// FUNCIONES DE INTERACCIÓN ESTRELLAS
+// interación estrellas
 function iluminar(val) {
     const estrellas = document.querySelectorAll('.local-rating-box .star');
     estrellas.forEach(s => {
@@ -250,7 +249,6 @@ function enviarVoto(nota, idContenido) {
         });
 }
 
-// RESTO DE FUNCIONES (Mantenidas intactas)
 function toggleMiLista(idContenido) {
     fetch(`/api/lista/toggle?idContenido=${idContenido}`, { method: 'POST' })
         .then(res => {

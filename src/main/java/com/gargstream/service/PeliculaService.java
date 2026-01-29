@@ -73,7 +73,7 @@ public class PeliculaService {
 
             //si hay varios resultados se coge el primero
             if(respuesta != null && respuesta.getResults() != null && !respuesta.getResults().isEmpty()){
-                Long idTmdb= respuesta.getResults().get(0).getIdTmdb(); // He cambiado .getFirst() por .get(0) por compatibilidad, es lo mismo
+                Long idTmdb= respuesta.getResults().get(0).getIdTmdb();
 
                 //buscar el video del trailer con el id
                 String idTrailer = tmdbService.obtenerTrailer(idTmdb, "movie");
@@ -111,7 +111,7 @@ public class PeliculaService {
                         String urlFondoCompleta = "https://image.tmdb.org/t/p/original" + datos.getRutaFondo();
                         pelicula.setRutaFondo(urlFondoCompleta);
                     }
-                    // -------------------------------------------------------------
+
 
                     //sacar el genero
                     if (datos.getGenres() != null){

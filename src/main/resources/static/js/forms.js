@@ -1,6 +1,6 @@
 /**
  * forms.js
- * Envío de formularios y overlay
+ * Envío de formularios con seguridad CSRF
  */
 
 async function enviarFormulario(e) {
@@ -10,19 +10,30 @@ async function enviarFormulario(e) {
   const ov = document.getElementById('overlay-loading');
   const con = document.getElementById('console-content');
 
-  ov.style.display = 'flex';
+  // Mostrar loading
+  if(ov) ov.style.display = 'flex';
   document.getElementById('console-box').style.display = 'block';
-  con.innerText = "⏳ Procesando...";
+  con.innerText = "Procesando...";
 
   try {
     const fd = new FormData(form);
-    const r = await fetch(form.action, { method:'POST', body:fd });
+
+    // 🟢 CAMBIO IMPORTANTE: Añadimos las cabeceras de seguridad
+    const headers = getAuthHeaders();
+    // Nota: Al usar FormData, NO ponemos 'Content-Type', el navegador lo pone solo.
+
+    const r = await fetch(form.action, {
+        method: 'POST',
+        headers: headers, // <--- Inyectamos el token aquí
+        body: fd
+    });
 
     if (r.ok) {
       const j = await r.json();
-      con.innerText = "✅ ÉXITO:\n" + JSON.stringify(j, null, 2);
-      con.style.color = "#0f0";
+      con.innerText = "ÉXITO:\n" + JSON.stringify(j, null, 2);
+      con.style.color = "#46d369";
 
+      // Refrescar lógica según el formulario
       if (form.action.includes('editar')) {
         setTimeout(() => {
           cerrarEditor();
@@ -31,17 +42,22 @@ async function enviarFormulario(e) {
         }, 1500);
       } else {
         form.reset();
-        if (form.action.includes('capitulo')) cargarSeriesEnSelector();
-        cargarMetricas();
+        // Si es capítulo, recargar selector
+        if (form.action.includes('capitulo') && typeof cargarSeriesEnSelector === 'function') {
+            cargarSeriesEnSelector();
+        }
+        if (typeof cargarMetricas === 'function') cargarMetricas();
       }
     } else {
-      con.innerText = "❌ ERROR:\n" + await r.text();
-      con.style.color = "red";
+      const textoError = await r.text();
+      con.innerText = "ERROR (" + r.status + "):\n" + textoError;
+      con.style.color = "#ff4444";
     }
   } catch (err) {
-    con.innerText = "❌ Error Red: " + err.message;
+    con.innerText = "Error Crítico: " + err.message;
     con.style.color = "red";
+    console.error(err);
   } finally {
-    ov.style.display = 'none';
+    if(ov) ov.style.display = 'none';
   }
 }

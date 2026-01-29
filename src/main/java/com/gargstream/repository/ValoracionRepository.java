@@ -16,7 +16,7 @@ public interface ValoracionRepository extends JpaRepository<Valoracion, Long> {
     //buscar el voto específico de un usuario en una película para que no se pueda vota doble
     Optional<Valoracion> findByUsuarioAndContenido(Usuario usuario, Contenido contenido);
 
-    // Obtener todos los votos de una película (para calcular la media)
+    // obtener todos los votos de una película (para calcular la media)
     List<Valoracion> findByContenido(Contenido contenido);
 
 

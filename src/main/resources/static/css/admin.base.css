@@ -1,12 +1,9 @@
-/* =====================================================
-   ADMIN BASE
-   GargStream – Panel de Administración
-   Base visual global (NO layout, NO secciones)
-   ===================================================== */
+/*
+   todo lo de admin base
+   es el GargStream - Panel de Administración
+*/
 
-/* -------------------------
-   VARIABLES GLOBALES
--------------------------- */
+/*variables globales*/
 :root {
   --primary-color: #ffb400;
   --primary-hover: #e5a100;
@@ -34,9 +31,7 @@
   --transition-normal: 0.3s;
 }
 
-/* -------------------------
-   RESET SUAVE
--------------------------- */
+/* reset suave*/
 *,
 *::before,
 *::after {
@@ -48,9 +43,7 @@ html, body {
   padding: 0;
 }
 
-/* -------------------------
-   BODY
--------------------------- */
+/* body*/
 body {
   background-color: var(--bg-color);
   color: var(--text-color);
@@ -61,9 +54,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* -------------------------
-   TIPOGRAFÍA
--------------------------- */
+/* tipografía */
 h1, h2, h3, h4, h5 {
   margin: 0 0 15px 0;
   font-weight: 700;
@@ -83,9 +74,7 @@ p {
   color: var(--text-muted);
 }
 
-/* -------------------------
-   LINKS
--------------------------- */
+/* links*/
 a {
   color: var(--primary-color);
   text-decoration: none;
@@ -96,9 +85,7 @@ a:hover {
   color: var(--primary-hover);
 }
 
-/* -------------------------
-   BOTONES BASE
--------------------------- */
+/* botones base*/
 button {
   font-family: inherit;
   font-size: 0.9em;
@@ -115,7 +102,7 @@ button:disabled {
   cursor: not-allowed;
 }
 
-/* Botón principal */
+/* botón principal */
 button[type="submit"] {
   background: var(--primary-color);
   color: #000;
@@ -129,7 +116,7 @@ button[type="submit"]:hover {
   transform: translateY(-1px);
 }
 
-/* Botón cancelar */
+/* botón cancelar */
 .btn-cancelar {
   background: transparent;
   color: var(--text-muted);
@@ -142,7 +129,7 @@ button[type="submit"]:hover {
   border-color: #fff;
 }
 
-/* Botón eliminar */
+/* botón eliminar */
 .btn-eliminar {
   background: rgba(255, 85, 94, 0.15);
   color: var(--danger-color);
@@ -155,9 +142,7 @@ button[type="submit"]:hover {
   background: rgba(255, 85, 94, 0.3);
 }
 
-/* -------------------------
-   INPUTS / FORMS BASE
--------------------------- */
+/* inputs o forms base */
 input,
 select,
 textarea {
@@ -195,9 +180,7 @@ label {
   color: var(--text-muted);
 }
 
-/* -------------------------
-   SCROLLBAR PERSONALIZADO
--------------------------- */
+/* scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   background: var(--bg-color);
@@ -212,9 +195,7 @@ label {
   background: var(--primary-color);
 }
 
-/* -------------------------
-   UTILIDADES GLOBALES
--------------------------- */
+/* ustilidades globales */
 .hidden {
   display: none !important;
 }

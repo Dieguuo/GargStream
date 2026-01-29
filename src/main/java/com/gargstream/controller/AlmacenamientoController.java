@@ -17,7 +17,6 @@ import java.util.*;
 @RequiredArgsConstructor
 public class AlmacenamientoController {
 
-    //BORRAR 2 LINEAS
     @org.springframework.beans.factory.annotation.Value("${tmdb.api.key}")
     private String apiKeyPrueba;
 

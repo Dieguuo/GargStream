@@ -44,7 +44,7 @@ public class ListaController {
 
         // lo devuelvo en json para que js sepa qué icono poner
         Map<String, Object> respuesta = new HashMap<>();
-        respuesta.put("enLista", !estabaEnLista); // El nuevo estado
+        respuesta.put("enLista", !estabaEnLista); // el nuevo estado
         respuesta.put("mensaje", estabaEnLista ? "Eliminado de mi lista" : "Añadido a mi lista");
 
         return ResponseEntity.ok(respuesta);

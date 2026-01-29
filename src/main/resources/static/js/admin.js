@@ -1,18 +1,24 @@
 /**
  * admin.js
- * Archivo principal del panel de administración
- * - Inicializa el sistema
- * - Define variables globales compartidas
+ * Configuración global y Utilidades de Seguridad
  */
 
-// ================================
-// 0. INICIO AUTOMÁTICO
-// ================================
+// Variables globales
+let listaUsuariosGlobal = [];
+
+// Inicio automático
 document.addEventListener("DOMContentLoaded", () => {
-  cargarMetricas();
+    cargarMetricas();
 });
 
-// ================================
-// VARIABLES GLOBALES
-// ================================
-let listaUsuariosGlobal = [];
+// 🟢 NUEVA FUNCIÓN: Obtener cabeceras de seguridad (CSRF)
+// Esto es lo que permite que el JS hable con el Spring Boot seguro
+function getAuthHeaders() {
+    const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+    const header = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+    return {
+        [header]: token
+        // No añadimos 'Content-Type' aquí porque varía (JSON vs FormData)
+    };
+}

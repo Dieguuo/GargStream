@@ -1,10 +1,10 @@
-/* =====================================================
-   ADMIN OVERLAYS
-   Cargas, bloqueos visuales y estados globales
-   Estética cristal blur / premium
-===================================================== */
+/*
+   admin overlays
+   cargas, bloqueos visuales y estados globales
+   estética cristal blur
+*/
 
-/* ======================= OVERLAY GLOBAL DE CARGA ======================= */
+/* overlay global de carga */
 #overlay-loading {
   position: fixed;
   inset: 0;
@@ -28,7 +28,6 @@
   animation: overlayFadeIn 0.25s ease;
 }
 
-/* Halo central */
 #overlay-loading::before {
   content: "";
   position: absolute;
@@ -44,7 +43,7 @@
   z-index: -1;
 }
 
-/* ======================= SPINNER ======================= */
+/* spinner */
 #overlay-loading .spinner {
   width: 72px;
   height: 72px;
@@ -60,7 +59,7 @@
   box-shadow: 0 0 25px rgba(255, 180, 0, 0.25);
 }
 
-/* ======================= TEXTOS OVERLAY ======================= */
+/* textos overlay */
 #overlay-loading .loading-text {
   font-size: 1.25rem;
   font-weight: 700;
@@ -76,7 +75,7 @@
   line-height: 1.4;
 }
 
-/* ======================= CONSOLA DE ESTADO ======================= */
+/* consola estado */
 #console-box {
   background: linear-gradient(
     135deg,
@@ -117,7 +116,7 @@
   line-height: 1.4;
 }
 
-/* ======================= BLOQUEO VISUAL FORMULARIO ======================= */
+/* bloqueo visual formulario */
 .form-section.loading {
   pointer-events: none;
   opacity: 0.55;
@@ -125,7 +124,7 @@
   transition: opacity 0.2s ease, filter 0.2s ease;
 }
 
-/* ======================= BACKDROP BASE ======================= */
+/* backdrop base */
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -143,7 +142,7 @@
   animation: overlayFadeIn 0.2s ease;
 }
 
-/* ======================= MODAL BASE ======================= */
+/* modal base */
 .modal {
   background: linear-gradient(
     145deg,
@@ -168,7 +167,7 @@
   animation: modalPop 0.25s ease;
 }
 
-/* ======================= MODAL TEXTOS ======================= */
+/* modal textos */
 .modal h2 {
   font-family: 'Bebas Neue', sans-serif;
   letter-spacing: 1px;
@@ -183,7 +182,7 @@
   line-height: 1.4;
 }
 
-/* ======================= BOTONES MODAL ======================= */
+/* botones modal */
 .modal-actions {
   display: flex;
   gap: 10px;
@@ -200,7 +199,7 @@
   transition: all 0.2s ease;
 }
 
-/* ======================= VARIANTES ======================= */
+/* variantes */
 .modal.success {
   border-color: rgba(70, 211, 105, 0.6);
 }
@@ -225,7 +224,7 @@
   color: var(--accent-color);
 }
 
-/* ======================= ANIMACIONES ======================= */
+/* animaciones */
 @keyframes spin {
   to {
     transform: rotate(360deg);

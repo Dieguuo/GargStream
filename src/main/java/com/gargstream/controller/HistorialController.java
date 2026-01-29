@@ -5,11 +5,14 @@ import com.gargstream.model.*;
 import com.gargstream.repository.ContenidoRepository;
 import com.gargstream.repository.HistorialRepository;
 import com.gargstream.repository.UsuarioRepository;
+import com.gargstream.service.DetallesUsuarioService;
 import com.gargstream.service.HistorialService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -106,7 +109,7 @@ public class HistorialController {
                     hSiguiente.setSegundosVistos(0.0);
                     hSiguiente.setDuracionTotal(h.getDuracionTotal());
 
-                    //visualmente le ponemos la carátula de la serie
+                    //visualmente se le pone la carátula de la serie
                     siguiente.setTitulo(seriePadre.getTitulo());
                     siguiente.setRutaCaratula(seriePadre.getRutaCaratula());
 
@@ -197,5 +200,29 @@ public class HistorialController {
 
         return null;
     }
+
+
+    //para borrar el continuar viendo
+    @DeleteMapping("/eliminar")
+    @Transactional
+    public ResponseEntity<Void> eliminarDelHistorial(
+            @RequestParam Long idContenido,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        if (userDetails == null) {
+            return ResponseEntity.status(401).build(); // No autorizado
+        }
+
+        Usuario usuario = usuarioRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        historialRepository.deleteByUsuarioAndContenidoId(usuario, idContenido);
+
+        return ResponseEntity.ok().build();
+    }
+
+
+
+
 
 }

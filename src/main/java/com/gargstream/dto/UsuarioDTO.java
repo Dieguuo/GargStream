@@ -10,7 +10,7 @@ import java.time.LocalDate;
 public class UsuarioDTO {
 
     //los datos que se van a enviar del usuario para la web.
-    // No pongo la contraseña porque es una falta de seguridad bastante grande.
+    // no pongo la contraseña porque es una falta de seguridad bastante grande.
     private Long id;
     private String nombre;
     private String email;

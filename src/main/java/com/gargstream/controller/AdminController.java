@@ -33,7 +33,7 @@ public class AdminController {
     private final SerieService serieService;
     private final UsuarioRepository usuarioRepository;
 
-    //email supremo
+    //email
     @Value("${gargstream.security.admin.supremo}")
     private String emailSupremo;
 
@@ -139,7 +139,6 @@ public class AdminController {
                 // guardar el archivo físico y capturar su nombre REAL
                 String nombreArchivoFisico = almacenamientoService.store(archivoSubtitulo);
 
-                // IMPORTANTE: Aquí usamos el nombre del archivo físico, NO el nombre del idioma
                 String rutaFinal = "/api/archivos/" + nombreArchivoFisico;
 
                 // crear un objeto Subtitulo
@@ -148,7 +147,7 @@ public class AdminController {
 
                 // usar lo que ponga el usuario en el formulario
                 nuevoSub.setIdioma((idiomaSub != null && !idiomaSub.isBlank()) ? idiomaSub : "es");
-                nuevoSub.setEtiqueta((nombreSub != null && !nombreSub.isBlank()) ? nombreSub : "Español (Extra)");
+                nuevoSub.setEtiqueta((nombreSub != null && !nombreSub.isBlank()) ? nombreSub : "Español (extra)");
                 nuevoSub.setContenido(contenido);
 
                 // añadirlo a la lista que ya hay
@@ -255,7 +254,7 @@ public class AdminController {
 
         //no se puede al admin supremo
         if (usuario.getEmail().equals(emailSupremo)) {
-            return ResponseEntity.badRequest().body("ACCESO DENEGADO: No puedes hacer nada con el admin supremo");
+            return ResponseEntity.badRequest().body("ACCESO DENEGADO: No puedes hacer nada con el admin");
         }
 
         //para que no se autobloquee
@@ -289,12 +288,12 @@ public class AdminController {
 
         //el admin supremo siempre es admin
         if (usuario.getEmail().equals(emailSupremo)) {
-            return ResponseEntity.badRequest().body("IMPOSIBLE: El Admin Supremo no puede ser degradado.");
+            return ResponseEntity.badRequest().body("IMPOSIBLE: El Admin no puede ser degradado.");
         }
 
         //que no se pueda autodegradar
         if (usuario.getEmail().equals(adminLogueado.getUsername())) {
-            return ResponseEntity.badRequest().body("⛔ SEGURIDAD: No puedes quitarte permisos a ti mismo.");
+            return ResponseEntity.badRequest().body("SEGURIDAD: No puedes quitarte permisos a ti mismo.");
         }
 
         try{
@@ -325,7 +324,7 @@ public class AdminController {
 
         //el admin supremo no se puede borrar
         if (usuario.getEmail().equals(emailSupremo)) {
-            return ResponseEntity.status(403).body("No se puede eliminar al admin supremo");
+            return ResponseEntity.status(403).body("No se puede eliminar al Admin");
         }
 
         //no se puede borrar un admin

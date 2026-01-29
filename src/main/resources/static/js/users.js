@@ -1,11 +1,9 @@
 /**
  * users.js
- * Gestión completa de usuarios
+ * gestión completa de usuarios
  */
 
-// ================================
-// CARGA Y LISTADO
-// ================================
+//carga y listado
 async function cargarUsuarios() {
   cerrarEditorUsuario();
 
@@ -42,7 +40,7 @@ function renderizarTablaUsuarios(usuarios) {
     const badge = u.rol === 'ADMIN' ? 'badge-admin' : 'badge-user';
     const fecha = u.fechaRegistro ? new Date(u.fechaRegistro).toLocaleDateString() : '-';
     const estado = u.bloqueado
-      ? '<span style="color:red;">BLOQ</span>'
+      ? '<span style="color:red;">BLOQUEADO</span>'
       : '<span style="color:#46d369;">ACTIVO</span>';
 
     tr.innerHTML = `
@@ -56,7 +54,7 @@ function renderizarTablaUsuarios(usuarios) {
       <td>${fecha}</td>
       <td style="text-align:right;">
         <button class="action-btn" onclick="abrirEditorUsuario(${u.id})">⚙️</button>
-        <button class="action-btn" onclick="eliminarUsuario(${u.id}, '${u.nombre}', '${u.rol}')" style="color:#f44;">🗑️</button>
+        <button class="action-btn" onclick="eliminarUsuario(${u.id}, '${u.nombre}', '${u.rol}')" style="color:#f44;">X</button>
       </td>
     `;
     tbody.appendChild(tr);
@@ -72,9 +70,7 @@ function filtrarUsuarios() {
   renderizarTablaUsuarios(filtrados);
 }
 
-// ================================
-// MODAL USUARIO
-// ================================
+// modal usuario
 function abrirEditorUsuario(id) {
   const u = listaUsuariosGlobal.find(x => x.id === id);
   if (!u) return;
@@ -112,25 +108,68 @@ function cerrarEditorUsuario() {
   document.getElementById('modal-usuario').style.display = 'none';
 }
 
-// ================================
-// API USUARIOS
-// ================================
+// api usuarios
+// ... (cargarUsuarios, renderizarTablaUsuarios, etc. SE QUEDAN IGUAL) ...
+
+// --- API USUARIOS CON SEGURIDAD ---
+
 async function toggleBloqueo(id, nombre) {
   if (!confirm(`¿Cambiar bloqueo a ${nombre}?`)) return;
-  const r = await fetch(`/api/admin/usuario/bloqueo?id=${id}`, { method: 'POST' });
-  if (r.ok) { alert(await r.text()); cargarUsuarios(); abrirEditorUsuario(id); }
+
+  // 🟢 Fetch con POST y CSRF
+  const r = await fetch(`/api/admin/usuario/bloqueo?id=${id}`, {
+      method: 'POST',
+      headers: getAuthHeaders() // Inyectamos token
+  });
+
+  if (r.ok) {
+      alert(await r.text());
+      cargarUsuarios();
+      abrirEditorUsuario(id);
+  } else {
+      alert("Error: " + await r.text());
+  }
 }
 
 async function cambiarRolUsuario(id, rol) {
   if (!confirm(`¿Cambiar rol a ${rol}?`)) return;
+
   const p = new URLSearchParams({ id, nuevoRol: rol });
-  const r = await fetch('/api/admin/usuario/cambiar-rol', { method:'POST', body:p });
-  if (r.ok) { alert("Rol cambiado"); cargarUsuarios(); abrirEditorUsuario(id); }
+
+  // 🟢 Fetch con POST y CSRF (y Content-Type para URLSearchParams)
+  const headers = getAuthHeaders();
+  // Al enviar URLSearchParams, el navegador suele poner el content-type correcto,
+  // pero el CSRF es obligatorio.
+
+  const r = await fetch('/api/admin/usuario/cambiar-rol', {
+      method: 'POST',
+      headers: headers,
+      body: p
+  });
+
+  if (r.ok) {
+      alert("Rol cambiado");
+      cargarUsuarios();
+      abrirEditorUsuario(id);
+  } else {
+      alert("Error: " + await r.text());
+  }
 }
 
 async function eliminarUsuario(id, nombre, rol) {
   if (rol === 'ADMIN') return alert("No puedes borrar admins.");
   if (!confirm(`¿ELIMINAR a ${nombre}?`)) return;
-  const r = await fetch(`/api/admin/usuario/eliminar/${id}`, { method:'DELETE' });
-  if (r.ok) { alert("Eliminado"); cargarUsuarios(); }
+
+  // 🟢 Fetch con DELETE y CSRF
+  const r = await fetch(`/api/admin/usuario/eliminar/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+  });
+
+  if (r.ok) {
+      alert("Eliminado");
+      cargarUsuarios();
+  } else {
+      alert("Error al eliminar");
+  }
 }
