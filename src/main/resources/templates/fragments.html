@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:fragment="admin-head">
+    <meta charset="UTF-8">
+    <title>Panel de Administración - GargStream</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+
+    <meta th:if="${_csrf}" name="_csrf" th:content="${_csrf.token}"/>
+    <meta th:if="${_csrf}" name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+    <link rel="stylesheet" th:href="@{/css/admin.base.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.layout.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.sidebar.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.dashboard.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.tables.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.forms.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.editor.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.components.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.overlay.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.responsive.css}">
+</head>
+
+<body>
+
+<div th:fragment="admin-sidebar" class="sidebar">
+    <h2>Panel Admin</h2>
+
+    <div style="padding: 0 20px 20px 20px; color: #aaa; font-size: 0.9em; border-bottom: 1px solid #333; margin-bottom: 20px;">
+        <p style="margin:0">Hola, <strong style="color:white" th:text="${#authentication.name}">Usuario</strong></p>
+    </div>
+
+    <button class="menu-btn active" onclick="mostrar('sec-dashboard'); cargarMetricas()">📊 Resumen</button>
+    <button class="menu-btn" onclick="mostrar('sec-usuarios'); cargarUsuarios()">👥 Usuarios</button>
+    <button class="menu-btn" onclick="mostrar('sec-cine')">🎬 Nueva Película</button>
+    <button class="menu-btn" onclick="mostrar('sec-serie')">📺 Nueva Serie</button>
+    <button class="menu-btn" onclick="mostrar('sec-capitulo'); cargarSeriesEnSelector()">▶️ Nuevo Capítulo</button>
+    <button class="menu-btn" onclick="mostrar('sec-video')">📹 Video Personal</button>
+    <button class="menu-btn" onclick="mostrar('sec-editar'); cargarContenidoParaEditar()">✏️ Editar / Gestionar</button>
+
+    <a th:href="@{/index}" class="back-link">← Volver al Catálogo</a>
+</div>
+
+</body>
+</html>
