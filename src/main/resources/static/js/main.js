@@ -8,6 +8,14 @@ let currentHeroIndex = 0;
 let heroSlidesData = [];
 let heroInterval = null;
 
+// 🟢 FUNCIÓN SEGURIDAD (Igual que en admin.js)
+function getAuthHeaders() {
+    const tokenMeta = document.querySelector('meta[name="_csrf"]');
+    const headerMeta = document.querySelector('meta[name="_csrf_header"]');
+    if (!tokenMeta || !headerMeta) return {};
+    return { [headerMeta.getAttribute('content')]: tokenMeta.getAttribute('content') };
+}
+
 // carga inicial
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -29,32 +37,22 @@ document.addEventListener('DOMContentLoaded', () => {
         fetchSafe('/api/historial/continuar-viendo')
     ])
     .then(([dataNovedades, dataCatalogo, dataMiLista, dataHistorial]) => {
-        // renderizar novedades
 
-        //invitado vs logueado
+        // Renderizar novedades según si está logueado
         const usuarioLogueado = (typeof isUserAuthenticated !== 'undefined' && isUserAuthenticated);
 
-                if (!usuarioLogueado) {
-                    // modo invitado tarjeta estática
-                    const staticSlide = [{
-                        id: 'intro-guest',
-                        titulo: "Bienvenido a GargStream",
-                        sipnosis: "Esta aplicación permite consultar, buscar y gestionar información sobre películas, series y vídeos personales. Los usuarios pueden visualizar listados, acceder al detalle de cada elemento y realizar acciones según su rol. Para comenzar a visualizar contenido, regístrese o inicie sesión.",
-                        rutaFondo: "/img/fondo_cine.jpeg",
-                        esStatic: true
-                    }];
-
-                    // renderizar solo la tarjeta estática
-                    renderHeroSlider(staticSlide);
-
-                } else {
-                    // modo logueado
-                    // renderizar las novedades
-                    renderHeroSlider(dataNovedades || []);
-                }
-
-
-
+        if (!usuarioLogueado) {
+            const staticSlide = [{
+                id: 'intro-guest',
+                titulo: "Bienvenido a GargStream",
+                sipnosis: "Esta aplicación permite consultar, buscar y gestionar información sobre películas, series y vídeos personales. Los usuarios pueden visualizar listados, acceder al detalle de cada elemento y realizar acciones según su rol. Para comenzar a visualizar contenido, regístrese o inicie sesión.",
+                rutaFondo: "/img/fondo_cine.jpeg",
+                esStatic: true
+            }];
+            renderHeroSlider(staticSlide);
+        } else {
+            renderHeroSlider(dataNovedades || []);
+        }
 
         // guardar datos globales
         catalogoCompleto = dataCatalogo || [];
@@ -70,11 +68,9 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         }).filter(h => h !== null);
 
-        // generar filtros y distribuir el contneido
+        // generar filtros y distribuir
         generarFiltros(catalogoCompleto);
         distribuirCatalogo(catalogoCompleto);
-
-        // renderizar mi lista e historial
         actualizarFilaMiLista(miListaCompleta);
         actualizarFilaHistorial(historialCompleto);
     })
@@ -103,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// función central de filtrado
+// Función central de filtrado
 function aplicarFiltrosGlobales(textoBusqueda, generoSeleccionado) {
     const hero = document.getElementById('hero-section');
     const esBusquedaTexto = textoBusqueda.length > 0;
@@ -154,7 +150,6 @@ function actualizarFilaHistorial(lista) {
     }
 }
 
-// generador de filtros
 function generarFiltros(lista) {
     const contenedor = document.getElementById('filter-bar');
     if(!contenedor) return;
@@ -189,16 +184,10 @@ function filtrarPorGenero(genero, elementoChip) {
     aplicarFiltrosGlobales("", genero);
 }
 
-// distribución de filas
 function distribuirCatalogo(lista) {
-
-    const pelis = lista.filter(item =>
-        item.rutaVideo && item.director && item.numeroCapitulo == null
-    );
+    const pelis = lista.filter(item => item.rutaVideo && item.director && item.numeroCapitulo == null);
     const series = lista.filter(item => !item.rutaVideo);
-    const videos = lista.filter(item =>
-        item.rutaVideo && !item.director && item.numeroCapitulo == null
-    );
+    const videos = lista.filter(item => item.rutaVideo && !item.director && item.numeroCapitulo == null);
 
     toggleFila('cat-peliculas', pelis);
     toggleFila('cat-series', series);
@@ -214,7 +203,6 @@ function toggleFila(idSeccion, items) {
     if(seccion) seccion.style.display = items.length === 0 ? 'none' : 'block';
 }
 
-// carrusel de novedades
 function renderHeroSlider(lista) {
     const heroWrapper = document.getElementById('hero-section');
     const container = document.getElementById('hero-slider-container');
@@ -233,20 +221,14 @@ function renderHeroSlider(lista) {
         return;
     }
 
-    heroSlidesData = lista.slice(0, 10);//10 novedades
+    heroSlidesData = lista.slice(0, 10);
     if(heroWrapper) heroWrapper.style.display = 'block';
 
     heroSlidesData.forEach((item, index) => {
         const slide = document.createElement('div');
-
-        // clase para cambiar al modo invitado
-        // si es staic se añade el guest mode para que el css lo sepa
         let clasesSlide = index === 0 ? 'hero-slide active' : 'hero-slide';
 
-        if (item.esStatic) {
-            clasesSlide += ' guest-mode';
-        }
-
+        if (item.esStatic) clasesSlide += ' guest-mode';
         slide.className = clasesSlide;
 
         let bgImage = item.rutaFondo ? item.rutaFondo : item.rutaCaratula;
@@ -254,10 +236,8 @@ function renderHeroSlider(lista) {
 
         slide.style.backgroundImage = `url('${bgImage}')`;
 
-        // lógica de botones invitado y logueado
         let botonesHtml = '';
         if (item.esStatic) {
-            // botones para invitado
             botonesHtml = `
                 <div class="guest-buttons">
                     <a href="/login" class="hero-btn btn-primary">Iniciar Sesión</a>
@@ -265,7 +245,6 @@ function renderHeroSlider(lista) {
                 </div>
             `;
         } else {
-            // botones para logueado
             botonesHtml = `
                 <a href="/ver_detalle.html?id=${item.id}" class="hero-btn btn-primary">▶ Reproducir</a>
                 <a href="/ver_detalle.html?id=${item.id}" class="hero-btn btn-secondary">Más Información</a>
@@ -284,7 +263,6 @@ function renderHeroSlider(lista) {
         `;
         container.appendChild(slide);
 
-        // indicadores sis hay más de una ficha
         if(indicators && heroSlidesData.length > 1) {
             const dot = document.createElement('div');
             dot.className = index === 0 ? 'indicator active' : 'indicator';
@@ -293,13 +271,11 @@ function renderHeroSlider(lista) {
         }
     });
 
-    //flechas
     if (heroSlidesData.length > 1) {
         if(prevBtn) prevBtn.style.display = 'block';
         if(nextBtn) nextBtn.style.display = 'block';
         iniciarAutoPlay();
     } else {
-        // si es static que no haya flechas
         if(prevBtn) prevBtn.style.display = 'none';
         if(nextBtn) nextBtn.style.display = 'none';
     }
@@ -334,37 +310,28 @@ function reiniciarAutoPlay() {
     if (heroSlidesData.length > 1) iniciarAutoPlay();
 }
 
-// Renderizado de filas estándar
 function renderRow(lista, containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
 
     container.innerHTML = "";
 
-    // detectar si el scroll es vertical u horizontal
     container.addEventListener('wheel', (evt) => {
         const hayDesbordamiento = container.scrollWidth > container.clientWidth;
-
         if (hayDesbordamiento) {
-            // si se pasa de ancho se pone scroll horizontal
             evt.preventDefault();
             container.scrollLeft += evt.deltaY;
         }
-        // si no, vertical
     });
 
     lista.forEach(item => {
-        // aseguramos que item.id sea correcto (a veces viene en item.contenido.id dependiendo del DTO)
         const idContenido = item.contenido ? item.contenido.id : item.id;
         const titulo = item.contenido ? item.contenido.titulo : item.titulo;
-
         const img = item.rutaCaratula || 'https://via.placeholder.com/160x240?text=No+Img';
         const link = `/ver_detalle.html?id=${idContenido}`;
         const rating = item.puntuacionMedia ? `⭐ ${item.puntuacionMedia}` : '';
 
-        //boton para borrar el continuar viendo
         let botonEliminarHTML = '';
-
         if (containerId === 'row-historial') {
             botonEliminarHTML = `
                 <div class="btn-remove-history"
@@ -375,7 +342,6 @@ function renderRow(lista, containerId) {
             `;
         }
 
-        // barra de progreso y etiqueta
         let barraHtml = '';
         let infoExtraHtml = '';
 
@@ -384,7 +350,6 @@ function renderRow(lista, containerId) {
         }
 
         const porcentaje = item.porcentaje || item.porcentajeVisto;
-
         if (porcentaje !== undefined && porcentaje > 0) {
             barraHtml = `
                 <div class="progress-container">
@@ -395,15 +360,12 @@ function renderRow(lista, containerId) {
 
         const div = document.createElement('div');
         div.className = 'standard-card';
-
         div.innerHTML = `
             <div onclick="window.location.href='${link}'">
                 <div class="img-wrapper" style="position:relative;">
                     <img src="${img}" loading="lazy" alt="${titulo}">
-
                     ${botonEliminarHTML} ${infoExtraHtml}
                     ${barraHtml}
-
                 </div>
                 <div class="standard-info">
                       <div class="st-title">${titulo}</div>
@@ -421,8 +383,10 @@ function eliminarDeContinuarViendo(idContenido, elementoBoton, event) {
 
     if (!confirm("¿Quieres quitar este título de 'Continuar viendo'?")) return;
 
+    // 🟢 AQUÍ USAMOS EL FETCH SEGURO (DELETE + TOKEN)
     fetch(`/api/historial/eliminar?idContenido=${idContenido}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: getAuthHeaders() // <--- Token inyectado
     })
     .then(res => {
         if (res.ok) {
@@ -450,31 +414,18 @@ function deslizarFila(idContainer, direccion) {
 
 function resetearVista() { window.location.reload(); }
 
-
-
-// lógica del menú de usuario
 document.addEventListener('DOMContentLoaded', () => {
-
-    // localizar el avatar
     const avatar = document.querySelector('.user-menu-container .avatar-circle');
     const dropdown = document.querySelector('.dropdown-content');
 
     if (avatar && dropdown) {
-
-        //al hacer click en el avatar
         avatar.addEventListener('click', (e) => {
-            // para que no se cierre si se sale el mouse del menú
             e.stopPropagation();
             dropdown.classList.toggle('show');
         });
-
-        // al hacer click en cualquier otro sitio
         window.addEventListener('click', (e) => {
-            // si el menú está abierto
             if (dropdown.classList.contains('show')) {
-                // y el click no ha sido dentro del menú
                 if (!dropdown.contains(e.target) && e.target !== avatar) {
-                    //se cierra
                     dropdown.classList.remove('show');
                 }
             }

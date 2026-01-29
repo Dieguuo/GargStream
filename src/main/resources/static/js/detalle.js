@@ -13,6 +13,17 @@ if(id) {
     cargarDatosCompletos();
 }
 
+
+
+function getAuthHeaders() {
+    const tokenMeta = document.querySelector('meta[name="_csrf"]');
+    const headerMeta = document.querySelector('meta[name="_csrf_header"]');
+    if (!tokenMeta || !headerMeta) return {};
+    return { [headerMeta.getAttribute('content')]: tokenMeta.getAttribute('content') };
+}
+
+
+
 function cargarDatosCompletos() {
     fetch('/api/public/contenido/' + id)
         .then(response => response.json())
@@ -309,10 +320,26 @@ function reproducir(urlVideo, listaSubtitulos, tiempoInicio = 0, idContenido = n
     }
 }
 
-function enviarLatido(id, current, total) {
-    const formData = new URLSearchParams();
-    formData.append('idContenido', id); formData.append('segundos', current); formData.append('total', total);
-    fetch('/api/historial/latido', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: formData }).catch(err => console.error(err));
+function enviarLatido(idContenido, segundos, total) {
+    // URLSearchParams crea los parámetros ?id=...&segundos=...
+    const params = new URLSearchParams({
+        idContenido: idContenido,
+        segundos: segundos,
+        total: total
+    });
+
+    fetch('/api/historial/latido', {
+        method: 'POST',
+
+        // 🟢 AQUÍ ESTÁ LA CLAVE: AÑADIR HEADERS
+        headers: getAuthHeaders(), // <--- ESTO FALTABA
+
+        body: params
+    })
+    .then(res => {
+        if (!res.ok) console.warn("No se pudo guardar el progreso (Error CSRF o Auth)");
+    })
+    .catch(err => console.error("Error conexión latido", err));
 }
 
 function verTrailer(youtubeId) {
