@@ -246,7 +246,7 @@
     let emailGuardado = "";
     let codigoGuardado = "";
 
-    // 🟢 FUNCIÓN DE SEGURIDAD PARA LEER EL TOKEN
+    //FUNCIÓN DE SEGURIDAD PARA LEER EL TOKEN
     function getAuthHeaders() {
         const tokenMeta = document.querySelector('meta[name="_csrf"]');
         const headerMeta = document.querySelector('meta[name="_csrf_header"]');
@@ -282,7 +282,7 @@
 
         fetch('/api/public/recuperar/solicitar', {
             method: 'POST',
-            // 🟢 INYECTAMOS TOKEN
+            //INYECTAMOS TOKEN
             headers: getAuthHeaders(),
             body: formData
         })
@@ -313,7 +313,7 @@
 
         fetch('/api/public/recuperar/verificar', {
             method: 'POST',
-            // 🟢 INYECTAMOS TOKEN
+            // INYECTAMOS TOKEN
             headers: getAuthHeaders(),
             body: formData
         })
@@ -350,7 +350,7 @@
 
         fetch('/api/public/recuperar/cambiar', {
             method: 'POST',
-            // 🟢 INYECTAMOS TOKEN
+            // INYECTAMOS TOKEN
             headers: getAuthHeaders(),
             body: formData
         })

@@ -94,7 +94,7 @@ public class AdminController {
         return ResponseEntity.ok(capitulo);
     }
 
-    //borrar archivos (Este método sigue aquí por compatibilidad con otras funciones si las hay)
+    //borrar archivos
     @DeleteMapping("/eliminar/{id}")
     public ResponseEntity<Void> eliminarContenido(@PathVariable Long id){
 
@@ -154,7 +154,7 @@ public class AdminController {
                 contenido.getSubtitulos().add(nuevoSub);
             }
 
-            // 5. Guardar todo
+            // guardar
             contenidoRepository.save(contenido);
 
             return ResponseEntity.ok().body("{\"mensaje\": \"Contenido actualizado correctamente\"}");

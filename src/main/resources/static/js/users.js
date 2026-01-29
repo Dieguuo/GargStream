@@ -108,15 +108,12 @@ function cerrarEditorUsuario() {
   document.getElementById('modal-usuario').style.display = 'none';
 }
 
-// api usuarios
-// ... (cargarUsuarios, renderizarTablaUsuarios, etc. SE QUEDAN IGUAL) ...
-
 // --- API USUARIOS CON SEGURIDAD ---
 
 async function toggleBloqueo(id, nombre) {
   if (!confirm(`¿Cambiar bloqueo a ${nombre}?`)) return;
 
-  // 🟢 Fetch con POST y CSRF
+  // Fetch con POST y CSRF
   const r = await fetch(`/api/admin/usuario/bloqueo?id=${id}`, {
       method: 'POST',
       headers: getAuthHeaders() // Inyectamos token
@@ -136,7 +133,7 @@ async function cambiarRolUsuario(id, rol) {
 
   const p = new URLSearchParams({ id, nuevoRol: rol });
 
-  // 🟢 Fetch con POST y CSRF (y Content-Type para URLSearchParams)
+  // Fetch con POST y CSRF (y Content-Type para URLSearchParams)
   const headers = getAuthHeaders();
   // Al enviar URLSearchParams, el navegador suele poner el content-type correcto,
   // pero el CSRF es obligatorio.
@@ -160,7 +157,7 @@ async function eliminarUsuario(id, nombre, rol) {
   if (rol === 'ADMIN') return alert("No puedes borrar admins.");
   if (!confirm(`¿ELIMINAR a ${nombre}?`)) return;
 
-  // 🟢 Fetch con DELETE y CSRF
+  // Fetch con DELETE y CSRF
   const r = await fetch(`/api/admin/usuario/eliminar/${id}`, {
       method: 'DELETE',
       headers: getAuthHeaders()

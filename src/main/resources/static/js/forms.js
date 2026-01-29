@@ -18,9 +18,9 @@ async function enviarFormulario(e) {
   try {
     const fd = new FormData(form);
 
-    // 🟢 CAMBIO IMPORTANTE: Añadimos las cabeceras de seguridad
+    //Añadimos las cabeceras de seguridad
     const headers = getAuthHeaders();
-    // Nota: Al usar FormData, NO ponemos 'Content-Type', el navegador lo pone solo.
+    // Al usar FormData, NO ponemos 'Content-Type', el navegador lo pone solo.
 
     const r = await fetch(form.action, {
         method: 'POST',

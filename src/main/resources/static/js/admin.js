@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
     cargarMetricas();
 });
 
-// 🟢 NUEVA FUNCIÓN: Obtener cabeceras de seguridad (CSRF)
+//Obtener cabeceras de seguridad (CSRF)
 // Esto es lo que permite que el JS hable con el Spring Boot seguro
 function getAuthHeaders() {
     const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
@@ -19,6 +19,6 @@ function getAuthHeaders() {
 
     return {
         [header]: token
-        // No añadimos 'Content-Type' aquí porque varía (JSON vs FormData)
+
     };
 }

@@ -331,8 +331,8 @@ function enviarLatido(idContenido, segundos, total) {
     fetch('/api/historial/latido', {
         method: 'POST',
 
-        // 🟢 AQUÍ ESTÁ LA CLAVE: AÑADIR HEADERS
-        headers: getAuthHeaders(), // <--- ESTO FALTABA
+        //ÑADIR HEADERS
+        headers: getAuthHeaders(),
 
         body: params
     })

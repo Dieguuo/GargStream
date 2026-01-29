@@ -81,15 +81,13 @@ public class SecurityConfig {
                         .permitAll()
                 );
 
-        // Desactivar CSRF para que funcionen las peticiones POST de Javascript (Latido y Favoritos)
-        //http.csrf(csrf -> csrf.disable());
         http.csrf(csrf -> csrf
                 .ignoringRequestMatchers("/h2-console/**") // Ignoramos H2 porque da problemas
         );
 
-        http.headers(headers -> headers.frameOptions(frame -> frame.sameOrigin())); // Cambia disable() por sameOrigin() para H2
+        http.headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
 
-        //http.headers(headers -> headers.frameOptions(frame -> frame.disable()));
+
 
         return http.build();
     }

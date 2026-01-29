@@ -8,7 +8,7 @@ let currentHeroIndex = 0;
 let heroSlidesData = [];
 let heroInterval = null;
 
-// 🟢 FUNCIÓN SEGURIDAD (Igual que en admin.js)
+// FUNCIÓN SEGURIDAD
 function getAuthHeaders() {
     const tokenMeta = document.querySelector('meta[name="_csrf"]');
     const headerMeta = document.querySelector('meta[name="_csrf_header"]');
@@ -383,7 +383,6 @@ function eliminarDeContinuarViendo(idContenido, elementoBoton, event) {
 
     if (!confirm("¿Quieres quitar este título de 'Continuar viendo'?")) return;
 
-    // 🟢 AQUÍ USAMOS EL FETCH SEGURO (DELETE + TOKEN)
     fetch(`/api/historial/eliminar?idContenido=${idContenido}`, {
         method: 'DELETE',
         headers: getAuthHeaders() // <--- Token inyectado
