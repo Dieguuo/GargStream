@@ -261,17 +261,29 @@ function enviarVoto(nota, idContenido) {
 }
 
 function toggleMiLista(idContenido) {
-    fetch(`/api/lista/toggle?idContenido=${idContenido}`, { method: 'POST' })
-        .then(res => {
-            if (res.status === 403 || res.status === 401) { window.location.href = '/login'; throw new Error("No autorizado"); }
-            return res.json();
-        })
-        .then(data => {
-            enMiLista = data.enLista;
-            const img = document.getElementById('icono-fav');
-            if (enMiLista) img.src = '/img/corazon_lleno.svg'; else img.src = '/img/corazon_vacio.svg';
-        })
-        .catch(err => console.error(err));
+    fetch(`/api/lista/toggle?idContenido=${idContenido}`, {
+        method: 'POST',
+        headers: getAuthHeaders()
+    })
+    .then(res => {
+        // Si sigue fallando por sesión caducada, redirige.
+        // Pero ahora con el token, si estás logueado, pasará.
+        if (res.status === 403 || res.status === 401) {
+            window.location.href = '/login';
+            throw new Error("No autorizado");
+        }
+        return res.json();
+    })
+    .then(data => {
+        // Actualizamos la variable global si la usas
+        if(typeof enMiLista !== 'undefined') enMiLista = data.enLista;
+
+        const img = document.getElementById('icono-fav');
+        if (img) {
+            img.src = data.enLista ? '/img/corazon_lleno.svg' : '/img/corazon_vacio.svg';
+        }
+    })
+    .catch(err => console.error("Error al actualizar lista:", err));
 }
 
 function reproducirPeli(idContenido) {

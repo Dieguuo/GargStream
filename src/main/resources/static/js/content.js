@@ -96,9 +96,16 @@ async function cargarContenidoParaEditar() {
 async function abrirEditor(id) {
   // Ocultamos grid, mostramos formulario
   document.getElementById('grid-edicion').style.display = 'none';
+
+  const buscador = document.querySelector('.admin-search-wrapper');
+      if (buscador) buscador.style.display = 'none';
+
+
   const form = document.getElementById('formulario-edicion');
   form.style.display = 'block'; // Lo hacemos visible
   form.scrollIntoView({ behavior: 'smooth' });
+
+
 
   // Limpiar lista de capítulos anterior
   const divCaps = document.getElementById('lista-capitulos-gestion');
@@ -157,30 +164,33 @@ function cerrarEditor() {
   const form = document.getElementById('formulario-edicion');
   const grid = document.getElementById('grid-edicion');
 
+  const buscador = document.querySelector('.admin-search-wrapper');
+    if (buscador) buscador.style.display = 'block';
+
   if(form) {
-      form.style.display = 'none'; // Ocultar formulario
+      form.style.display = 'none'; // ocultar formulario
       form.querySelector('form').reset();
   }
-  if(grid) grid.style.display = 'grid'; // Mostrar grid
+  if(grid) grid.style.display = 'grid'; // mostrar grid
 }
 
-// --- FUNCIONES DE BORRADO (CON SEGURIDAD) ---
+// --- dunciones de borrado ---
 
 async function ejecutarBorradoTotal() {
   const id = document.getElementById('edit-id').value;
   if (!id) return alert("Error: No hay ID cargado");
 
-  if (!confirm("¿ELIMINAR DEFINITIVAMENTE este contenido y sus archivos?")) return;
+  if (!confirm("¿Eliminar definitivamente este contenido y sus archivos?")) return;
 
   try {
     const r = await fetch(`/api/admin/eliminar-contenido/${id}`, {
       method: 'DELETE',
-      headers: getHeaders() // Token
+      headers: getHeaders() // token
     });
 
     if (r.ok) {
       alert("Eliminado correctamente.");
-      cargarContenidoParaEditar(); // Recargar grid
+      cargarContenidoParaEditar(); // recargar grid
       if(typeof cargarMetricas === 'function') cargarMetricas();
     } else {
       alert("Error: " + await r.text());
