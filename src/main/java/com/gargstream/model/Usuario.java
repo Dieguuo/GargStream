@@ -1,9 +1,7 @@
 package com.gargstream.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -96,10 +94,14 @@ public class Usuario implements UserDetails {
 
     //relación con historial para borrado en cascada
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<Historial> historial = new ArrayList<>();
 
     //relación con valoraciones para borrado en cascada
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<Valoracion> valoraciones = new ArrayList<>();
 
     //la relación de la lista de favoritos
@@ -110,6 +112,8 @@ public class Usuario implements UserDetails {
             joinColumns = @JoinColumn(name = "usuario_id"),
             inverseJoinColumns = @JoinColumn(name = "contenido_id")
     )
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     //mejor usar set para que no haya duplicados
     private Set<Contenido> miLista = new HashSet<>();
 }

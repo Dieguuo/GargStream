@@ -3,6 +3,7 @@ package com.gargstream.config;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.LockedException;
@@ -14,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.io.IOException;
 
@@ -26,6 +28,10 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
+
+    //para buscar los usuarios para recordarlo
+    @Autowired
+    private UserDetailsService userDetailsService;
 
     //manejador de errores
     @Bean
@@ -74,6 +80,14 @@ public class SecurityConfig {
                         .failureHandler(falloPersonalizadoHandler())
                         .permitAll() // Todos pueden ver el login
                 )
+
+                .rememberMe((remember) -> remember
+                        .key("claveSecretaGargStream") // clave única para firmar la cookie
+                        .tokenValiditySeconds(604800) // 7 días de duración
+                        .rememberMeParameter("remember-me") // nombre del checkbox en el html
+                        .userDetailsService(userDetailsService) // servicio para recargar al usuario
+                )
+
                 // cerrar sesión
                 .logout(logout -> logout
                         .logoutUrl("/logout")

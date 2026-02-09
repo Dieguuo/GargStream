@@ -52,15 +52,12 @@ public class GlobalExceptionHandler {
     }
 
     // error genérico
+    // Error genérico (500)
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> manejarErrorGeneral(Exception ex) {
+    public String manejarErrorGeneral(Exception ex) {
         ex.printStackTrace();
 
-        String tituloError = "Error Inesperado";
-        String mensajeError = "Ha ocurrido un error: " + ex.getMessage();
-
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(tituloError + ": " + mensajeError);
+        // Esto busca el archivo en templates/error/500.html
+        return "error/500";
     }
 }
