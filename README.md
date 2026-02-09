@@ -72,6 +72,41 @@ Para arrancar el proyecto en tu entorno local, sigue estos pasos:
 
 ---
 
+## Configuración de Servicios Externos (API & Correo)
+
+Para que la aplicación funcione correctamente (descarga de información de películas y envío de correos de recuperación), **es necesario configurar tus propias credenciales**.
+
+Abre el archivo de configuración ubicado en:
+`src/main/resources/application.properties`
+
+### 1. API de TMDB (Películas y Series)
+El proyecto utiliza la API de **The Movie Database (TMDB)** para obtener títulos, sinopsis y carátulas automáticamente.
+* Regístrate en [themoviedb.org](https://www.themoviedb.org/) y solicita una **API Key** gratuita.
+* Busca esta línea en el archivo y pega tu clave:
+
+```properties
+# Reemplaza 'TU_CLAVE_AQUI' por tu API Key real
+tmdb.api.key=TU_CLAVE_AQUI
+```
+
+### Configuración de Correo (Recuperación de Contraseña)
+
+Para que la aplicación pueda enviar **códigos de verificación** y correos para restablecer contraseñas olvidadas, es necesario configurar el servidor de correo.
+
+El proyecto está preconfigurado para **Gmail**, pero necesitas poner tus credenciales en el archivo `src/main/resources/application.properties`:
+
+```properties
+# 1. Tu dirección de correo (Gmail)
+spring.mail.username=tu_correo@gmail.com
+
+# 2. Tu Contraseña de Aplicación
+# IMPORTANTE: No uses tu contraseña normal de Google.
+# Debes generar una contraseña específica de 16 caracteres en:
+# Google Account > Seguridad > Verificación en 2 pasos > Contraseñas de aplicaciones
+spring.mail.password=tu_contraseña_de_aplicacion_aqui
+```
+---
+
 ## Usuarios de Prueba
 
 El sistema utiliza una base de datos local (H2). Puedes usar estas credenciales para probar los diferentes roles:
