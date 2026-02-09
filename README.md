@@ -48,6 +48,25 @@ Aquí puedes ver el aspecto de la aplicación en funcionamiento:
 
 ---
 
+## 📂 Estructura del Proyecto
+
+El código fuente está organizado siguiendo el patrón de arquitectura **MVC (Modelo-Vista-Controlador)** estándar de Spring Boot:
+
+* **`src/main/java/com/gargstream`**
+    * 📂 **`config`**: Configuraciones de seguridad (Spring Security) e inicialización de datos.
+    * 📂 **`controller`**: Controladores que manejan las rutas y peticiones HTTP.
+    * 📂 **`dto`**: Objetos de Transferencia de Datos para comunicación segura entre capas.
+    * 📂 **`exception`**: Manejo centralizado de errores y excepciones personalizadas.
+    * 📂 **`model`**: Entidades JPA que representan las tablas de la base de datos.
+    * 📂 **`repository`**: Interfaces de acceso a datos.
+    * 📂 **`service`**: Lógica de negocio, envío de correos y gestión de archivos.
+* **`src/main/resources`**
+    * 📂 **`static`**: Recursos públicos (hojas de estilo CSS, scripts JS e imágenes).
+    * 📂 **`templates`**: Vistas HTML renderizadas con **Thymeleaf**.
+        * 📂 **`error`**: Páginas personalizadas para errores.
+    * 📄 **`application.properties`**: Configuración principal del servidor y credenciales.
+
+---
 ## Requisitos y Ejecución
 
 Para arrancar el proyecto en tu entorno local, sigue estos pasos:
