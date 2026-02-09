@@ -61,3 +61,31 @@ async function enviarFormulario(e) {
     if(ov) ov.style.display = 'none';
   }
 }
+
+
+
+// Función para ver las imágenes antes de subir
+function previsualizarPro(input, idImg, idPlaceholder) {
+    const img = document.getElementById(idImg);
+    const placeholder = document.getElementById(idPlaceholder);
+    // Buscamos la etiqueta flotante (es hermana de la imagen)
+    const label = img.parentElement.querySelector('.preview-label-floating');
+
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            img.src = e.target.result;
+            img.style.display = 'block';       // Mostramos la imagen
+            placeholder.style.display = 'none'; // Ocultamos el texto de fondo
+            if(label) label.style.display = 'block'; // Mostramos la etiquetita negra
+        }
+
+        reader.readAsDataURL(input.files[0]);
+    } else {
+        img.src = "";
+        img.style.display = 'none';
+        placeholder.style.display = 'block';
+        if(label) label.style.display = 'none';
+    }
+}

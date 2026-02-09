@@ -137,18 +137,77 @@
 
         <div id="sec-video" class="form-section">
             <h1>Subir Video Personal</h1>
-            <form th:action="@{/api/admin/nuevo-video}" onsubmit="enviarFormulario(event)">
-                <label>*Título:</label>
-                <input type="text" name="titulo" required>
-                <label>Autor:</label>
-                <input type="text" name="autor" placeholder="Yo">
+            <form th:action="@{/api/admin/nuevo-video}" onsubmit="enviarFormulario(event)" enctype="multipart/form-data">
+
+                <div class="row">
+                    <div style="flex: 1;">
+                        <label>*Título:</label>
+                        <input type="text" name="titulo" required placeholder="Ej: Vacaciones 2025">
+                    </div>
+                    <div style="flex: 1;">
+                        <label>Autor:</label>
+                        <input type="text" name="autor" placeholder="Yo">
+                    </div>
+                </div>
+
                 <label>Descripción:</label>
-                <textarea name="descripcion" rows="3"></textarea>
-                <label>*Archivo de Vídeo:</label>
-                <input type="file" name="archivo" required accept="video/*">
-                <label>Subtítulos (.srt o .vtt):</label>
-                <input type="file" name="subtitulo" accept=".srt,.vtt">
-                <button type="submit">Subir Video</button>
+                <textarea name="descripcion" rows="3" placeholder="Breve descripción del vídeo..."></textarea>
+
+                <div class="section-separator"></div>
+                <div class="section-title">📂 Archivos Multimedia</div>
+
+                <div class="row">
+                    <div style="flex: 1;">
+                        <label>*Archivo de Vídeo (MP4, MKV):</label>
+                        <input type="file" name="archivo" required accept="video/*">
+                    </div>
+                    <div style="flex: 1;">
+                        <label>Subtítulos (.srt o .vtt):</label>
+                        <input type="file" name="subtitulo" accept=".srt,.vtt">
+                    </div>
+                </div>
+
+                <div class="row" style="margin-top: 25px;">
+
+                    <div style="flex: 1; display: flex; flex-direction: column;">
+                        <label style="margin-bottom: 5px;">*Carátula (Vertical):</label>
+
+                        <input type="file" name="caratula" required accept="image/*"
+                               onchange="previsualizarPro(this, 'preview-img-caratula', 'placeholder-caratula')">
+
+                        <div class="preview-container preview-vertical">
+                            <img id="preview-img-caratula" class="preview-img">
+                            <div class="preview-label-floating" id="lbl-caratula">Carátula Seleccionada</div>
+
+                            <div id="placeholder-caratula" class="preview-placeholder">
+                                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                                <span>Vista Previa<br><small>(Vertical)</small></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="flex: 1; display: flex; flex-direction: column;">
+                        <label style="margin-bottom: 5px;">Imagen de Fondo (Opcional):</label>
+
+                        <input type="file" name="fondo" accept="image/*"
+                               onchange="previsualizarPro(this, 'preview-img-fondo', 'placeholder-fondo')">
+
+                        <div class="preview-container preview-horizontal">
+                            <img id="preview-img-fondo" class="preview-img">
+                            <div class="preview-label-floating" id="lbl-fondo">Fondo Seleccionado</div>
+
+                            <div id="placeholder-fondo" class="preview-placeholder">
+                                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 6l-3.75 5 2.85 3.8-1.6 1.2C9.81 13.75 7 10 7 10l-6 8h22L14 6z"/></svg>
+                                <span>Vista Previa<br><small>(Horizontal)</small></span>
+                                <div style="font-size: 0.75em; color: #444; margin-top: 5px;">
+                                    Si se deja vacío, se usará la carátula borrosa.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" style="margin-top: 20px;">Subir Video</button>
             </form>
         </div>
 

@@ -26,12 +26,18 @@ public class ContenidoService {
     private static final String CARPETA_VIDEOS = "Videos_Personales";
     private static final String CARPETA_SERIES = "Series";
 
-    //guardar un vídeo personal en la db
-    public VideoPersonal guardarVideoPersonal(String titulo, String sipnosis, String autor, MultipartFile archivo, MultipartFile archivoSubtitulo){
+    //guardar un vídeo personal en la db con imágenes
+    public VideoPersonal guardarVideoPersonal(String titulo, String sipnosis, String autor,
+                                              MultipartFile archivo,
+                                              MultipartFile caratula,
+                                              MultipartFile fondo,
+                                              MultipartFile archivoSubtitulo){
+
         //crear el nombre de la carpeta
         String tituloSanitizado = almacenamientoService.sanitizarNombre(titulo);
         //la ruta
         String rutaCarpeta = CARPETA_VIDEOS + "/" + tituloSanitizado;
+
         //guardar el archivo físico en esa carpeta
         String nombreArchivo = almacenamientoService.store(archivo, rutaCarpeta);
         //url para verlo
@@ -44,11 +50,33 @@ public class ContenidoService {
         video.setAutor(autor);
         video.setRutaVideo(urlVideo);
 
+        //guardar la carátula obligatoria
+        if (caratula != null && !caratula.isEmpty()) {
+            String nombreCaratula = almacenamientoService.store(caratula, rutaCarpeta);
+            String urlCaratula = "/api/archivos/" + nombreCaratula;
+            video.setRutaCaratula(urlCaratula);
+
+            //si hay fondo guardarlo, si no usar la carátula
+            if (fondo != null && !fondo.isEmpty()) {
+                String nombreFondo = almacenamientoService.store(fondo, rutaCarpeta);
+                video.setRutaFondo("/api/archivos/" + nombreFondo);
+            } else {
+                video.setRutaFondo(urlCaratula);
+            }
+        }
+
         //si hay subts añadirlos en la misma carpeta
         if(archivoSubtitulo != null && !archivoSubtitulo.isEmpty()){
             String nombreSubtitulo = almacenamientoService.store(archivoSubtitulo, rutaCarpeta);
             String urlSubtitulo = "/api/archivos/" + nombreSubtitulo;
-            video.setRutaSubtitulo(urlSubtitulo);
+
+            //añadir a la lista de subtítulos
+            Subtitulo sub = new Subtitulo();
+            sub.setRutaArchivo(urlSubtitulo);
+            sub.setIdioma("es");
+            sub.setEtiqueta("Español");
+            sub.setContenido(video);
+            video.getSubtitulos().add(sub);
         }
 
         //guardar en la db h2

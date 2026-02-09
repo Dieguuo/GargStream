@@ -46,14 +46,14 @@ public class AdminController {
             @RequestParam("descripcion") String descripcion,
             @RequestParam("autor") String autor,
             @RequestParam("archivo") MultipartFile archivo,
-            //los subtitulso son opcionales
+            @RequestParam("caratula") MultipartFile caratula, // carátula obligatoria para que no descuadre con el resto
+            @RequestParam(value = "fondo", required = false) MultipartFile fondo,
             @RequestParam(value = "subtitulo", required = false) MultipartFile subtitulo){
 
-
-        VideoPersonal videoGuardado = contenidoService.guardarVideoPersonal(titulo, descripcion, autor, archivo, subtitulo);
+        // Llamamos al servicio actualizado (tendremos que cambiarlo ahora)
+        VideoPersonal videoGuardado = contenidoService.guardarVideoPersonal(titulo, descripcion, autor, archivo, caratula, fondo, subtitulo);
 
         return ResponseEntity.ok(videoGuardado);
-
     }
 
     /*PELICULAS*/
