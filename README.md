@@ -48,7 +48,7 @@ Aquí puedes ver el aspecto de la aplicación en funcionamiento:
 
 ---
 
-## 📂 Estructura del Proyecto
+## Estructura del Proyecto
 
 El código fuente está organizado siguiendo el patrón de arquitectura **MVC (Modelo-Vista-Controlador)** estándar de Spring Boot:
 
