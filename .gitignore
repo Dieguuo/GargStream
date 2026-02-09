@@ -69,7 +69,6 @@ contenido-fisico/
 /uploads/**
 !/uploads/.gitkeep
 
-src/main/java/com/gargstream/config/DataInitializer.java
 
 application-secret.properties
 src/main/resources/application-secret.properties
