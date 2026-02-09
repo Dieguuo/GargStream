@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Contacto - GargStream</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- ESTILOS GENERALES --- */
+        body {
+            background-color: #141414;
+            color: #e5e5e5;
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+        }
+
+        .contact-wrapper {
+            display: flex; justify-content: center; align-items: center;
+            min-height: 85vh; padding-top: 80px;
+        }
+        .contact-box {
+            background-color: #1f1f1f;
+            padding: 40px; border-radius: 8px;
+            width: 100%; max-width: 600px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; margin-bottom: 8px; color: #a3a3a3; font-weight: bold; }
+
+        .form-control {
+            width: 100%; padding: 12px;
+            background-color: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 4px; color: white;
+            box-sizing: border-box; font-family: 'Roboto', sans-serif;
+        }
+        .form-control:focus {
+            outline: none; border-color: #ffb400;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .btn-submit {
+            background-color: #ffb400; color: black;
+            border: none; padding: 12px; width: 100%;
+            font-weight: bold; border-radius: 4px; cursor: pointer;
+            font-size: 1.1em; transition: 0.2s; margin-top: 10px;
+        }
+        .btn-submit:hover { background-color: #e5a100; transform: translateY(-2px); }
+
+        .alert-success {
+            background: rgba(70, 211, 105, 0.1); border: 1px solid #46d369;
+            color: #46d369; padding: 15px; border-radius: 4px;
+            margin-bottom: 20px; text-align: center;
+        }
+
+        /* --- ESTILOS CABECERA --- */
+        .header-simple {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 4%; position: fixed; top: 0; left: 0; width: 100%;
+            background: rgba(20, 20, 20, 0.85); /* Un poco transparente como el original */
+            backdrop-filter: blur(12px); /* Efecto borroso detrás */
+            z-index: 1000; box-sizing: border-box;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .logo-text {
+            font-family: 'Bebas Neue', cursive; font-size: 2.2em;
+            color: #ffb400; text-decoration: none; letter-spacing: 2px;
+            cursor: pointer;
+        }
+
+        /* Contenedor del Avatar y Menú */
+        .user-menu-container {
+            position: relative;
+            display: inline-block;
+            padding-bottom: 15px;
+            margin-bottom: -15px;
+        }
+
+        .avatar-circle {
+            width: 38px; height: 38px; border-radius: 5px;
+            object-fit: cover; cursor: pointer;
+            border: 2px solid transparent; transition: 0.2s;
+        }
+        .user-menu-container:hover .avatar-circle { border-color: #ffb400; }
+
+        /* --- AQUÍ ESTABA LA DIFERENCIA --- */
+        /* Ahora usamos el mismo color exacto que styles.css */
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 50px;
+
+            /* ANTES ERA GRIS (#1f1f1f), AHORA ES NEGRO TRANSPARENTE IGUAL QUE EL HOME */
+            background-color: rgba(0,0,0,0.95);
+
+            min-width: 180px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.1);
+            z-index: 2000;
+            padding: 8px 0;
+            backdrop-filter: blur(10px);
+        }
+
+        .user-menu-container:hover .dropdown-content {
+            display: block;
+            animation: fadeIn 0.2s;
+        }
+
+        .dropdown-header {
+            padding: 10px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            color: #888; font-size: 0.85em; margin-bottom: 5px;
+        }
+        .dropdown-header span { color: white; font-weight: bold; display: block; font-size: 1.1em;}
+
+        .dropdown-item {
+            color: #ddd;
+            padding: 10px 16px;
+            text-decoration: none;
+            display: flex; align-items: center; gap: 10px;
+            transition: 0.2s;
+            font-size: 0.9em;
+        }
+        .dropdown-item:hover {
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+            border-left: 3px solid #ffb400;
+        }
+
+        .btn-logout-menu {
+            width: 100%; text-align: left; background: none; border: none;
+            color: #ff555e; padding: 12px 16px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            margin-top: 5px;
+            cursor: pointer; font-size: 0.9em; font-weight: bold; font-family: 'Roboto', sans-serif;
+        }
+        .btn-logout-menu:hover { background-color: rgba(255,85,94,0.1); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .btn-login { text-decoration: none; color: white; font-weight: bold; }
+        .btn-login:hover { color: #ffb400; }
+    </style>
+</head>
+<body>
+
+<div class="header-simple">
+    <a href="/" class="logo-text">GARGSTREAM</a>
+
+    <div class="header-actions">
+        <div class="user-menu-container" sec:authorize="isAuthenticated()">
+            <img th:src="${usuario != null and usuario.avatarUrl != null ? usuario.avatarUrl : '/img/default-avatar.png'}"
+                 onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png'"
+                 class="avatar-circle" alt="Perfil">
+
+            <div class="dropdown-content">
+                <div class="dropdown-header">
+                    Hola, <span th:text="${usuario != null ? usuario.nombre : 'Usuario'}">Usuario</span>
+                </div>
+
+                <a href="/perfil" class="dropdown-item">Mi Perfil</a>
+
+                <a th:href="@{/admin}" class="dropdown-item"
+                   sec:authorize="hasAuthority('ADMIN')" style="color: #ffb400;">
+                    Panel Admin
+                </a>
+
+                <form th:action="@{/logout}" method="post" style="margin: 0;">
+                    <button type="submit" class="btn-logout-menu">Cerrar Sesión</button>
+                </form>
+            </div>
+        </div>
+
+        <div sec:authorize="!isAuthenticated()">
+            <a href="/login" class="btn-login">Iniciar Sesión</a>
+        </div>
+    </div>
+</div>
+
+<div class="contact-wrapper">
+    <div class="contact-box">
+        <h2 style="color: #ffb400; margin-top: 0; font-family: 'Bebas Neue'; font-size: 2.5em;">Buzón de Sugerencias</h2>
+        <p style="color: #bbb; margin-bottom: 30px;">Envía tus peticiones, reporta errores o danos tu opinión.</p>
+
+        <div th:if="${param.exito}" class="alert-success">
+            ¡Mensaje enviado! Revisa tu correo, te hemos enviado una confirmación.
+        </div>
+
+        <form th:action="@{/contacto/enviar}" method="post">
+            <div class="form-group">
+                <label class="form-label">Asunto</label>
+                <select name="asunto" class="form-control">
+                    <option value="Sugerencia">Sugerencia General</option>
+                    <option value="Peticion">Petición de Película/Serie</option>
+                    <option value="Error">Reportar un Error</option>
+                    <option value="Otro">Otro</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Mensaje</label>
+                <textarea name="mensaje" class="form-control" rows="6" placeholder="Escribe aquí tu mensaje..." required></textarea>
+            </div>
+
+            <button type="submit" class="btn-submit">ENVIAR MENSAJE</button>
+        </form>
+
+        <div style="margin-top: 20px; text-align: center;">
+            <a href="/" style="color: #666; text-decoration: none; font-size: 0.9em;">Cancelar y volver al inicio</a>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
