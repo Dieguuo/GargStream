@@ -240,24 +240,35 @@ function enviarVoto(nota, idContenido) {
     fd.append('contenidoId', idContenido);
     fd.append('nota', nota);
 
-    fetch('/api/valoracion/votar', { method: 'POST', body: fd })
-        .then(res => {
-            if(res.ok) {
-                miVotoActual = nota;
-                restaurar();
-                // Actualizar texto media
-                fetch('/api/public/contenido/' + idContenido)
-                    .then(r => r.json())
-                    .then(c => {
-                         const nuevoTexto = `${c.notaPromedioLocal}/5 (${c.contadorVotos} votos)`;
-                         // Selector
-                         const textDiv = document.querySelector('.local-rating-box div:nth-child(2)');
-                         if(textDiv) textDiv.innerText = nuevoTexto;
-                    });
+    fetch('/api/valoracion/votar', {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: fd
+    })
+    .then(res => {
+        if(res.ok) {
+            miVotoActual = nota;
+            restaurar();
+
+            fetch('/api/public/contenido/' + idContenido)
+                .then(r => r.json())
+                .then(c => {
+                        const nuevoTexto = `${c.notaPromedioLocal}/5 (${c.contadorVotos} votos)`;
+                        const textDiv = document.querySelector('.local-rating-box div:nth-child(2)');
+                        if(textDiv) textDiv.innerText = nuevoTexto;
+                });
+
+
+        } else {
+            // si falla por seguridad le mando al login
+            if (res.status === 403 || res.status === 401) {
+                window.location.href = '/login';
             } else {
                 alert("Error al votar");
             }
-        });
+        }
+    })
+    .catch(err => console.error(err));
 }
 
 function toggleMiLista(idContenido) {

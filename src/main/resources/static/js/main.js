@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const staticSlide = [{
                 id: 'intro-guest',
                 titulo: "Bienvenido a GargStream",
-                sipnosis: "Esta aplicación permite consultar, buscar y gestionar información sobre películas, series y vídeos personales. Los usuarios pueden visualizar listados, acceder al detalle de cada elemento y realizar acciones según su rol. Para comenzar a visualizar contenido, regístrese o inicie sesión.",
+                sipnosis: "Esta aplicación permite consultar, buscar y gestionar información sobre películas, series y vídeos personales. Los usuarios pueden visualizar listados, acceder al detalle de cada elemento y realizar acciones según su rol. Para comenzar a visualizar contenido, regístrese o inicie sesión.<br><br><span style='color: #ffb400; font-weight: bold; font-size: 1.1em;'>Credenciales de administrador:</span><br><strong style='color: white;'>Correo: admin@gargstream.es<br>Contraseña: 1234</strong>",
                 rutaFondo: "/img/fondo_cine.jpeg",
                 esStatic: true
             }];
