@@ -22,8 +22,8 @@ public class Capitulo extends Contenido{
     private Temporada temporada;
 
     //lista de subtitulos
-    @OneToMany(mappedBy = "capitulo", cascade = CascadeType.ALL, orphanRemoval = true)
-    private java.util.List<Subtitulo> subtitulos = new java.util.ArrayList<>();
+    //@OneToMany(mappedBy = "capitulo", cascade = CascadeType.ALL, orphanRemoval = true)
+    //private java.util.List<Subtitulo> subtitulos = new java.util.ArrayList<>();
 
 
 }
