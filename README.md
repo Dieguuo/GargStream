@@ -50,7 +50,7 @@ Aquí puedes ver el aspecto de la aplicación en funcionamiento:
 
 ## Estructura del Proyecto
 
-El código fuente está organizado siguiendo el patrón de arquitectura **MVC (Modelo-Vista-Controlador)** estándar de Spring Boot:
+El código está organizado siguiendo el patrón de arquitectura MVC:
 
 * **`src/main/java/com/gargstream`**
     * 📂 **`config`**: Configuraciones de seguridad (Spring Security) e inicialización de datos.
